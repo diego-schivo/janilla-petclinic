@@ -42,7 +42,7 @@ public class VetController {
 	}
 
 	@Handle(method = "GET", uri = "/vets.html")
-	public Object find(@Parameter("page") Integer page) throws IOException {
+	public Object find(@Parameter(name = "page") Integer page) throws IOException {
 		try {
 			var c = persistence.getCrud(Vet.class);
 			var i = page != null ? page - 1 : 0;
@@ -64,10 +64,18 @@ public class VetController {
 		}
 	}
 
+	@Handle(method = "GET", uri = "/vets")
+	public Object find() throws IOException {
+		var c = persistence.getCrud(Vet.class);
+		var v = c.read(c.list()).toList();
+//		return new Vets(v);
+		return v;
+	}
+
 	@Render(template = "vetList.html")
 	public record FindOutcome(Collection<Result> results, Paginator paginator) {
 
-		@Render(template = "vetList-Result.html")
+		@Render(template = "vetList-result.html")
 		public record Result(Vet vet, @Render(delimiter = ", ") Collection<@Render(template = """
 				<span>${name}</span>
 				""") Specialty> specialties) {

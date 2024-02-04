@@ -22,6 +22,7 @@ import com.janilla.http.ExchangeContext;
 import com.janilla.web.Error;
 import com.janilla.web.ExceptionHandlerFactory;
 import com.janilla.web.HandlerFactory;
+import com.janilla.web.Render;
 
 /**
  * @author Diego Schivo
@@ -37,6 +38,8 @@ public class CustomExceptionHandlerFactory extends ExceptionHandlerFactory {
 	@Override
 	protected void handle(Error error, ExchangeContext context) throws IOException {
 		super.handle(error, context);
-		mainFactory.createHandler(new ObjectAndType(context.getException(), null), context).accept(context);
+		var e = context.getException();
+		if (e.getClass().isAnnotationPresent(Render.class))
+			mainFactory.createHandler(new ObjectAndType(e, null), context).accept(context);
 	}
 }
