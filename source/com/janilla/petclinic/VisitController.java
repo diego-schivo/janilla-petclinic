@@ -65,8 +65,7 @@ public class VisitController {
 		if (!errors.isEmpty())
 			return Form.of(visit, errors, persistence);
 
-		var c = persistence.getCrud(Visit.class);
-		persistence.getDatabase().performTransaction(() -> c.create(visit));
+		persistence.getCrud(Visit.class).create(visit);
 		return URI.create("/owners/" + owner);
 	}
 

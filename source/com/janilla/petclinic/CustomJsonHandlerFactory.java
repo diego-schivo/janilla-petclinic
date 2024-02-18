@@ -22,7 +22,7 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import com.janilla.http.ExchangeContext;
+import com.janilla.http.HttpExchange;
 import com.janilla.json.JsonToken;
 import com.janilla.json.ReflectionJsonIterator;
 import com.janilla.persistence.Persistence;
@@ -46,7 +46,7 @@ public class CustomJsonHandlerFactory extends JsonHandlerFactory {
 	}
 
 	@Override
-	protected Iterator<JsonToken<?>> newJsonIterator(Object object, ExchangeContext context) {
+	protected Iterator<JsonToken<?>> newJsonIterator(Object object, HttpExchange context) {
 		return new ReflectionJsonIterator(object) {
 
 			@Override

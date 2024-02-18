@@ -119,8 +119,7 @@ public class OwnerController {
 		if (!errors.isEmpty())
 			return new Form(owner, errors);
 
-		var c = persistence.getCrud(Owner.class);
-		var i = persistence.getDatabase().performTransaction(() -> c.create(owner));
+		var i = persistence.getCrud(Owner.class).create(owner);
 		return URI.create("/owners/" + i);
 	}
 
@@ -137,9 +136,7 @@ public class OwnerController {
 		if (!errors.isEmpty())
 			return new Form(owner, errors);
 
-		var c = persistence.getCrud(Owner.class);
-		var o = persistence.getDatabase()
-				.performTransaction(() -> c.update(id, x -> Reflection.copy(owner, x, y -> !y.equals("id"))));
+		var o = persistence.getCrud(Owner.class).update(id, x -> Reflection.copy(owner, x, y -> !y.equals("id")));
 		return URI.create("/owners/" + o.getId());
 	}
 

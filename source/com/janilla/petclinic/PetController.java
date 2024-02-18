@@ -59,8 +59,7 @@ public class PetController {
 		if (!errors.isEmpty())
 			return Form.of(pet, errors, persistence);
 
-		var c = persistence.getCrud(Pet.class);
-		persistence.getDatabase().performTransaction(() -> c.create(pet));
+		persistence.getCrud(Pet.class).create(pet);
 		return URI.create("/owners/" + owner);
 	}
 
@@ -77,9 +76,8 @@ public class PetController {
 		if (!errors.isEmpty())
 			return Form.of(pet, errors, persistence);
 
-		var c = persistence.getCrud(Pet.class);
-		var p = persistence.getDatabase().performTransaction(
-				() -> c.update(id, x -> Reflection.copy(pet, x, y -> !Set.of("id", "owner").contains(y))));
+		var p = persistence.getCrud(Pet.class).update(id,
+				x -> Reflection.copy(pet, x, y -> !Set.of("id", "owner").contains(y)));
 		return URI.create("/owners/" + p.getOwner());
 	}
 

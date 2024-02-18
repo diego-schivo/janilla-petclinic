@@ -15,7 +15,9 @@
  */
 module com.janilla.petclinic {
 
+	exports com.janilla.petclinic;
+
 	opens com.janilla.petclinic;
 
-	requires com.janilla;
+	requires transitive com.janilla;
 }

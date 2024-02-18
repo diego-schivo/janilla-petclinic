@@ -22,11 +22,14 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Properties;
+import java.util.function.Supplier;
 
+import com.janilla.http.HttpExchange;
 import com.janilla.http.HttpServer;
 import com.janilla.io.IO;
 import com.janilla.persistence.ApplicationPersistenceBuilder;
 import com.janilla.persistence.Persistence;
+import com.janilla.util.Lazy;
 import com.janilla.web.ApplicationHandlerBuilder;
 
 /**
@@ -37,30 +40,26 @@ public class PetClinicApplication {
 
 	public static void main(String[] args) throws IOException {
 		var p = new Properties();
-		try (var s = PetClinicApplication.class.getResourceAsStream("application.properties")) {
+		try (var s = PetClinicApplication.class.getResourceAsStream("configuration.properties")) {
 			p.load(s);
 		}
 
 		var a = new PetClinicApplication();
-		a.setProperties(p);
+		a.setConfiguration(p);
 		a.getPersistence();
 
 		var s = new HttpServer();
 		s.setPort(Integer.parseInt(p.getProperty("petclinic.http.port")));
-		{
-			var b = new ApplicationHandlerBuilder();
-			b.setApplication(a);
-			s.setHandler(b.build());
-		}
+		s.setHandler(a.getHandler());
 		s.run();
 	}
 
-	Properties properties;
+	Properties configuration;
 
 	private IO.Supplier<Persistence> persistence = IO.Lazy.of(() -> {
 		Path f;
 		{
-			var p = properties.getProperty("petclinic.database.path");
+			var p = configuration.getProperty("petclinic.database.path");
 			if (p.startsWith("~"))
 				p = System.getProperty("user.home") + p.substring(1);
 			f = Path.of(p);
@@ -91,7 +90,7 @@ public class PetClinicApplication {
 				z.setAddress(y[2]);
 				z.setCity(y[3]);
 				z.setTelephone(y[4]);
-				p.getDatabase().performTransaction(() -> p.getCrud(Owner.class).create(z));
+				p.getCrud(Owner.class).create(z);
 			}
 			for (var x : """
 					cat
@@ -102,41 +101,41 @@ public class PetClinicApplication {
 					hamster""".split("\n")) {
 				var z = new PetType();
 				z.setName(x);
-				p.getDatabase().performTransaction(() -> p.getCrud(PetType.class).create(z));
+				p.getCrud(PetType.class).create(z);
 			}
 			for (var x : """
-					Leo	2010-09-07	0	0
-					Basil	2012-08-06	5	1
-					Rosy	2011-04-17	1	2
-					Jewel	2010-03-07	1	2
-					Iggy	2010-11-30	2	3
-					George	2010-01-20	3	4
-					Samantha	2012-09-04	0	5
-					Max	2012-09-04	0	5
-					Lucky	2011-08-06	4	6
-					Mulligan	2007-02-24	1	7
-					Freddy	2010-03-09	4	8
-					Lucky	2010-06-24	1	9
-					Sly	2012-06-08	0	9""".split("\n")) {
+					Leo	2010-09-07	1	1
+					Basil	2012-08-06	6	2
+					Rosy	2011-04-17	2	3
+					Jewel	2010-03-07	2	3
+					Iggy	2010-11-30	3	4
+					George	2010-01-20	4	5
+					Samantha	2012-09-04	1	6
+					Max	2012-09-04	1	6
+					Lucky	2011-08-06	5	7
+					Mulligan	2007-02-24	2	8
+					Freddy	2010-03-09	5	9
+					Lucky	2010-06-24	2	10
+					Sly	2012-06-08	1	10""".split("\n")) {
 				var y = x.split("\t");
 				var z = new Pet();
 				z.setName(y[0]);
 				z.setBirthDate(LocalDate.parse(y[1]));
 				z.setType(Long.parseLong(y[2]));
 				z.setOwner(Long.parseLong(y[3]));
-				p.getDatabase().performTransaction(() -> p.getCrud(Pet.class).create(z));
+				p.getCrud(Pet.class).create(z);
 			}
 			for (var x : """
-					6	2013-01-01	rabies shot
-					7	2013-01-02	rabies shot
-					7	2013-01-03	neutered
-					6	2013-01-04	spayed""".split("\n")) {
+					7	2013-01-01	rabies shot
+					8	2013-01-02	rabies shot
+					8	2013-01-03	neutered
+					7	2013-01-04	spayed""".split("\n")) {
 				var y = x.split("\t");
 				var z = new Visit();
 				z.setPet(Long.parseLong(y[0]));
 				z.setDate(LocalDate.parse(y[1]));
 				z.setDescription(y[2]);
-				p.getDatabase().performTransaction(() -> p.getCrud(Visit.class).create(z));
+				p.getCrud(Visit.class).create(z);
 			}
 			for (var x : """
 					radiology
@@ -144,33 +143,40 @@ public class PetClinicApplication {
 					dentistry""".split("\n")) {
 				var z = new Specialty();
 				z.setName(x);
-				p.getDatabase().performTransaction(() -> p.getCrud(Specialty.class).create(z));
+				p.getCrud(Specialty.class).create(z);
 			}
 			for (var x : """
 					James	Carter
-					Helen	Leary	0
-					Linda	Douglas	1	2
-					Rafael	Ortega	1
-					Henry	Stevens	0
+					Helen	Leary	1
+					Linda	Douglas	2	3
+					Rafael	Ortega	2
+					Henry	Stevens	1
 					Sharon	Jenkins""".split("\n")) {
 				var y = x.split("\t");
 				var z = new Vet();
 				z.setFirstName(y[0]);
 				z.setLastName(y[1]);
 				z.setSpecialties(Arrays.stream(y).skip(2).map(Long::valueOf).toList());
-				p.getDatabase().performTransaction(() -> p.getCrud(Vet.class).create(z));
+				p.getCrud(Vet.class).create(z);
 			}
 		}
 
 		return p;
 	});
 
-	public Properties getProperties() {
-		return properties;
+	Supplier<IO.Consumer<HttpExchange>> handler = Lazy.of(() -> {
+		var b = new ApplicationHandlerBuilder();
+		b.setApplication(PetClinicApplication.this);
+		return b.build();
+	});
+
+
+	public Properties getConfiguration() {
+		return configuration;
 	}
 
-	public void setProperties(Properties properties) {
-		this.properties = properties;
+	public void setConfiguration(Properties configuration) {
+		this.configuration = configuration;
 	}
 
 	public Persistence getPersistence() {
@@ -179,5 +185,9 @@ public class PetClinicApplication {
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
+	}
+
+	public IO.Consumer<HttpExchange> getHandler() {
+		return handler.get();
 	}
 }
