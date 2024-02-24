@@ -41,7 +41,7 @@ public class VetController {
 		this.persistence = persistence;
 	}
 
-	@Handle(method = "GET", uri = "/vets.html")
+	@Handle(method = "GET", path = "/vets.html")
 	public Object find(@Parameter(name = "page") Integer page) throws IOException {
 		try {
 			var c = persistence.getCrud(Vet.class);
@@ -64,7 +64,7 @@ public class VetController {
 		}
 	}
 
-	@Handle(method = "GET", uri = "/vets")
+	@Handle(method = "GET", path = "/vets")
 	public Object find() throws IOException {
 		var c = persistence.getCrud(Vet.class);
 		var v = c.read(c.list()).toList();

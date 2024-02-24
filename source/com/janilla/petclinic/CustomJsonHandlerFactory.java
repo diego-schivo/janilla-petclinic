@@ -47,7 +47,7 @@ public class CustomJsonHandlerFactory extends JsonHandlerFactory {
 
 	@Override
 	protected Iterator<JsonToken<?>> newJsonIterator(Object object, HttpExchange context) {
-		return new ReflectionJsonIterator(object) {
+		var i = new ReflectionJsonIterator() {
 
 			@Override
 			public Iterator<JsonToken<?>> newValueIterator(Object object) {
@@ -68,5 +68,7 @@ public class CustomJsonHandlerFactory extends JsonHandlerFactory {
 				return super.newValueIterator(object);
 			}
 		};
+		i.setObject(object);
+		return i;
 	}
 }

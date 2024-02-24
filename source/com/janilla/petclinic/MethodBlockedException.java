@@ -15,17 +15,17 @@
  */
 package com.janilla.petclinic;
 
-import com.janilla.web.Handle;
 import com.janilla.web.Render;
 
 /**
  * @author Diego Schivo
  */
-@Render(template = "welcome.html")
-public class WelcomeController {
+@Render(template = "error.html")
+public class MethodBlockedException extends RuntimeException {
 
-	@Handle(method = "GET", path = "/")
-	public Object welcome() {
-		return this;
+	private static final long serialVersionUID = 4918046711205707493L;
+
+	public MethodBlockedException() {
+		super("The requested action is disabled on this public server: please set up and run the application locally");
 	}
 }

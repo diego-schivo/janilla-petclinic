@@ -23,7 +23,7 @@ import com.janilla.web.Handle;
  */
 public class CrashController {
 
-	@Handle(method = "GET", uri = "/oups")
+	@Handle(method = "GET", path = "/oups")
 	public void triggerException() {
 		throw new ShowcaseException();
 	}

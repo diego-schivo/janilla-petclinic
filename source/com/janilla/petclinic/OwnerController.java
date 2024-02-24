@@ -51,13 +51,13 @@ public class OwnerController {
 		this.persistence = persistence;
 	}
 
-	@Handle(method = "GET", uri = "/owners/find")
+	@Handle(method = "GET", path = "/owners/find")
 	public Object initFind() {
 		var o = new Owner();
 		return new FindForm(o, null);
 	}
 
-	@Handle(method = "GET", uri = "/owners")
+	@Handle(method = "GET", path = "/owners")
 	public Object find(Owner owner, @Parameter(name = "page") Integer page) throws IOException {
 		var c = persistence.getCrud(Owner.class);
 		var n = owner.getLastName();
@@ -71,7 +71,6 @@ public class OwnerController {
 		default -> {
 			var d = persistence.getCrud(Pet.class);
 			var l = (int) ((f.total() + 4) / 5);
-//			try {
 			var r = c.read(f.ids()).map(o -> {
 				try {
 					var p = d.read(d.filter("owner", o.getId())).toList();
@@ -82,14 +81,11 @@ public class OwnerController {
 			}).toList();
 			var p = new Paginator(i, l, URI.create("/owners"));
 			yield new FindOutcome(r, p);
-//			} catch (UncheckedIOException e) {
-//				throw e.getCause();
-//			}
 		}
 		};
 	}
 
-	@Handle(method = "GET", uri = "/owners/(\\d+)")
+	@Handle(method = "GET", path = "/owners/(\\d+)")
 	public Object show(long id) throws IOException {
 		var c = persistence.getCrud(Owner.class);
 		var d = persistence.getCrud(Pet.class);
@@ -107,13 +103,13 @@ public class OwnerController {
 		return new Details(o, p);
 	}
 
-	@Handle(method = "GET", uri = "/owners/new")
+	@Handle(method = "GET", path = "/owners/new")
 	public Object initCreate() {
 		var o = new Owner();
 		return new Form(o, null);
 	}
 
-	@Handle(method = "POST", uri = "/owners/new")
+	@Handle(method = "POST", path = "/owners/new")
 	public Object create(Owner owner) throws IOException {
 		var errors = validate(owner);
 		if (!errors.isEmpty())
@@ -123,14 +119,14 @@ public class OwnerController {
 		return URI.create("/owners/" + i);
 	}
 
-	@Handle(method = "GET", uri = "/owners/(\\d+)/edit")
+	@Handle(method = "GET", path = "/owners/(\\d+)/edit")
 	public Object initUpdate(long id) throws IOException {
 		var c = persistence.getCrud(Owner.class);
 		var o = c.read(id);
 		return new Form(o, null);
 	}
 
-	@Handle(method = "POST", uri = "/owners/(\\d+)/edit")
+	@Handle(method = "POST", path = "/owners/(\\d+)/edit")
 	public Object update(long id, Owner owner) throws IOException {
 		var errors = validate(owner);
 		if (!errors.isEmpty())

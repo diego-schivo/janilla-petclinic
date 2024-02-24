@@ -46,7 +46,7 @@ public class VisitController {
 		this.persistence = persistence;
 	}
 
-	@Handle(method = "GET", uri = "/owners/(\\d+)/pets/(\\d+)/visits/new")
+	@Handle(method = "GET", path = "/owners/(\\d+)/pets/(\\d+)/visits/new")
 	public Object initCreate(long owner, long pet) throws IOException {
 		var o = persistence.getCrud(Owner.class).read(owner);
 		var p = persistence.getCrud(Pet.class).read(pet);
@@ -58,7 +58,7 @@ public class VisitController {
 		return new Form(o, p, t, v, w, null);
 	}
 
-	@Handle(method = "POST", uri = "/owners/(\\d+)/pets/(\\d+)/visits/new")
+	@Handle(method = "POST", path = "/owners/(\\d+)/pets/(\\d+)/visits/new")
 	public Object create(long owner, long pet, Visit visit) throws IOException {
 		visit.setPet(pet);
 		var errors = validate(visit);

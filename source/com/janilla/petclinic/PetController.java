@@ -45,14 +45,14 @@ public class PetController {
 		this.persistence = persistence;
 	}
 
-	@Handle(method = "GET", uri = "/owners/(\\d+)/pets/new")
+	@Handle(method = "GET", path = "/owners/(\\d+)/pets/new")
 	public Object initCreate(long owner) throws IOException {
 		var p = new Pet();
 		p.setOwner(owner);
 		return Form.of(p, null, persistence);
 	}
 
-	@Handle(method = "POST", uri = "/owners/(\\d+)/pets/new")
+	@Handle(method = "POST", path = "/owners/(\\d+)/pets/new")
 	public Object create(long owner, Pet pet) throws IOException {
 		pet.setOwner(owner);
 		var errors = validate(pet);
@@ -63,13 +63,13 @@ public class PetController {
 		return URI.create("/owners/" + owner);
 	}
 
-	@Handle(method = "GET", uri = "/owners/(\\d+)/pets/(\\d+)/edit")
+	@Handle(method = "GET", path = "/owners/(\\d+)/pets/(\\d+)/edit")
 	public Object initUpdate(long owner, long id) throws IOException {
 		var p = persistence.getCrud(Pet.class).read(id);
 		return Form.of(p, null, persistence);
 	}
 
-	@Handle(method = "POST", uri = "/owners/(\\d+)/pets/(\\d+)/edit")
+	@Handle(method = "POST", path = "/owners/(\\d+)/pets/(\\d+)/edit")
 	public Object update(long owner, long id, Pet pet) throws IOException {
 		pet.setOwner(owner);
 		var errors = validate(pet);

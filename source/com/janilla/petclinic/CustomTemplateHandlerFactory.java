@@ -52,20 +52,19 @@ public class CustomTemplateHandlerFactory extends TemplateHandlerFactory {
 	}
 
 	static Layout toLayout(Object object) {
-		var o = object;
-		var c = o.getClass();
+		var c = object.getClass();
 		var d = c.getEnclosingClass();
 		var a1 = c == WelcomeController.class;
 		var a2 = d != null && Set.of(OwnerController.class, PetController.class, VisitController.class).contains(d);
 		var a3 = d == VetController.class;
-		var a4 = c == ShowcaseException.class;
+		var a4 = object instanceof Exception;
 		if (a1 || a2 || a3 || a4) {
 			var i1 = new NavItem("home", "Home", URI.create("/"), "home page", a1);
 			var i2 = new NavItem("search", "Find owners", URI.create("/owners/find"), "find owners", a2);
 			var i3 = new NavItem("list", "Veterinarians", URI.create("/vets.html"), "veterinarians", a3);
 			var i4 = new NavItem("exclamation-triangle", "Error", URI.create("/oups"),
 					"trigger a RuntimeException to see how it is handled", a4);
-			return new Layout(List.of(i1, i2, i3, i4), o);
+			return new Layout(List.of(i1, i2, i3, i4), object);
 		}
 		return null;
 	}
