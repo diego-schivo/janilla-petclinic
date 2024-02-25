@@ -2,11 +2,11 @@
 	<td valign="top">
 		<dl class="dl-horizontal">
 			<dt>Name</dt>
-			<dd>${pet.name}</dd>
+			<dd>__pet.name__</dd>
 			<dt>Birth Date</dt>
-			<dd>${pet.birthDate}</dd>
+			<dd>__pet.birthDate__</dd>
 			<dt>Type</dt>
-			<dd>${type.name}</dd>
+			<dd>__type.name__</dd>
 		</dl>
 	</td>
 	<td valign="top">
@@ -17,10 +17,10 @@
 					<th>Description</th>
 				</tr>
 			</thead>
-			#{visits}
+			<!--__visits__-->
 			<tr>
-				<td><a href="/owners/${pet.owner}/pets/${pet.id}/edit">Edit Pet</a></td>
-				<td><a href="/owners/${pet.owner}/pets/${pet.id}/visits/new">Add Visit</a></td>
+				<td><a href="/owners/__pet.owner__/pets/__pet.id__/edit">Edit Pet</a></td>
+				<td><a href="/owners/__pet.owner__/pets/__pet.id__/visits/new">Add Visit</a></td>
 			</tr>
 		</table>
 	</td>

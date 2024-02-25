@@ -158,9 +158,9 @@ public class OwnerController {
 
 	@Render(template = "findOwners.html")
 	public record FindForm(Owner owner, Map<String, @Render(template = """
-			<div>#{}</div>
+			<div><!--____--></div>
 			""") Collection<@Render(template = """
-			<p>${}</p>
+			<p>____</p>
 			""") String>> errors) {
 	}
 
@@ -169,7 +169,7 @@ public class OwnerController {
 
 		@Render(template = "ownersList-result.html")
 		public record Result(Owner owner, @Render(delimiter = ", ") Collection<@Render(template = """
-				${name}
+				__name__
 				""") Pet> pets) {
 		}
 	}

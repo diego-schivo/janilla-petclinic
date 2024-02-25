@@ -28,7 +28,7 @@ import com.janilla.web.Render;
 @Render(template = "selectField.html")
 public record SelectField(String label, String name, Map<? extends Object, String> items, Object value,
 		@Render(template = """
-				<span class="help-inline">${}</span>
+				<span class="help-inline">____</span>
 				""", delimiter = "<br />") Collection<String> errors) implements FormField {
 
 	public String errorClass() {
@@ -45,7 +45,7 @@ public record SelectField(String label, String name, Map<? extends Object, Strin
 	}
 
 	@Render(template = """
-			<option value="${value}" #{selectedAttribute}>${text}</option>
+			<option value="__value__" <!--__selectedAttribute__-->>__text__</option>
 			""")
 	public record Option(Object value, String text, boolean selected) {
 
