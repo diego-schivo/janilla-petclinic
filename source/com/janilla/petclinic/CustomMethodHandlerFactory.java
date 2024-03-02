@@ -36,7 +36,7 @@ public class CustomMethodHandlerFactory extends MethodHandlerFactory {
 
 	@Override
 	protected void handle(MethodInvocation invocation, HttpExchange exchange) throws IOException {
-		if (Boolean.parseBoolean(configuration.getProperty("petclinic.disable-unsafe-actions")))
+		if (Boolean.parseBoolean(configuration.getProperty("petclinic.live-demo")))
 			switch (exchange.getRequest().getMethod().name()) {
 			case "GET":
 				break;

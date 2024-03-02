@@ -34,7 +34,7 @@ class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 		return p;
 	}
 
-	void populate(Persistence p) throws IOException {
+	void populate(Persistence persistence) throws IOException {
 		for (var x : """
 				George	Franklin	110 W. Liberty St.	Madison	6085551023
 				Betty	Davis	638 Cardinal Ave.	Sun Prairie	6085551749
@@ -53,7 +53,7 @@ class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 			z.setAddress(y[2]);
 			z.setCity(y[3]);
 			z.setTelephone(y[4]);
-			p.getCrud(Owner.class).create(z);
+			persistence.getCrud(Owner.class).create(z);
 		}
 
 		for (var x : """
@@ -65,7 +65,7 @@ class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 				hamster""".split("\n")) {
 			var z = new PetType();
 			z.setName(x);
-			p.getCrud(PetType.class).create(z);
+			persistence.getCrud(PetType.class).create(z);
 		}
 
 		for (var x : """
@@ -88,7 +88,7 @@ class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 			z.setBirthDate(LocalDate.parse(y[1]));
 			z.setType(Long.parseLong(y[2]));
 			z.setOwner(Long.parseLong(y[3]));
-			p.getCrud(Pet.class).create(z);
+			persistence.getCrud(Pet.class).create(z);
 		}
 
 		for (var x : """
@@ -101,7 +101,7 @@ class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 			z.setPet(Long.parseLong(y[0]));
 			z.setDate(LocalDate.parse(y[1]));
 			z.setDescription(y[2]);
-			p.getCrud(Visit.class).create(z);
+			persistence.getCrud(Visit.class).create(z);
 		}
 
 		for (var x : """
@@ -110,7 +110,7 @@ class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 				dentistry""".split("\n")) {
 			var z = new Specialty();
 			z.setName(x);
-			p.getCrud(Specialty.class).create(z);
+			persistence.getCrud(Specialty.class).create(z);
 		}
 
 		for (var x : """
@@ -125,7 +125,7 @@ class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 			z.setFirstName(y[0]);
 			z.setLastName(y[1]);
 			z.setSpecialties(Arrays.stream(y).skip(2).map(Long::valueOf).toList());
-			p.getCrud(Vet.class).create(z);
+			persistence.getCrud(Vet.class).create(z);
 		}
 	}
 }

@@ -10,16 +10,16 @@
 		</tr>
 	</thead>
 	<tr>
-		<td>__pet.name__</td>
-		<td>__pet.birthDate__</td>
-		<td>__petType.name__</td>
-		<td>__owner.firstName__ __owner.lastName__</td>
+		<td>${pet.name}</td>
+		<td>${pet.birthDate}</td>
+		<td>${petType.name}</td>
+		<td>${owner.firstName} ${owner.lastName}</td>
 	</tr>
 </table>
 <form class="form-horizontal" method="post">
 	<div class="form-group has-feedback">
-		<!--__fields.date__-->
-		<!--__fields.description__-->
+		<!--${fields.date}-->
+		<!--${fields.description}-->
 	</div>
 	<div class="form-group">
 		<div class="col-sm-offset-2 col-sm-10">
@@ -35,5 +35,5 @@
 		<th>Date</th>
 		<th>Description</th>
 	</tr>
-	<!--__previousVisits__-->
+	<!--${previousVisits}-->
 </table>

@@ -2,27 +2,27 @@
 <table class="table table-striped">
 	<tr>
 		<th>Name</th>
-		<td><b>__owner.firstName__ __owner.lastName__</b></td>
+		<td><b>${owner.firstName} ${owner.lastName}</b></td>
 	</tr>
 	<tr>
 		<th>Address</th>
-		<td>__owner.address__</td>
+		<td>${owner.address}</td>
 	</tr>
 	<tr>
 		<th>City</th>
-		<td>__owner.city__</td>
+		<td>${owner.city}</td>
 	</tr>
 	<tr>
 		<th>Telephone</th>
-		<td>__owner.telephone__</td>
+		<td>${owner.telephone}</td>
 	</tr>
 </table>
-<a href="/owners/__owner.id__/edit" class="btn btn-primary">Edit Owner</a>
-<a href="/owners/__owner.id__/pets/new" class="btn btn-primary">Add New Pet</a>
+<a href="/owners/${owner.id}/edit" class="btn btn-primary">Edit Owner</a>
+<a href="/owners/${owner.id}/pets/new" class="btn btn-primary">Add New Pet</a>
 <br />
 <br />
 <br />
 <h2>Pets and Visits</h2>
 <table class="table table-striped">
-	<!--__pets__-->
+	<!--${pets}-->
 </table>

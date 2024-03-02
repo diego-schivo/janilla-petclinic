@@ -56,7 +56,7 @@ public class PetClinicApplication {
 	private IO.Supplier<Persistence> persistence = IO.Lazy.of(() -> {
 		var b = new CustomPersistenceBuilder();
 		{
-			var p = configuration.getProperty("petclinic.database.path");
+			var p = configuration.getProperty("petclinic.database.file");
 			if (p.startsWith("~"))
 				p = System.getProperty("user.home") + p.substring(1);
 			b.setFile(Path.of(p));
