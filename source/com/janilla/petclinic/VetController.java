@@ -77,7 +77,7 @@ public class VetController {
 
 		@Render(template = "vetList-result.html")
 		public record Result(Vet vet, @Render(delimiter = ", ") Collection<@Render(template = """
-				<span>__name__</span>
+				<span>${name}</span>
 				""") Specialty> specialties) {
 		}
 	}

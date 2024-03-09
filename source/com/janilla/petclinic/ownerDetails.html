@@ -26,3 +26,40 @@
 <table class="table table-striped">
 	<!--${pets}-->
 </table>
+
+<template id="ownerDetails-pet">
+	<tr>
+		<td valign="top">
+			<dl class="dl-horizontal">
+				<dt>Name</dt>
+				<dd>${pet.name}</dd>
+				<dt>Birth Date</dt>
+				<dd>${pet.birthDate}</dd>
+				<dt>Type</dt>
+				<dd>${type.name}</dd>
+			</dl>
+		</td>
+		<td valign="top">
+			<table class="table-condensed">
+				<thead>
+					<tr>
+						<th>Visit Date</th>
+						<th>Description</th>
+					</tr>
+				</thead>
+				<!--${visits}-->
+				<tr>
+					<td><a href="/owners/${pet.owner}/pets/${pet.id}/edit">Edit Pet</a></td>
+					<td><a href="/owners/${pet.owner}/pets/${pet.id}/visits/new">Add Visit</a></td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</template>
+
+<template id="ownerDetails-visit">
+	<tr>
+		<td>${date}</td>
+		<td>${description}</td>
+	</tr>
+</template>

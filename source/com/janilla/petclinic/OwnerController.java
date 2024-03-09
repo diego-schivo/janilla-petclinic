@@ -63,7 +63,7 @@ public class OwnerController {
 		var n = owner.getLastName();
 		var i = page != null ? page - 1 : 0;
 		var f = n != null && !n.isBlank()
-				? c.filter2("lastName", i * 5, 5, x -> Util.startsWithIgnoreCase((String) x, n))
+				? c.filter2("lastName", x -> Util.startsWithIgnoreCase((String) x, n), i * 5, 5)
 				: c.list(i * 5, 5);
 		return switch ((int) f.total()) {
 		case 0 -> new FindForm(owner, Map.of("lastName", List.of("has not been found")));
@@ -158,9 +158,9 @@ public class OwnerController {
 
 	@Render(template = "findOwners.html")
 	public record FindForm(Owner owner, Map<String, @Render(template = """
-			<div><!--____--></div>
+			<div><!--${}--></div>
 			""") Collection<@Render(template = """
-			<p>____</p>
+			<p>${}</p>
 			""") String>> errors) {
 	}
 
@@ -169,7 +169,7 @@ public class OwnerController {
 
 		@Render(template = "ownersList-result.html")
 		public record Result(Owner owner, @Render(delimiter = ", ") Collection<@Render(template = """
-				__name__
+				${name}
 				""") Pet> pets) {
 		}
 	}
