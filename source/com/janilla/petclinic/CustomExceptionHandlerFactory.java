@@ -40,6 +40,6 @@ public class CustomExceptionHandlerFactory extends ExceptionHandlerFactory {
 		super.handle(error, context);
 		var e = context.getException();
 		if (e.getClass().isAnnotationPresent(Render.class))
-			mainFactory.createHandler(new ObjectAndType(e, null), context).accept(context);
+			mainFactory.createHandler(new ObjectAndType(null, e, null), context).accept(context);
 	}
 }

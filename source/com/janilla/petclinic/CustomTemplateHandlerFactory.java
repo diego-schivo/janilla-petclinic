@@ -37,9 +37,9 @@ public class CustomTemplateHandlerFactory extends TemplateHandlerFactory {
 		var l = layout.get();
 		var r = false;
 		if (l == null) {
-			l = toLayout(input.object());
+			l = toLayout(input.getValue());
 			if (l != null) {
-				input = new ObjectAndType(l, null);
+				input = new ObjectAndType(null, l, null);
 				r = true;
 			}
 		}
