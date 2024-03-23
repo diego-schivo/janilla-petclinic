@@ -46,7 +46,7 @@ public class CustomJsonHandlerFactory extends JsonHandlerFactory {
 	}
 
 	@Override
-	protected Iterator<JsonToken<?>> newJsonIterator(Object object, HttpExchange context) {
+	protected Iterator<JsonToken<?>> newJsonIterator(Object object, HttpExchange exchange) {
 		var i = new ReflectionJsonIterator() {
 
 			@Override

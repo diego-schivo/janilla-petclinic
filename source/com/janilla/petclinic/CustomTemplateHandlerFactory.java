@@ -20,7 +20,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Set;
 
-import com.janilla.frontend.RenderEngine.ObjectAndType;
+import com.janilla.frontend.RenderEngine.Entry;
 import com.janilla.http.HttpExchange;
 import com.janilla.petclinic.Layout.NavItem;
 import com.janilla.web.TemplateHandlerFactory;
@@ -33,18 +33,18 @@ public class CustomTemplateHandlerFactory extends TemplateHandlerFactory {
 	static ThreadLocal<Layout> layout = new ThreadLocal<>();
 
 	@Override
-	protected void render(ObjectAndType input, HttpExchange context) throws IOException {
+	protected void render(Entry input, HttpExchange exchange) throws IOException {
 		var l = layout.get();
 		var r = false;
 		if (l == null) {
 			l = toLayout(input.getValue());
 			if (l != null) {
-				input = new ObjectAndType(null, l, null);
+				input = new Entry(null, l, null);
 				r = true;
 			}
 		}
 		try {
-			super.render(input, context);
+			super.render(input, exchange);
 		} finally {
 			if (r)
 				layout.remove();

@@ -12,7 +12,7 @@ A database-oriented application designed to display and manage information relat
 
 ## Run PetClinic locally
 
-Janilla PetClinic is a [Janilla](https://www.janilla.com/) application built using [Maven](https://maven.apache.org/users/index.html). You can run it from Maven directly (it should work just as well with Java 21 or newer):
+Janilla PetClinic is a [Janilla](https://janilla.com/) application built using [Maven](https://maven.apache.org/users/index.html). You can run it from Maven directly (it should work just as well with Java 21 or newer):
 
 ```bash
 git clone https://github.com/diego-schivo/janilla-petclinic.git
