@@ -15,19 +15,50 @@
  */
 package com.janilla.petclinic;
 
+import java.lang.reflect.AnnotatedType;
 import java.net.URI;
 import java.util.List;
+import java.util.regex.Pattern;
 
+import com.janilla.frontend.RenderEngine;
+import com.janilla.frontend.Renderer;
 import com.janilla.web.Render;
 
 @Render(template = "layout.html")
-public record Layout(List<NavItem> navItems, Object content) {
+public record Layout(URI uri, RenderEngine.Entry entry) implements Renderer {
+
+	protected static List<NavItem> navItems = List.of(new NavItem("home", "Home", URI.create("/"), "home page"),
+			new NavItem("search", "Find owners", URI.create("/owners/find"), "find owners"),
+			new NavItem("list", "Veterinarians", URI.create("/vets.html"), "veterinarians"),
+			new NavItem("exclamation-triangle", "Error", URI.create("/oups"),
+					"trigger a RuntimeException to see how it is handled"));
+
+	public List<NavItem> navItems() {
+		return navItems;
+	}
+
+	private static Pattern pathPrefix = Pattern.compile("^/\\w*");
+
+	@Override
+	public boolean evaluate(RenderEngine engine) {
+		record A(Layout layout, Object content) {
+		}
+		record B(NavItem navItem, Object activeClass) {
+		}
+		return engine.match(A.class, (i, o) -> {
+			o.setValue(entry.getValue());
+			var r = entry.getType() instanceof AnnotatedType x ? x.getAnnotation(Render.class) : null;
+			if (r != null)
+				o.setTemplate(r.template());
+		}) || engine.match(B.class, (i, o) -> {
+			var m1 = pathPrefix.matcher(i.navItem.href.getPath());
+			var m2 = pathPrefix.matcher(uri.getPath());
+			if (m1.find() && m2.find() && m1.group().equals(m2.group()))
+				o.setValue("active");
+		});
+	}
 
 	@Render(template = "layout-navItem.html")
-	public record NavItem(String icon, String text, URI href, String title, boolean active) {
-
-		public String activeClass() {
-			return active ? "active" : "";
-		}
+	public record NavItem(String icon, String text, URI href, String title) {
 	}
 }

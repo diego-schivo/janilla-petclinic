@@ -16,13 +16,9 @@
 package com.janilla.petclinic;
 
 import java.io.IOException;
-import java.net.URI;
-import java.util.List;
-import java.util.Set;
 
-import com.janilla.frontend.RenderEngine.Entry;
+import com.janilla.frontend.RenderEngine;
 import com.janilla.http.HttpExchange;
-import com.janilla.petclinic.Layout.NavItem;
 import com.janilla.web.TemplateHandlerFactory;
 
 /**
@@ -33,13 +29,13 @@ public class CustomTemplateHandlerFactory extends TemplateHandlerFactory {
 	static ThreadLocal<Layout> layout = new ThreadLocal<>();
 
 	@Override
-	protected void render(Entry input, HttpExchange exchange) throws IOException {
+	protected void render(RenderEngine.Entry input, HttpExchange exchange) throws IOException {
 		var l = layout.get();
 		var r = false;
 		if (l == null) {
-			l = toLayout(input.getValue());
+			l = new Layout(exchange.getRequest().getURI(), input);
 			if (l != null) {
-				input = new Entry(null, l, null);
+				input = new RenderEngine.Entry(null, l, null);
 				r = true;
 			}
 		}
@@ -49,23 +45,5 @@ public class CustomTemplateHandlerFactory extends TemplateHandlerFactory {
 			if (r)
 				layout.remove();
 		}
-	}
-
-	static Layout toLayout(Object object) {
-		var c = object.getClass();
-		var d = c.getEnclosingClass();
-		var a1 = c == WelcomeController.class;
-		var a2 = d != null && Set.of(OwnerController.class, PetController.class, VisitController.class).contains(d);
-		var a3 = d == VetController.class;
-		var a4 = object instanceof Exception;
-		if (a1 || a2 || a3 || a4) {
-			var i1 = new NavItem("home", "Home", URI.create("/"), "home page", a1);
-			var i2 = new NavItem("search", "Find owners", URI.create("/owners/find"), "find owners", a2);
-			var i3 = new NavItem("list", "Veterinarians", URI.create("/vets.html"), "veterinarians", a3);
-			var i4 = new NavItem("exclamation-triangle", "Error", URI.create("/oups"),
-					"trigger a RuntimeException to see how it is handled", a4);
-			return new Layout(List.of(i1, i2, i3, i4), object);
-		}
-		return null;
 	}
 }
