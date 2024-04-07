@@ -115,8 +115,8 @@ public class OwnerController {
 		if (!errors.isEmpty())
 			return new Form(owner, errors);
 
-		var i = persistence.getCrud(Owner.class).create(owner);
-		return URI.create("/owners/" + i);
+		var o = persistence.getCrud(Owner.class).create(owner);
+		return URI.create("/owners/" + o.getId());
 	}
 
 	@Handle(method = "GET", path = "/owners/(\\d+)/edit")
