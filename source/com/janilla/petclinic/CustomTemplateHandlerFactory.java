@@ -35,7 +35,7 @@ public class CustomTemplateHandlerFactory extends TemplateHandlerFactory {
 		if (l == null) {
 			l = new Layout(exchange.getRequest().getURI(), input);
 			if (l != null) {
-				input = new RenderEngine.Entry(null, l, null);
+				input = RenderEngine.Entry.of(null, l, null);
 				r = true;
 			}
 		}

@@ -40,6 +40,6 @@ public class CustomExceptionHandlerFactory extends ExceptionHandlerFactory {
 		super.handle(error, exchange);
 		var e = exchange.getException();
 		if (e.getClass().isAnnotationPresent(Render.class))
-			mainFactory.createHandler(new RenderEngine.Entry(null, e, null), exchange).accept(exchange);
+			mainFactory.createHandler(RenderEngine.Entry.of(null, e, null), exchange).accept(exchange);
 	}
 }
