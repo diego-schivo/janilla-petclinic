@@ -112,7 +112,7 @@ public class PetController {
 			return n -> {
 				try {
 					var l = labels.get(n);
-					var v = Reflection.getter(Pet.class, n).invoke(pet);
+					var v = Reflection.property(Pet.class, n).get(pet);
 					var e = errors != null ? errors.get(n) : null;
 					return switch (n) {
 					case "birthDate" -> new InputField(l, n, "date", v, e);

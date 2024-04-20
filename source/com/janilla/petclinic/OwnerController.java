@@ -192,7 +192,7 @@ public class OwnerController {
 			return n -> {
 				try {
 					var l = labels.get(n);
-					var v = Reflection.getter(Owner.class, n).invoke(owner);
+					var v = Reflection.property(Owner.class, n).get(owner);
 					var e = errors != null ? errors.get(n) : null;
 					return new InputField(l, n, "text", v, e);
 				} catch (ReflectiveOperationException e) {

@@ -100,7 +100,7 @@ public class VisitController {
 				try {
 					var l = labels.get(n);
 					var t = n.equals("date") ? "date" : "text";
-					var v = Reflection.getter(Visit.class, n).invoke(visit);
+					var v = Reflection.property(Visit.class, n).get(visit);
 					var e = errors != null ? errors.get(n) : null;
 					return new InputField(l, n, t, v, e);
 				} catch (ReflectiveOperationException e) {
