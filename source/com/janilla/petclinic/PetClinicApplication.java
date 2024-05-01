@@ -23,6 +23,7 @@ import java.util.function.Supplier;
 import com.janilla.http.HttpExchange;
 import com.janilla.http.HttpServer;
 import com.janilla.io.IO;
+import com.janilla.persistence.Persistence;
 import com.janilla.util.Lazy;
 import com.janilla.web.ApplicationHandlerBuilder;
 
@@ -52,7 +53,7 @@ public class PetClinicApplication {
 	public Properties configuration;
 
 	private Supplier<Persistence> persistence = Lazy.of(() -> {
-		var b = new PersistenceBuilder();
+		var b = new CustomPersistenceBuilder();
 		{
 			var p = configuration.getProperty("petclinic.database.file");
 			if (p.startsWith("~"))
@@ -60,7 +61,7 @@ public class PetClinicApplication {
 			b.setFile(Path.of(p));
 		}
 		b.setApplication(this);
-		return (Persistence) b.build();
+		return b.build();
 	});
 
 	Supplier<IO.Consumer<HttpExchange>> handler = Lazy.of(() -> {
@@ -75,23 +76,5 @@ public class PetClinicApplication {
 
 	public IO.Consumer<HttpExchange> getHandler() {
 		return handler.get();
-	}
-
-	public class ExceptionHandlerFactory extends CustomExceptionHandlerFactory {
-	}
-
-	public class JsonHandlerFactory extends CustomJsonHandlerFactory {
-	}
-
-	public class MethodHandlerFactory extends CustomMethodHandlerFactory {
-	}
-
-	public class Persistence extends CustomPersistence {
-	}
-
-	public class PersistenceBuilder extends CustomPersistenceBuilder {
-	}
-
-	public class TemplateHandlerFactory extends CustomTemplateHandlerFactory {
 	}
 }

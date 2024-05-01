@@ -22,7 +22,7 @@ import java.util.Arrays;
 import com.janilla.persistence.ApplicationPersistenceBuilder;
 import com.janilla.persistence.Persistence;
 
-public abstract class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
+public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 
 	@Override
 	public Persistence build() {

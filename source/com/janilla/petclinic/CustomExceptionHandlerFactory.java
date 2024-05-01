@@ -27,7 +27,7 @@ import com.janilla.web.Render;
 /**
  * @author Diego Schivo
  */
-public abstract class CustomExceptionHandlerFactory extends ExceptionHandlerFactory {
+public class CustomExceptionHandlerFactory extends ExceptionHandlerFactory {
 
 	public HandlerFactory mainFactory;
 

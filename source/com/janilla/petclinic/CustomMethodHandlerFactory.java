@@ -26,7 +26,7 @@ import com.janilla.web.MethodInvocation;
 /**
  * @author Diego Schivo
  */
-public abstract class CustomMethodHandlerFactory extends MethodHandlerFactory {
+public class CustomMethodHandlerFactory extends MethodHandlerFactory {
 
 	public Properties configuration;
 

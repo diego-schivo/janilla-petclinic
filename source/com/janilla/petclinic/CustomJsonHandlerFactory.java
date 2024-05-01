@@ -29,7 +29,7 @@ import com.janilla.web.JsonHandlerFactory;
 /**
  * @author Diego Schivo
  */
-public abstract class CustomJsonHandlerFactory extends JsonHandlerFactory {
+public class CustomJsonHandlerFactory extends JsonHandlerFactory {
 
 	public Properties configuration;
 

@@ -18,7 +18,7 @@ package com.janilla.petclinic;
 import com.janilla.persistence.Crud;
 import com.janilla.persistence.Persistence;
 
-public abstract class CustomPersistence extends Persistence {
+public class CustomPersistence extends Persistence {
 
 	@Override
 	protected <E> Crud<E> newCrud(Class<E> type) {

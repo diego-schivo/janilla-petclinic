@@ -24,7 +24,7 @@ import com.janilla.web.TemplateHandlerFactory;
 /**
  * @author Diego Schivo
  */
-public abstract class CustomTemplateHandlerFactory extends TemplateHandlerFactory {
+public class CustomTemplateHandlerFactory extends TemplateHandlerFactory {
 
 	static ThreadLocal<Layout> layout = new ThreadLocal<>();
 
