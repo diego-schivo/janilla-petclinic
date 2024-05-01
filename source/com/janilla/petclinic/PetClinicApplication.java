@@ -16,7 +16,6 @@
 package com.janilla.petclinic;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.Properties;
 import java.util.function.Supplier;
@@ -24,7 +23,6 @@ import java.util.function.Supplier;
 import com.janilla.http.HttpExchange;
 import com.janilla.http.HttpServer;
 import com.janilla.io.IO;
-import com.janilla.persistence.Persistence;
 import com.janilla.util.Lazy;
 import com.janilla.web.ApplicationHandlerBuilder;
 
@@ -41,20 +39,20 @@ public class PetClinicApplication {
 			try (var s = a.getClass().getResourceAsStream("configuration.properties")) {
 				c.load(s);
 			}
-			a.setConfiguration(c);
+			a.configuration = c;
 		}
 		a.getPersistence();
 
 		var s = new HttpServer();
-		s.setPort(Integer.parseInt(a.getConfiguration().getProperty("petclinic.server.port")));
+		s.setPort(Integer.parseInt(a.configuration.getProperty("petclinic.server.port")));
 		s.setHandler(a.getHandler());
 		s.run();
 	}
 
-	Properties configuration;
+	public Properties configuration;
 
-	private IO.Supplier<Persistence> persistence = IO.Lazy.of(() -> {
-		var b = new CustomPersistenceBuilder();
+	private Supplier<Persistence> persistence = Lazy.of(() -> {
+		var b = new PersistenceBuilder();
 		{
 			var p = configuration.getProperty("petclinic.database.file");
 			if (p.startsWith("~"))
@@ -62,7 +60,7 @@ public class PetClinicApplication {
 			b.setFile(Path.of(p));
 		}
 		b.setApplication(this);
-		return b.build();
+		return (Persistence) b.build();
 	});
 
 	Supplier<IO.Consumer<HttpExchange>> handler = Lazy.of(() -> {
@@ -71,23 +69,29 @@ public class PetClinicApplication {
 		return b.build();
 	});
 
-	public Properties getConfiguration() {
-		return configuration;
-	}
-
-	public void setConfiguration(Properties configuration) {
-		this.configuration = configuration;
-	}
-
 	public Persistence getPersistence() {
-		try {
-			return persistence.get();
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
+		return persistence.get();
 	}
 
 	public IO.Consumer<HttpExchange> getHandler() {
 		return handler.get();
+	}
+
+	public class ExceptionHandlerFactory extends CustomExceptionHandlerFactory {
+	}
+
+	public class JsonHandlerFactory extends CustomJsonHandlerFactory {
+	}
+
+	public class MethodHandlerFactory extends CustomMethodHandlerFactory {
+	}
+
+	public class Persistence extends CustomPersistence {
+	}
+
+	public class PersistenceBuilder extends CustomPersistenceBuilder {
+	}
+
+	public class TemplateHandlerFactory extends CustomTemplateHandlerFactory {
 	}
 }

@@ -47,19 +47,18 @@ public class PetController {
 
 	@Handle(method = "GET", path = "/owners/(\\d+)/pets/new")
 	public Object initCreate(long owner) throws IOException {
-		var p = new Pet();
-		p.setOwner(owner);
+		var p = new Pet(null, null, null, null, owner);
 		return Form.of(p, null, persistence);
 	}
 
 	@Handle(method = "POST", path = "/owners/(\\d+)/pets/new")
 	public Object create(long owner, Pet pet) throws IOException {
-		pet.setOwner(owner);
-		var errors = validate(pet);
+		var p = new Pet(null, pet.name(), pet.birthDate(), pet.type(), owner);
+		var errors = validate(p);
 		if (!errors.isEmpty())
-			return Form.of(pet, errors, persistence);
+			return Form.of(p, errors, persistence);
 
-		persistence.getCrud(Pet.class).create(pet);
+		persistence.getCrud(Pet.class).create(p);
 		return URI.create("/owners/" + owner);
 	}
 
@@ -71,23 +70,23 @@ public class PetController {
 
 	@Handle(method = "POST", path = "/owners/(\\d+)/pets/(\\d+)/edit")
 	public Object update(long owner, long id, Pet pet) throws IOException {
-		pet.setOwner(owner);
-		var errors = validate(pet);
+		var p = new Pet(id, pet.name(), pet.birthDate(), pet.type(), owner);
+		var errors = validate(p);
 		if (!errors.isEmpty())
-			return Form.of(pet, errors, persistence);
+			return Form.of(p, errors, persistence);
 
-		var p = persistence.getCrud(Pet.class).update(id,
-				x -> Reflection.copy(pet, x, y -> !Set.of("id", "owner").contains(y)));
-		return URI.create("/owners/" + p.getOwner());
+		var q = persistence.getCrud(Pet.class).update(id,
+				x -> Reflection.copy(p, x, y -> !Set.of("id", "owner").contains(y)));
+		return URI.create("/owners/" + q.owner());
 	}
 
 	protected Map<String, Collection<String>> validate(Pet pet) {
 		var errors = new HashMap<String, Collection<String>>();
-		if (pet.getName() == null || pet.getName().isBlank())
+		if (pet.name() == null || pet.name().isBlank())
 			errors.computeIfAbsent("name", k -> new ArrayList<>()).add("must not be blank");
-		if (pet.getBirthDate() == null)
+		if (pet.birthDate() == null)
 			errors.computeIfAbsent("birthDate", k -> new ArrayList<>()).add("must not be blank");
-		if (pet.getType() == null)
+		if (pet.type() == null)
 			errors.computeIfAbsent("type", k -> new ArrayList<>()).add("must not be blank");
 		return errors;
 	}
@@ -96,41 +95,37 @@ public class PetController {
 	public record Form(Owner owner, Pet pet, Collection<PetType> types, Map<String, Collection<String>> errors) {
 
 		static Form of(Pet pet, Map<String, Collection<String>> errors, Persistence persistence) throws IOException {
-			var o = persistence.getCrud(Owner.class).read(pet.getOwner());
+			var o = persistence.getCrud(Owner.class).read(pet.owner());
 			var c = persistence.getCrud(PetType.class);
 			var t = c.read(c.filter(null)).toList();
 			return new Form(o, pet, t, errors);
 		}
 
 		public String heading() {
-			return (pet.getId() == null ? "New " : "") + "Pet";
+			return (pet.id() == null ? "New " : "") + "Pet";
 		}
 
 		static Map<String, String> labels = Map.of("name", "Name", "birthDate", "Birth Date", "type", "Type");
 
 		public Function<String, FormField> fields() {
 			return n -> {
-				try {
-					var l = labels.get(n);
-					var v = Reflection.property(Pet.class, n).get(pet);
-					var e = errors != null ? errors.get(n) : null;
-					return switch (n) {
-					case "birthDate" -> new InputField(l, n, "date", v, e);
-					case "type" -> {
-						var i = types.stream().collect(
-								Collectors.toMap(PetType::getId, PetType::getName, (a, b) -> a, LinkedHashMap::new));
-						yield new SelectField(l, n, i, v, e);
-					}
-					default -> new InputField(l, n, "text", v, e);
-					};
-				} catch (ReflectiveOperationException e) {
-					throw new RuntimeException(e);
+				var l = labels.get(n);
+				var v = Reflection.property(Pet.class, n).get(pet);
+				var e = errors != null ? errors.get(n) : null;
+				return switch (n) {
+				case "birthDate" -> new InputField(l, n, "date", v, e);
+				case "type" -> {
+					var i = types.stream().collect(
+							Collectors.toMap(PetType::id, PetType::name, (a, b) -> a, LinkedHashMap::new));
+					yield new SelectField(l, n, i, v, e);
 				}
+				default -> new InputField(l, n, "text", v, e);
+				};
 			};
 		}
 
 		public String button() {
-			return (pet.getId() == null ? "Add" : "Update") + " Pet";
+			return (pet == null || pet.id() == null ? "Add" : "Update") + " Pet";
 		}
 	}
 }

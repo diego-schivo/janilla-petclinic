@@ -10,16 +10,16 @@
 		</tr>
 	</thead>
 	<tr>
-		<td>${pet.name}</td>
-		<td>${pet.birthDate}</td>
-		<td>${petType.name}</td>
-		<td>${owner.firstName} ${owner.lastName}</td>
+		<td>{pet.name}</td>
+		<td>{pet.birthDate}</td>
+		<td>{petType.name}</td>
+		<td>{owner.firstName} {owner.lastName}</td>
 	</tr>
 </table>
 <form class="form-horizontal" method="post">
 	<div class="form-group has-feedback">
-		<!--${fields.date}-->
-		<!--${fields.description}-->
+		<{fields.date}>
+		<{fields.description}>
 	</div>
 	<div class="form-group">
 		<div class="col-sm-offset-2 col-sm-10">
@@ -35,12 +35,12 @@
 		<th>Date</th>
 		<th>Description</th>
 	</tr>
-	<!--${previousVisits}-->
+	<{previousVisits}>
 </table>
 
 <template id="createOrUpdateVisitForm-previousVisit">
 	<tr>
-		<td>${date}</td>
-		<td>${description}</td>
+		<td>{date}</td>
+		<td>{description}</td>
 	</tr>
 </template>

@@ -20,14 +20,14 @@
 			</button>
 			<div class="collapse navbar-collapse" id="main-navbar">
 				<ul class="nav navbar-nav me-auto">
-					<!--${navItems}-->
+					<{navItems}>
 				</ul>
 			</div>
 		</div>
 	</nav>
 	<div class="container-fluid">
 		<div class="container xd-container">
-			<!--${content}-->
+			<{content}>
 			<br />
 			<br />
 			<div class="container">
@@ -44,9 +44,9 @@
 
 <template id="layout-navItem">
 	<li class="nav-item">
-		<a class="nav-link ${activeClass}" href="${href}" title="${title}">
-			<span class="fa fa-${icon}"></span>
-			<span>${text}</span>
+		<a class="nav-link {activeClass}" href="{href}" title="{title}">
+			<span class="fa fa-{icon}"></span>
+			<span>{text}</span>
 		</a>
 	</li>
 </template>

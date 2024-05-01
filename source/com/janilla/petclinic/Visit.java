@@ -26,46 +26,5 @@ import com.janilla.persistence.Store;
  * @author Diego Schivo
  */
 @Store
-public class Visit {
-
-	private Long id;
-
-	@Index(sort = "date")
-	private Long pet;
-
-	private LocalDate date;
-
-	private String description;
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public Long getPet() {
-		return pet;
-	}
-
-	public void setPet(Long pet) {
-		this.pet = pet;
-	}
-
-	public LocalDate getDate() {
-		return date;
-	}
-
-	public void setDate(LocalDate date) {
-		this.date = date;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
+public record Visit(Long id, @Index(sort = "date") Long pet, LocalDate date, String description) {
 }

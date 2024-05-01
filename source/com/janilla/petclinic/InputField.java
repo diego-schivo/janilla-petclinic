@@ -24,7 +24,7 @@ import com.janilla.web.Render;
  */
 @Render(template = "inputField.html")
 public record InputField(String label, String name, String type, Object value, @Render(template = """
-		<span class="help-inline">${}</span>
+		<span class="help-inline">{}</span>
 		""", delimiter = "<br />") Collection<String> errors) implements FormField {
 
 	public String errorClass() {

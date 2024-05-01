@@ -10,17 +10,17 @@
 		</tr>
 	</thead>
 	<tbody>
-		<!--${results}-->
+		<{results}>
 	</tbody>
 </table>
-<!--${paginator}-->
+<{paginator}>
 
 <template id="ownersList-result">
 	<tr>
-		<td><a href="/owners/${owner.id}">${owner.firstName} ${owner.lastName}</a></td>
-		<td>${owner.address}</td>
-		<td>${owner.city}</td>
-		<td>${owner.telephone}</td>
-		<td><span>${pets}</span></td>
+		<td><a href="/owners/{owner.id}">{owner.firstName} {owner.lastName}</a></td>
+		<td>{owner.address}</td>
+		<td>{owner.city}</td>
+		<td>{owner.telephone}</td>
+		<td><span>{pets}</span></td>
 	</tr>
 </template>

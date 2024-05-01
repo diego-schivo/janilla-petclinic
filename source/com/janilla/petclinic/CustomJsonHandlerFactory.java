@@ -15,8 +15,6 @@
  */
 package com.janilla.petclinic;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map.Entry;
@@ -31,19 +29,11 @@ import com.janilla.web.JsonHandlerFactory;
 /**
  * @author Diego Schivo
  */
-public class CustomJsonHandlerFactory extends JsonHandlerFactory {
+public abstract class CustomJsonHandlerFactory extends JsonHandlerFactory {
 
-	Properties configuration;
+	public Properties configuration;
 
-	Persistence persistence;
-
-	public void setConfiguration(Properties configuration) {
-		this.configuration = configuration;
-	}
-
-	public void setPersistence(Persistence persistence) {
-		this.persistence = persistence;
-	}
+	public Persistence persistence;
 
 	@Override
 	protected Iterator<JsonToken<?>> newJsonIterator(Object object, HttpExchange exchange) {
@@ -57,11 +47,7 @@ public class CustomJsonHandlerFactory extends JsonHandlerFactory {
 					case "specialties":
 						if (object instanceof Collection<?> c) {
 							var i = c.stream().mapToLong(x -> (Long) x).toArray();
-							try {
-								object = persistence.getCrud(Specialty.class).read(i).toList();
-							} catch (IOException f) {
-								throw new UncheckedIOException(f);
-							}
+							object = persistence.getCrud(Specialty.class).read(i).toList();
 						}
 						break;
 					}

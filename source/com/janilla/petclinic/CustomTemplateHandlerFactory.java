@@ -24,25 +24,22 @@ import com.janilla.web.TemplateHandlerFactory;
 /**
  * @author Diego Schivo
  */
-public class CustomTemplateHandlerFactory extends TemplateHandlerFactory {
+public abstract class CustomTemplateHandlerFactory extends TemplateHandlerFactory {
 
 	static ThreadLocal<Layout> layout = new ThreadLocal<>();
 
 	@Override
 	protected void render(RenderEngine.Entry input, HttpExchange exchange) throws IOException {
 		var l = layout.get();
-		var r = false;
-		if (l == null) {
+		var n = l == null;
+		if (n) {
 			l = new Layout(exchange.getRequest().getURI(), input);
-			if (l != null) {
-				input = RenderEngine.Entry.of(null, l, null);
-				r = true;
-			}
+			input = RenderEngine.Entry.of(null, l, null);
 		}
 		try {
 			super.render(input, exchange);
 		} finally {
-			if (r)
+			if (n)
 				layout.remove();
 		}
 	}

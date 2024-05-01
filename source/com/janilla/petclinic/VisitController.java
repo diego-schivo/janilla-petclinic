@@ -50,9 +50,8 @@ public class VisitController {
 	public Object initCreate(long owner, long pet) throws IOException {
 		var o = persistence.getCrud(Owner.class).read(owner);
 		var p = persistence.getCrud(Pet.class).read(pet);
-		var t = persistence.getCrud(PetType.class).read(p.getType());
-		var v = new Visit();
-		v.setDate(LocalDate.now());
+		var t = persistence.getCrud(PetType.class).read(p.type());
+		var v = new Visit(null, null, LocalDate.now(), null);
 		var c = persistence.getCrud(Visit.class);
 		var w = c.read(c.filter("pet", pet)).toList();
 		return new Form(o, p, t, v, w, null);
@@ -60,20 +59,20 @@ public class VisitController {
 
 	@Handle(method = "POST", path = "/owners/(\\d+)/pets/(\\d+)/visits/new")
 	public Object create(long owner, long pet, Visit visit) throws IOException {
-		visit.setPet(pet);
-		var errors = validate(visit);
+		var v = new Visit(null, pet, visit.date(), visit.description());
+		var errors = validate(v);
 		if (!errors.isEmpty())
-			return Form.of(visit, errors, persistence);
+			return Form.of(v, errors, persistence);
 
-		persistence.getCrud(Visit.class).create(visit);
+		persistence.getCrud(Visit.class).create(v);
 		return URI.create("/owners/" + owner);
 	}
 
 	protected Map<String, Collection<String>> validate(Visit visit) {
 		var errors = new HashMap<String, Collection<String>>();
-		if (visit.getDate() == null)
+		if (visit.date() == null)
 			errors.computeIfAbsent("date", k -> new ArrayList<>()).add("must not be blank");
-		if (visit.getDescription() == null || visit.getDescription().isBlank())
+		if (visit.description() == null || visit.description().isBlank())
 			errors.computeIfAbsent("description", k -> new ArrayList<>()).add("must not be blank");
 		return errors;
 	}
@@ -85,11 +84,11 @@ public class VisitController {
 
 		static Form of(Visit visit, Map<String, Collection<String>> errors, Persistence persistence)
 				throws IOException {
-			var p = persistence.getCrud(Pet.class).read(visit.getPet());
-			var o = persistence.getCrud(Owner.class).read(p.getOwner());
-			var t = persistence.getCrud(PetType.class).read(p.getType());
+			var p = persistence.getCrud(Pet.class).read(visit.pet());
+			var o = persistence.getCrud(Owner.class).read(p.owner());
+			var t = persistence.getCrud(PetType.class).read(p.type());
 			var c = persistence.getCrud(Visit.class);
-			var w = c.read(c.filter("pet", p.getId())).toList();
+			var w = c.read(c.filter("pet", p.id())).toList();
 			return new Form(o, p, t, visit, w, errors);
 		}
 
@@ -97,15 +96,11 @@ public class VisitController {
 
 		public Function<String, FormField> fields() {
 			return n -> {
-				try {
-					var l = labels.get(n);
-					var t = n.equals("date") ? "date" : "text";
-					var v = Reflection.property(Visit.class, n).get(visit);
-					var e = errors != null ? errors.get(n) : null;
-					return new InputField(l, n, t, v, e);
-				} catch (ReflectiveOperationException e) {
-					throw new RuntimeException(e);
-				}
+				var l = labels.get(n);
+				var t = n.equals("date") ? "date" : "text";
+				var v = Reflection.property(Visit.class, n).get(visit);
+				var e = errors != null ? errors.get(n) : null;
+				return new InputField(l, n, t, v, e);
 			};
 		}
 	}

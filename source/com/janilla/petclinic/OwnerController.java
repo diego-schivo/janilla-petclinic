@@ -16,7 +16,6 @@
 package com.janilla.petclinic;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -53,14 +52,14 @@ public class OwnerController {
 
 	@Handle(method = "GET", path = "/owners/find")
 	public Object initFind() {
-		var o = new Owner();
-		return new FindForm(o, null);
+//		var o = new Owner();
+		return new FindForm(null, null);
 	}
 
 	@Handle(method = "GET", path = "/owners")
 	public Object find(Owner owner, @Parameter(name = "page") Integer page) throws IOException {
 		var c = persistence.getCrud(Owner.class);
-		var n = owner.getLastName();
+		var n = owner.lastName();
 		var i = page != null ? page - 1 : 0;
 		var f = n != null && !n.isBlank()
 				? c.filter2("lastName", x -> Util.startsWithIgnoreCase((String) x, n), i * 5, 5)
@@ -72,12 +71,8 @@ public class OwnerController {
 			var d = persistence.getCrud(Pet.class);
 			var l = (int) ((f.total() + 4) / 5);
 			var r = c.read(f.ids()).map(o -> {
-				try {
-					var p = d.read(d.filter("owner", o.getId())).toList();
-					return new Result(o, p);
-				} catch (IOException e) {
-					throw new UncheckedIOException(e);
-				}
+				var p = d.read(d.filter("owner", o.id())).toList();
+				return new Result(o, p);
 			}).toList();
 			var p = new Paginator(i, l, URI.create("/owners"));
 			yield new FindOutcome(r, p);
@@ -91,22 +86,18 @@ public class OwnerController {
 		var d = persistence.getCrud(Pet.class);
 		var e = persistence.getCrud(Visit.class);
 		var o = c.read(id);
-		var p = d.read(d.filter("owner", o.getId())).map(x -> {
-			try {
-				var t = persistence.getCrud(PetType.class).read(x.getType());
-				var v = e.read(e.filter("pet", x.getId()));
-				return new Pet2(x, t, v);
-			} catch (IOException f) {
-				throw new UncheckedIOException(f);
-			}
+		var p = d.read(d.filter("owner", o.id())).map(x -> {
+			var t = persistence.getCrud(PetType.class).read(x.type());
+			var v = e.read(e.filter("pet", x.id()));
+			return new Pet2(x, t, v);
 		});
 		return new Details(o, p);
 	}
 
 	@Handle(method = "GET", path = "/owners/new")
 	public Object initCreate() {
-		var o = new Owner();
-		return new Form(o, null);
+//		var o = new Owner();
+		return new Form(null, null);
 	}
 
 	@Handle(method = "POST", path = "/owners/new")
@@ -116,7 +107,7 @@ public class OwnerController {
 			return new Form(owner, errors);
 
 		var o = persistence.getCrud(Owner.class).create(owner);
-		return URI.create("/owners/" + o.getId());
+		return URI.create("/owners/" + o.id());
 	}
 
 	@Handle(method = "GET", path = "/owners/(\\d+)/edit")
@@ -133,24 +124,24 @@ public class OwnerController {
 			return new Form(owner, errors);
 
 		var o = persistence.getCrud(Owner.class).update(id, x -> Reflection.copy(owner, x, y -> !y.equals("id")));
-		return URI.create("/owners/" + o.getId());
+		return URI.create("/owners/" + o.id());
 	}
 
 	static Pattern tenDigits = Pattern.compile("\\d{10}");
 
 	protected Map<String, Collection<String>> validate(Owner owner) {
 		var errors = new HashMap<String, Collection<String>>();
-		if (owner.getFirstName() == null || owner.getFirstName().isBlank())
+		if (owner.firstName() == null || owner.firstName().isBlank())
 			errors.computeIfAbsent("firstName", k -> new ArrayList<>()).add("must not be blank");
-		if (owner.getLastName() == null || owner.getLastName().isBlank())
+		if (owner.lastName() == null || owner.lastName().isBlank())
 			errors.computeIfAbsent("lastName", k -> new ArrayList<>()).add("must not be blank");
-		if (owner.getAddress() == null || owner.getAddress().isBlank())
+		if (owner.address() == null || owner.address().isBlank())
 			errors.computeIfAbsent("address", k -> new ArrayList<>()).add("must not be blank");
-		if (owner.getCity() == null || owner.getCity().isBlank())
+		if (owner.city() == null || owner.city().isBlank())
 			errors.computeIfAbsent("city", k -> new ArrayList<>()).add("must not be blank");
-		if (owner.getTelephone() == null || owner.getTelephone().isBlank())
+		if (owner.telephone() == null || owner.telephone().isBlank())
 			errors.computeIfAbsent("telephone", k -> new ArrayList<>()).add("must not be blank");
-		if (owner.getTelephone() == null || !tenDigits.matcher(owner.getTelephone()).matches())
+		if (owner.telephone() == null || !tenDigits.matcher(owner.telephone()).matches())
 			errors.computeIfAbsent("telephone", k -> new ArrayList<>())
 					.add("numeric value out of bounds (<10 digits>.<0 digits> expected)");
 		return errors;
@@ -158,9 +149,9 @@ public class OwnerController {
 
 	@Render(template = "findOwners.html")
 	public record FindForm(Owner owner, Map<String, @Render(template = """
-			<div><!--${}--></div>
+			<div><{}></div>
 			""") Collection<@Render(template = """
-			<p>${}</p>
+			<p>{}</p>
 			""") String>> errors) {
 	}
 
@@ -169,7 +160,7 @@ public class OwnerController {
 
 		@Render(template = "ownersList-result.html")
 		public record Result(Owner owner, @Render(delimiter = ", ") Collection<@Render(template = """
-				${name}
+				{name}
 				""") Pet> pets) {
 		}
 	}
@@ -190,19 +181,15 @@ public class OwnerController {
 
 		public Function<String, FormField> fields() {
 			return n -> {
-				try {
-					var l = labels.get(n);
-					var v = Reflection.property(Owner.class, n).get(owner);
-					var e = errors != null ? errors.get(n) : null;
-					return new InputField(l, n, "text", v, e);
-				} catch (ReflectiveOperationException e) {
-					throw new RuntimeException(e);
-				}
+				var l = labels.get(n);
+				var v = Reflection.property(Owner.class, n).get(owner);
+				var e = errors != null ? errors.get(n) : null;
+				return new InputField(l, n, "text", v, e);
 			};
 		}
 
 		public String button() {
-			return (owner.getId() == null ? "Add" : "Update") + " Owner";
+			return (owner == null || owner.id() == null ? "Add" : "Update") + " Owner";
 		}
 	}
 }

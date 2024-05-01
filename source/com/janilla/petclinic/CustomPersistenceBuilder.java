@@ -15,7 +15,6 @@
  */
 package com.janilla.petclinic;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -23,18 +22,25 @@ import java.util.Arrays;
 import com.janilla.persistence.ApplicationPersistenceBuilder;
 import com.janilla.persistence.Persistence;
 
-class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
+public abstract class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 
 	@Override
-	public Persistence build() throws IOException {
+	public Persistence build() {
 		var e = Files.exists(file);
 		var p = super.build();
+		p.setTypeResolver(x -> {
+			try {
+				return Class.forName("com.janilla.petclinic." + x.replace('.', '$'));
+			} catch (ClassNotFoundException f) {
+				throw new RuntimeException(f);
+			}
+		});
 		if (!e)
-			populate(p);
+			seed(p);
 		return p;
 	}
 
-	void populate(Persistence persistence) throws IOException {
+	void seed(Persistence persistence) {
 		for (var x : """
 				George	Franklin	110 W. Liberty St.	Madison	6085551023
 				Betty	Davis	638 Cardinal Ave.	Sun Prairie	6085551749
@@ -47,13 +53,7 @@ class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 				David	Schroeder	2749 Blackhawk Trail	Madison	6085559435
 				Carlos	Estaban	2335 Independence La.	Waunakee	6085555487""".split("\n")) {
 			var y = x.split("\t");
-			var z = new Owner();
-			z.setFirstName(y[0]);
-			z.setLastName(y[1]);
-			z.setAddress(y[2]);
-			z.setCity(y[3]);
-			z.setTelephone(y[4]);
-			persistence.getCrud(Owner.class).create(z);
+			persistence.getCrud(Owner.class).create(new Owner(null, y[0], y[1], y[2], y[3], y[4]));
 		}
 
 		for (var x : """
@@ -63,9 +63,7 @@ class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 				snake
 				bird
 				hamster""".split("\n")) {
-			var z = new PetType();
-			z.setName(x);
-			persistence.getCrud(PetType.class).create(z);
+			persistence.getCrud(PetType.class).create(new PetType(null, x));
 		}
 
 		for (var x : """
@@ -83,12 +81,8 @@ class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 				Lucky	2010-06-24	2	10
 				Sly	2012-06-08	1	10""".split("\n")) {
 			var y = x.split("\t");
-			var z = new Pet();
-			z.setName(y[0]);
-			z.setBirthDate(LocalDate.parse(y[1]));
-			z.setType(Long.parseLong(y[2]));
-			z.setOwner(Long.parseLong(y[3]));
-			persistence.getCrud(Pet.class).create(z);
+			persistence.getCrud(Pet.class)
+					.create(new Pet(null, y[0], LocalDate.parse(y[1]), Long.parseLong(y[2]), Long.parseLong(y[3])));
 		}
 
 		for (var x : """
@@ -97,20 +91,14 @@ class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 				8	2013-01-03	neutered
 				7	2013-01-04	spayed""".split("\n")) {
 			var y = x.split("\t");
-			var z = new Visit();
-			z.setPet(Long.parseLong(y[0]));
-			z.setDate(LocalDate.parse(y[1]));
-			z.setDescription(y[2]);
-			persistence.getCrud(Visit.class).create(z);
+			persistence.getCrud(Visit.class).create(new Visit(null, Long.parseLong(y[0]), LocalDate.parse(y[1]), y[2]));
 		}
 
 		for (var x : """
 				radiology
 				surgery
 				dentistry""".split("\n")) {
-			var z = new Specialty();
-			z.setName(x);
-			persistence.getCrud(Specialty.class).create(z);
+			persistence.getCrud(Specialty.class).create(new Specialty(null, x));
 		}
 
 		for (var x : """
@@ -121,11 +109,8 @@ class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 				Henry	Stevens	1
 				Sharon	Jenkins""".split("\n")) {
 			var y = x.split("\t");
-			var z = new Vet();
-			z.setFirstName(y[0]);
-			z.setLastName(y[1]);
-			z.setSpecialties(Arrays.stream(y).skip(2).map(Long::valueOf).toList());
-			persistence.getCrud(Vet.class).create(z);
+			persistence.getCrud(Vet.class)
+					.create(new Vet(null, y[0], y[1], Arrays.stream(y).skip(2).map(Long::valueOf).toList()));
 		}
 	}
 }

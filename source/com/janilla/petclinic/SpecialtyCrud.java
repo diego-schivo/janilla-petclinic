@@ -15,22 +15,22 @@
  */
 package com.janilla.petclinic;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
-import com.janilla.io.IO;
 import com.janilla.persistence.Crud;
+import com.janilla.util.Lazy;
 
 /**
  * @author Diego Schivo
  */
 public class SpecialtyCrud extends Crud<Specialty> {
 
-	Map<Long, IO.Supplier<Specialty>> readCache = new ConcurrentHashMap<>();
+	Map<Long, Supplier<Specialty>> readCache = new ConcurrentHashMap<>();
 
 	@Override
-	public Specialty read(long id) throws IOException {
-		return readCache.computeIfAbsent(id, k -> IO.Lazy.of(() -> super.read(id))).get();
+	public Specialty read(long id) {
+		return readCache.computeIfAbsent(id, k -> Lazy.of(() -> super.read(id))).get();
 	}
 }

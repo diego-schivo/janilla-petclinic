@@ -49,13 +49,9 @@ public class VetController {
 			var p = c.list(i * 5, 5);
 			var l = (int) ((p.total() + 4) / 5);
 			var r = c.read(p.ids()).map(v -> {
-				try {
-					var j = v.getSpecialties().stream().mapToLong(Long::longValue).toArray();
-					var s = persistence.getCrud(Specialty.class).read(j).toList();
-					return new Result(v, s);
-				} catch (IOException e) {
-					throw new UncheckedIOException(e);
-				}
+				var j = v.specialties().stream().mapToLong(Long::longValue).toArray();
+				var s = persistence.getCrud(Specialty.class).read(j).toList();
+				return new Result(v, s);
 			}).toList();
 			var q = new Paginator(i, l, URI.create("/vets.html"));
 			return new FindOutcome(r, q);
@@ -77,7 +73,7 @@ public class VetController {
 
 		@Render(template = "vetList-result.html")
 		public record Result(Vet vet, @Render(delimiter = ", ") Collection<@Render(template = """
-				<span>${name}</span>
+				<span>{name}</span>
 				""") Specialty> specialties) {
 		}
 	}

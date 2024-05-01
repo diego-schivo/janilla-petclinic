@@ -27,19 +27,18 @@ import com.janilla.web.Render;
 /**
  * @author Diego Schivo
  */
-public class CustomExceptionHandlerFactory extends ExceptionHandlerFactory {
+public abstract class CustomExceptionHandlerFactory extends ExceptionHandlerFactory {
 
-	protected HandlerFactory mainFactory;
-
-	public void setMainFactory(HandlerFactory mainFactory) {
-		this.mainFactory = mainFactory;
-	}
+	public HandlerFactory mainFactory;
 
 	@Override
 	protected void handle(Error error, HttpExchange exchange) throws IOException {
 		super.handle(error, exchange);
 		var e = exchange.getException();
-		if (e.getClass().isAnnotationPresent(Render.class))
-			mainFactory.createHandler(RenderEngine.Entry.of(null, e, null), exchange).accept(exchange);
+		if (e.getClass().isAnnotationPresent(Render.class)) {
+			var o = RenderEngine.Entry.of(null, e, null);
+			var h = mainFactory.createHandler(o, exchange);
+			h.accept(exchange);
+		}
 	}
 }

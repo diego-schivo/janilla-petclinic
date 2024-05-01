@@ -27,56 +27,5 @@ import com.janilla.persistence.Store;
  * @author Diego Schivo
  */
 @Store
-public class Pet {
-
-	private Long id;
-
-	private String name;
-
-	private LocalDate birthDate;
-
-	private Long type;
-
-	@Index(sort = "name")
-	private Long owner;
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public LocalDate getBirthDate() {
-		return birthDate;
-	}
-
-	public void setBirthDate(LocalDate birthDate) {
-		this.birthDate = birthDate;
-	}
-
-	public Long getType() {
-		return type;
-	}
-
-	public void setType(Long type) {
-		this.type = type;
-	}
-
-	public Long getOwner() {
-		return owner;
-	}
-
-	public void setOwner(Long owner) {
-		this.owner = owner;
-	}
+public record Pet(Long id, String name, LocalDate birthDate, Long type, @Index(sort = "name") Long owner) {
 }
