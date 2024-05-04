@@ -91,7 +91,7 @@ public class PetController {
 		return errors;
 	}
 
-	@Render(template = "createOrUpdatePetForm.html")
+	@Render("createOrUpdatePetForm.html")
 	public record Form(Owner owner, Pet pet, Collection<PetType> types, Map<String, Collection<String>> errors) {
 
 		static Form of(Pet pet, Map<String, Collection<String>> errors, Persistence persistence) throws IOException {

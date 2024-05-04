@@ -26,10 +26,10 @@ import com.janilla.web.Render;
 /**
  * @author Diego Schivo
  */
-@Render(template = "paginator.html")
+@Render("paginator.html")
 public record Paginator(int index, int length, URI uri) {
 
-	public Stream<@Render(template = "paginator-page.html") Element> pages() {
+	public Stream<@Render("paginator-page.html") Element> pages() {
 		return IntStream.rangeClosed(1, length).mapToObj(x -> new Element(x != index + 1 ? uri : null, x));
 	}
 

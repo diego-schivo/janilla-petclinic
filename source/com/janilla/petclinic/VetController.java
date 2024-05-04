@@ -68,11 +68,11 @@ public class VetController {
 		return v;
 	}
 
-	@Render(template = "vetList.html")
+	@Render("vetList.html")
 	public record FindOutcome(Collection<Result> results, Paginator paginator) {
 
-		@Render(template = "vetList-result.html")
-		public record Result(Vet vet, @Render(delimiter = ", ") Collection<@Render(template = """
+		@Render("vetList-result.html")
+		public record Result(Vet vet, @Render(delimiter = ", ") Collection<@Render("""
 				<span>{name}</span>
 				""") Specialty> specialties) {
 		}

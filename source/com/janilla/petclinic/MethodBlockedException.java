@@ -20,7 +20,7 @@ import com.janilla.web.Render;
 /**
  * @author Diego Schivo
  */
-@Render(template = "error.html")
+@Render("error.html")
 public class MethodBlockedException extends RuntimeException {
 
 	private static final long serialVersionUID = 4918046711205707493L;

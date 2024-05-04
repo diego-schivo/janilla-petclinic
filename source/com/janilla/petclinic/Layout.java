@@ -24,7 +24,7 @@ import com.janilla.frontend.RenderEngine;
 import com.janilla.frontend.Renderer;
 import com.janilla.web.Render;
 
-@Render(template = "layout.html")
+@Render("layout.html")
 public record Layout(URI uri, RenderEngine.Entry entry) implements Renderer {
 
 	protected static List<NavItem> navItems = List.of(new NavItem("home", "Home", URI.create("/"), "home page"),
@@ -49,7 +49,7 @@ public record Layout(URI uri, RenderEngine.Entry entry) implements Renderer {
 			o.setValue(entry.getValue());
 			var r = entry.getType() instanceof AnnotatedType x ? x.getAnnotation(Render.class) : null;
 			if (r != null)
-				o.setTemplate(r.template());
+				o.setTemplate(!r.template().isEmpty() ? r.template() : r.value());
 		}) || engine.match(B.class, (i, o) -> {
 			var m1 = pathPrefix.matcher(i.navItem.href.getPath());
 			var m2 = pathPrefix.matcher(uri.getPath());
@@ -58,7 +58,7 @@ public record Layout(URI uri, RenderEngine.Entry entry) implements Renderer {
 		});
 	}
 
-	@Render(template = "layout-navItem.html")
+	@Render("layout-navItem.html")
 	public record NavItem(String icon, String text, URI href, String title) {
 	}
 }

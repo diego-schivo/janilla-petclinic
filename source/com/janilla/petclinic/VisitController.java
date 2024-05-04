@@ -77,9 +77,9 @@ public class VisitController {
 		return errors;
 	}
 
-	@Render(template = "createOrUpdateVisitForm.html")
+	@Render("createOrUpdateVisitForm.html")
 	public record Form(Owner owner, Pet pet, PetType petType, Visit visit,
-			List<@Render(template = "createOrUpdateVisitForm-previousVisit.html") Visit> previousVisits,
+			List<@Render("createOrUpdateVisitForm-previousVisit.html") Visit> previousVisits,
 			Map<String, Collection<String>> errors) {
 
 		static Form of(Visit visit, Map<String, Collection<String>> errors, Persistence persistence)

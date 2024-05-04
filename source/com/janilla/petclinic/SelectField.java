@@ -25,7 +25,7 @@ import com.janilla.web.Render;
 /**
  * @author Diego Schivo
  */
-@Render(template = "selectField.html")
+@Render("selectField.html")
 public record SelectField(String label, String name, Map<? extends Object, String> items, Object value,
 		@Render(template = """
 				<span class="help-inline">{}</span>
@@ -44,7 +44,7 @@ public record SelectField(String label, String name, Map<? extends Object, Strin
 		return errors == null || errors.isEmpty() ? "ok" : "remove";
 	}
 
-	@Render(template = """
+	@Render("""
 			<option value="{value}" data-{selectedAttribute}>{text}</option>
 			""")
 	public record Option(Object value, String text, boolean selected) {

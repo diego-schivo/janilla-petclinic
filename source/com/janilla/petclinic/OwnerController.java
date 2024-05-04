@@ -147,33 +147,33 @@ public class OwnerController {
 		return errors;
 	}
 
-	@Render(template = "findOwners.html")
-	public record FindForm(Owner owner, Map<String, @Render(template = """
+	@Render("findOwners.html")
+	public record FindForm(Owner owner, Map<String, @Render("""
 			<div><{}></div>
-			""") Collection<@Render(template = """
+			""") Collection<@Render("""
 			<p>{}</p>
 			""") String>> errors) {
 	}
 
-	@Render(template = "ownersList.html")
+	@Render("ownersList.html")
 	public record FindOutcome(Collection<Result> results, Paginator paginator) {
 
-		@Render(template = "ownersList-result.html")
-		public record Result(Owner owner, @Render(delimiter = ", ") Collection<@Render(template = """
+		@Render("ownersList-result.html")
+		public record Result(Owner owner, @Render(delimiter = ", ") Collection<@Render("""
 				{name}
 				""") Pet> pets) {
 		}
 	}
 
-	@Render(template = "ownerDetails.html")
+	@Render("ownerDetails.html")
 	public record Details(Owner owner, Stream<Pet2> pets) {
 
-		@Render(template = "ownerDetails-pet.html")
-		public record Pet2(Pet pet, PetType type, Stream<@Render(template = "ownerDetails-visit.html") Visit> visits) {
+		@Render("ownerDetails-pet.html")
+		public record Pet2(Pet pet, PetType type, Stream<@Render("ownerDetails-visit.html") Visit> visits) {
 		}
 	}
 
-	@Render(template = "createOrUpdateOwnerForm.html")
+	@Render("createOrUpdateOwnerForm.html")
 	public record Form(Owner owner, Map<String, Collection<String>> errors) {
 
 		static Map<String, String> labels = Map.of("firstName", "First Name", "lastName", "Last Name", "address",

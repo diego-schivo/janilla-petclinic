@@ -24,7 +24,7 @@ import com.janilla.web.Render;
 public class WelcomeController {
 
 	@Handle(method = "GET", path = "/")
-	public @Render(template = "welcome.html") Object getPage() {
+	public @Render("welcome.html") Object getPage() {
 		return "page";
 	}
 }
