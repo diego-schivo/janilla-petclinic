@@ -57,7 +57,7 @@ public class OwnerController {
 	}
 
 	@Handle(method = "GET", path = "/owners")
-	public Object find(Owner owner, @Parameter(name = "page") Integer page) throws IOException {
+	public Object find(Owner owner, @Parameter("page") Integer page) throws IOException {
 		var c = persistence.getCrud(Owner.class);
 		var n = owner.lastName();
 		var i = page != null ? page - 1 : 0;

@@ -42,7 +42,7 @@ public class VetController {
 	}
 
 	@Handle(method = "GET", path = "/vets.html")
-	public Object find(@Parameter(name = "page") Integer page) throws IOException {
+	public Object find(@Parameter("page") Integer page) throws IOException {
 		try {
 			var c = persistence.getCrud(Vet.class);
 			var i = page != null ? page - 1 : 0;
