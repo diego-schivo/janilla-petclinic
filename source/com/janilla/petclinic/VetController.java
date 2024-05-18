@@ -22,8 +22,8 @@ import java.util.Collection;
 
 import com.janilla.persistence.Persistence;
 import com.janilla.petclinic.VetController.FindOutcome.Result;
-import com.janilla.reflect.Parameter;
 import com.janilla.web.Handle;
+import com.janilla.web.Bind;
 import com.janilla.web.Render;
 
 /**
@@ -42,7 +42,7 @@ public class VetController {
 	}
 
 	@Handle(method = "GET", path = "/vets.html")
-	public Object find(@Parameter("page") Integer page) throws IOException {
+	public Object find(@Bind("page") Integer page) throws IOException {
 		try {
 			var c = persistence.getCrud(Vet.class);
 			var i = page != null ? page - 1 : 0;

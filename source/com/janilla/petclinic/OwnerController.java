@@ -29,10 +29,10 @@ import java.util.stream.Stream;
 import com.janilla.persistence.Persistence;
 import com.janilla.petclinic.OwnerController.Details.Pet2;
 import com.janilla.petclinic.OwnerController.FindOutcome.Result;
-import com.janilla.reflect.Parameter;
 import com.janilla.reflect.Reflection;
 import com.janilla.util.Util;
 import com.janilla.web.Handle;
+import com.janilla.web.Bind;
 import com.janilla.web.Render;
 
 /**
@@ -57,7 +57,7 @@ public class OwnerController {
 	}
 
 	@Handle(method = "GET", path = "/owners")
-	public Object find(Owner owner, @Parameter("page") Integer page) throws IOException {
+	public Object find(Owner owner, @Bind("page") Integer page) throws IOException {
 		var c = persistence.getCrud(Owner.class);
 		var n = owner.lastName();
 		var i = page != null ? page - 1 : 0;
