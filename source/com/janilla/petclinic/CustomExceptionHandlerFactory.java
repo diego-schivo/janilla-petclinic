@@ -15,30 +15,28 @@
  */
 package com.janilla.petclinic;
 
-import java.io.IOException;
-
 import com.janilla.frontend.RenderEngine;
 import com.janilla.http.HttpExchange;
 import com.janilla.web.Error;
 import com.janilla.web.ExceptionHandlerFactory;
-import com.janilla.web.HandlerFactory;
 import com.janilla.web.Render;
+import com.janilla.web.WebHandlerFactory;
 
 /**
  * @author Diego Schivo
  */
 public class CustomExceptionHandlerFactory extends ExceptionHandlerFactory {
 
-	public HandlerFactory mainFactory;
+	public WebHandlerFactory mainFactory;
 
 	@Override
-	protected void handle(Error error, HttpExchange exchange) throws IOException {
+	protected void handle(Error error, HttpExchange exchange) {
 		super.handle(error, exchange);
 		var e = exchange.getException();
 		if (e.getClass().isAnnotationPresent(Render.class)) {
 			var o = RenderEngine.Entry.of(null, e, null);
 			var h = mainFactory.createHandler(o, exchange);
-			h.accept(exchange);
+			h.handle(exchange);
 		}
 	}
 }

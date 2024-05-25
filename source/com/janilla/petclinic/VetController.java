@@ -27,11 +27,11 @@ import com.janilla.web.Bind;
 import com.janilla.web.Render;
 
 /**
+ * @author Diego Schivo
  * @author Juergen Hoeller
  * @author Mark Fisher
  * @author Ken Krebs
  * @author Arjen Poutsma
- * @author Diego Schivo
  */
 public class VetController {
 
@@ -44,13 +44,13 @@ public class VetController {
 	@Handle(method = "GET", path = "/vets.html")
 	public Object find(@Bind("page") Integer page) throws IOException {
 		try {
-			var c = persistence.getCrud(Vet.class);
+			var c = persistence.crud(Vet.class);
 			var i = page != null ? page - 1 : 0;
 			var p = c.list(i * 5, 5);
 			var l = (int) ((p.total() + 4) / 5);
 			var r = c.read(p.ids()).map(v -> {
 				var j = v.specialties().stream().mapToLong(Long::longValue).toArray();
-				var s = persistence.getCrud(Specialty.class).read(j).toList();
+				var s = persistence.crud(Specialty.class).read(j).toList();
 				return new Result(v, s);
 			}).toList();
 			var q = new Paginator(i, l, URI.create("/vets.html"));
@@ -62,7 +62,7 @@ public class VetController {
 
 	@Handle(method = "GET", path = "/vets")
 	public Object find() throws IOException {
-		var c = persistence.getCrud(Vet.class);
+		var c = persistence.crud(Vet.class);
 		var v = c.read(c.list()).toList();
 //		return new Vets(v);
 		return v;

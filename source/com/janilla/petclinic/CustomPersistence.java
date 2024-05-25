@@ -18,10 +18,13 @@ package com.janilla.petclinic;
 import com.janilla.persistence.Crud;
 import com.janilla.persistence.Persistence;
 
+/**
+ * @author Diego Schivo
+ */
 public class CustomPersistence extends Persistence {
 
 	@Override
-	protected <E> Crud<E> newCrud(Class<E> type) {
+	protected <E> Crud<E> createCrud(Class<E> type) {
 		if (type == Vet.class) {
 			@SuppressWarnings("unchecked")
 			var c = (Crud<E>) new VetRepository();
@@ -32,6 +35,6 @@ public class CustomPersistence extends Persistence {
 			return c;
 		}
 
-		return super.newCrud(type);
+		return super.createCrud(type);
 	}
 }

@@ -21,11 +21,14 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import com.janilla.frontend.RenderEngine;
-import com.janilla.frontend.Renderer;
+import com.janilla.frontend.RenderParticipant;
 import com.janilla.web.Render;
 
+/**
+ * @author Diego Schivo
+ */
 @Render("layout.html")
-public record Layout(URI uri, RenderEngine.Entry entry) implements Renderer {
+public record Layout(URI uri, RenderEngine.Entry entry) implements RenderParticipant {
 
 	protected static List<NavItem> navItems = List.of(new NavItem("home", "Home", URI.create("/"), "home page"),
 			new NavItem("search", "Find owners", URI.create("/owners/find"), "find owners"),
@@ -40,7 +43,7 @@ public record Layout(URI uri, RenderEngine.Entry entry) implements Renderer {
 	private static Pattern pathPrefix = Pattern.compile("^/\\w*");
 
 	@Override
-	public boolean evaluate(RenderEngine engine) {
+	public boolean render(RenderEngine engine) {
 		record A(Layout layout, Object content) {
 		}
 		record B(NavItem navItem, Object activeClass) {

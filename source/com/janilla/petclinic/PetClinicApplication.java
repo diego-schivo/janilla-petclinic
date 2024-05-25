@@ -15,28 +15,26 @@
  */
 package com.janilla.petclinic;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Properties;
 import java.util.function.Supplier;
 
-import com.janilla.http.HttpExchange;
 import com.janilla.http.HttpServer;
-import com.janilla.io.IO;
 import com.janilla.persistence.ApplicationPersistenceBuilder;
 import com.janilla.persistence.Persistence;
 import com.janilla.reflect.Factory;
 import com.janilla.util.Lazy;
 import com.janilla.util.Util;
 import com.janilla.web.ApplicationHandlerBuilder;
+import com.janilla.web.WebHandler;
 
 /**
- * @author Dave Syer
  * @author Diego Schivo
+ * @author Dave Syer
  */
 public class PetClinicApplication {
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws Exception {
 		var a = new PetClinicApplication();
 		{
 			var c = new Properties();
@@ -47,7 +45,7 @@ public class PetClinicApplication {
 		}
 		a.getPersistence();
 
-		var s = new HttpServer();
+		var s = a.getFactory().create(HttpServer.class);
 		s.setPort(Integer.parseInt(a.configuration.getProperty("petclinic.server.port")));
 		s.setHandler(a.getHandler());
 		s.run();
@@ -58,31 +56,29 @@ public class PetClinicApplication {
 	private Supplier<Factory> factory = Lazy.of(() -> {
 		var f = new Factory();
 		f.setTypes(Util.getPackageClasses(getClass().getPackageName()).toList());
-		f.setEnclosing(this);
+		f.setSource(this);
 		return f;
 	});
 
 	private Supplier<Persistence> persistence = Lazy.of(() -> {
-//		var b = new CustomPersistenceBuilder();
-		var f = getFactory();
-		var b = f.newInstance(ApplicationPersistenceBuilder.class);
+		var b = getFactory().create(ApplicationPersistenceBuilder.class);
 		{
 			var p = configuration.getProperty("petclinic.database.file");
 			if (p.startsWith("~"))
 				p = System.getProperty("user.home") + p.substring(1);
 			b.setFile(Path.of(p));
 		}
-//		b.setApplication(this);
 		return b.build();
 	});
 
-	Supplier<IO.Consumer<HttpExchange>> handler = Lazy.of(() -> {
-//		var b = new ApplicationHandlerBuilder();
-//		b.setApplication(this);
-		var f = getFactory();
-		var b = f.newInstance(ApplicationHandlerBuilder.class);
+	Supplier<WebHandler> handler = Lazy.of(() -> {
+		var b = getFactory().create(ApplicationHandlerBuilder.class);
 		return b.build();
 	});
+
+	public PetClinicApplication getApplication() {
+		return this;
+	}
 
 	public Factory getFactory() {
 		return factory.get();
@@ -92,7 +88,7 @@ public class PetClinicApplication {
 		return persistence.get();
 	}
 
-	public IO.Consumer<HttpExchange> getHandler() {
+	public WebHandler getHandler() {
 		return handler.get();
 	}
 }

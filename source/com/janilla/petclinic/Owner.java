@@ -19,12 +19,12 @@ import com.janilla.persistence.Index;
 import com.janilla.persistence.Store;
 
 /**
+ * @author Diego Schivo
  * @author Ken Krebs
  * @author Juergen Hoeller
  * @author Sam Brannen
  * @author Michael Isvy
  * @author Oliver Drotbohm
- * @author Diego Schivo
  */
 @Store
 public record Owner(Long id, String firstName, @Index String lastName, String address, String city, String telephone) {

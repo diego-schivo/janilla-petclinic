@@ -32,10 +32,10 @@ import com.janilla.web.Handle;
 import com.janilla.web.Render;
 
 /**
+ * @author Diego Schivo
  * @author Juergen Hoeller
  * @author Ken Krebs
  * @author Arjen Poutsma
- * @author Diego Schivo
  */
 public class PetController {
 
@@ -58,13 +58,13 @@ public class PetController {
 		if (!errors.isEmpty())
 			return Form.of(p, errors, persistence);
 
-		persistence.getCrud(Pet.class).create(p);
+		persistence.crud(Pet.class).create(p);
 		return URI.create("/owners/" + owner);
 	}
 
 	@Handle(method = "GET", path = "/owners/(\\d+)/pets/(\\d+)/edit")
 	public Object initUpdate(long owner, long id) throws IOException {
-		var p = persistence.getCrud(Pet.class).read(id);
+		var p = persistence.crud(Pet.class).read(id);
 		return Form.of(p, null, persistence);
 	}
 
@@ -75,7 +75,7 @@ public class PetController {
 		if (!errors.isEmpty())
 			return Form.of(p, errors, persistence);
 
-		var q = persistence.getCrud(Pet.class).update(id,
+		var q = persistence.crud(Pet.class).update(id,
 				x -> Reflection.copy(p, x, y -> !Set.of("id", "owner").contains(y)));
 		return URI.create("/owners/" + q.owner());
 	}
@@ -95,8 +95,8 @@ public class PetController {
 	public record Form(Owner owner, Pet pet, Collection<PetType> types, Map<String, Collection<String>> errors) {
 
 		static Form of(Pet pet, Map<String, Collection<String>> errors, Persistence persistence) throws IOException {
-			var o = persistence.getCrud(Owner.class).read(pet.owner());
-			var c = persistence.getCrud(PetType.class);
+			var o = persistence.crud(Owner.class).read(pet.owner());
+			var c = persistence.crud(PetType.class);
 			var t = c.read(c.filter(null)).toList();
 			return new Form(o, pet, t, errors);
 		}

@@ -36,22 +36,22 @@ public class CustomJsonHandlerFactory extends JsonHandlerFactory {
 	public Persistence persistence;
 
 	@Override
-	protected Iterator<JsonToken<?>> newJsonIterator(Object object, HttpExchange exchange) {
+	protected Iterator<JsonToken<?>> buildJsonIterator(Object object, HttpExchange exchange) {
 		var i = new ReflectionJsonIterator() {
 
 			@Override
-			public Iterator<JsonToken<?>> newValueIterator(Object object) {
+			public Iterator<JsonToken<?>> buildValueIterator(Object object) {
 				var o = getStack().peek();
 				if (o instanceof Entry e)
 					switch ((String) e.getKey()) {
 					case "specialties":
 						if (object instanceof Collection<?> c) {
 							var i = c.stream().mapToLong(x -> (Long) x).toArray();
-							object = persistence.getCrud(Specialty.class).read(i).toList();
+							object = persistence.crud(Specialty.class).read(i).toList();
 						}
 						break;
 					}
-				return super.newValueIterator(object);
+				return super.buildValueIterator(object);
 			}
 		};
 		i.setObject(object);

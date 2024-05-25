@@ -22,6 +22,9 @@ import java.util.Arrays;
 import com.janilla.persistence.ApplicationPersistenceBuilder;
 import com.janilla.persistence.Persistence;
 
+/**
+ * @author Diego Schivo
+ */
 public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 
 	@Override
@@ -53,7 +56,7 @@ public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 				David	Schroeder	2749 Blackhawk Trail	Madison	6085559435
 				Carlos	Estaban	2335 Independence La.	Waunakee	6085555487""".split("\n")) {
 			var y = x.split("\t");
-			persistence.getCrud(Owner.class).create(new Owner(null, y[0], y[1], y[2], y[3], y[4]));
+			persistence.crud(Owner.class).create(new Owner(null, y[0], y[1], y[2], y[3], y[4]));
 		}
 
 		for (var x : """
@@ -63,7 +66,7 @@ public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 				snake
 				bird
 				hamster""".split("\n")) {
-			persistence.getCrud(PetType.class).create(new PetType(null, x));
+			persistence.crud(PetType.class).create(new PetType(null, x));
 		}
 
 		for (var x : """
@@ -81,7 +84,7 @@ public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 				Lucky	2010-06-24	2	10
 				Sly	2012-06-08	1	10""".split("\n")) {
 			var y = x.split("\t");
-			persistence.getCrud(Pet.class)
+			persistence.crud(Pet.class)
 					.create(new Pet(null, y[0], LocalDate.parse(y[1]), Long.parseLong(y[2]), Long.parseLong(y[3])));
 		}
 
@@ -91,14 +94,14 @@ public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 				8	2013-01-03	neutered
 				7	2013-01-04	spayed""".split("\n")) {
 			var y = x.split("\t");
-			persistence.getCrud(Visit.class).create(new Visit(null, Long.parseLong(y[0]), LocalDate.parse(y[1]), y[2]));
+			persistence.crud(Visit.class).create(new Visit(null, Long.parseLong(y[0]), LocalDate.parse(y[1]), y[2]));
 		}
 
 		for (var x : """
 				radiology
 				surgery
 				dentistry""".split("\n")) {
-			persistence.getCrud(Specialty.class).create(new Specialty(null, x));
+			persistence.crud(Specialty.class).create(new Specialty(null, x));
 		}
 
 		for (var x : """
@@ -109,7 +112,7 @@ public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 				Henry	Stevens	1
 				Sharon	Jenkins""".split("\n")) {
 			var y = x.split("\t");
-			persistence.getCrud(Vet.class)
+			persistence.crud(Vet.class)
 					.create(new Vet(null, y[0], y[1], Arrays.stream(y).skip(2).map(Long::valueOf).toList()));
 		}
 	}

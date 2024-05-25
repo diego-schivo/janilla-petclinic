@@ -21,9 +21,9 @@ import com.janilla.persistence.Index;
 import com.janilla.persistence.Store;
 
 /**
+ * @author Diego Schivo
  * @author Ken Krebs
  * @author Dave Syer
- * @author Diego Schivo
  */
 @Store
 public record Visit(Long id, @Index(sort = "date") Long pet, LocalDate date, String description) {

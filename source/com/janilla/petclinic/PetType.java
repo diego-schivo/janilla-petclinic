@@ -19,8 +19,8 @@ import com.janilla.persistence.Index;
 import com.janilla.persistence.Store;
 
 /**
- * @author Juergen Hoeller
  * @author Diego Schivo
+ * @author Juergen Hoeller
  */
 @Store
 @Index(sort = "name")

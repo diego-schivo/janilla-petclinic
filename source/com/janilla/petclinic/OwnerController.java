@@ -36,11 +36,11 @@ import com.janilla.web.Bind;
 import com.janilla.web.Render;
 
 /**
+ * @author Diego Schivo
  * @author Juergen Hoeller
  * @author Ken Krebs
  * @author Arjen Poutsma
  * @author Michael Isvy
- * @author Diego Schivo
  */
 public class OwnerController {
 
@@ -58,17 +58,17 @@ public class OwnerController {
 
 	@Handle(method = "GET", path = "/owners")
 	public Object find(Owner owner, @Bind("page") Integer page) throws IOException {
-		var c = persistence.getCrud(Owner.class);
+		var c = persistence.crud(Owner.class);
 		var n = owner.lastName();
 		var i = page != null ? page - 1 : 0;
 		var f = n != null && !n.isBlank()
-				? c.filter2("lastName", x -> Util.startsWithIgnoreCase((String) x, n), i * 5, 5)
+				? c.filter("lastName", x -> Util.startsWithIgnoreCase((String) x, n), i * 5, 5)
 				: c.list(i * 5, 5);
 		return switch ((int) f.total()) {
 		case 0 -> new FindForm(owner, Map.of("lastName", List.of("has not been found")));
 		case 1 -> URI.create("/owners/" + f.ids()[0]);
 		default -> {
-			var d = persistence.getCrud(Pet.class);
+			var d = persistence.crud(Pet.class);
 			var l = (int) ((f.total() + 4) / 5);
 			var r = c.read(f.ids()).map(o -> {
 				var p = d.read(d.filter("owner", o.id())).toList();
@@ -82,12 +82,12 @@ public class OwnerController {
 
 	@Handle(method = "GET", path = "/owners/(\\d+)")
 	public Object show(long id) throws IOException {
-		var c = persistence.getCrud(Owner.class);
-		var d = persistence.getCrud(Pet.class);
-		var e = persistence.getCrud(Visit.class);
+		var c = persistence.crud(Owner.class);
+		var d = persistence.crud(Pet.class);
+		var e = persistence.crud(Visit.class);
 		var o = c.read(id);
 		var p = d.read(d.filter("owner", o.id())).map(x -> {
-			var t = persistence.getCrud(PetType.class).read(x.type());
+			var t = persistence.crud(PetType.class).read(x.type());
 			var v = e.read(e.filter("pet", x.id()));
 			return new Pet2(x, t, v);
 		});
@@ -106,13 +106,13 @@ public class OwnerController {
 		if (!errors.isEmpty())
 			return new Form(owner, errors);
 
-		var o = persistence.getCrud(Owner.class).create(owner);
+		var o = persistence.crud(Owner.class).create(owner);
 		return URI.create("/owners/" + o.id());
 	}
 
 	@Handle(method = "GET", path = "/owners/(\\d+)/edit")
 	public Object initUpdate(long id) throws IOException {
-		var c = persistence.getCrud(Owner.class);
+		var c = persistence.crud(Owner.class);
 		var o = c.read(id);
 		return new Form(o, null);
 	}
@@ -123,7 +123,7 @@ public class OwnerController {
 		if (!errors.isEmpty())
 			return new Form(owner, errors);
 
-		var o = persistence.getCrud(Owner.class).update(id, x -> Reflection.copy(owner, x, y -> !y.equals("id")));
+		var o = persistence.crud(Owner.class).update(id, x -> Reflection.copy(owner, x, y -> !y.equals("id")));
 		return URI.create("/owners/" + o.id());
 	}
 

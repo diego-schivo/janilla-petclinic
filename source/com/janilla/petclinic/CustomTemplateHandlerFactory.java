@@ -15,8 +15,6 @@
  */
 package com.janilla.petclinic;
 
-import java.io.IOException;
-
 import com.janilla.frontend.RenderEngine;
 import com.janilla.http.HttpExchange;
 import com.janilla.web.TemplateHandlerFactory;
@@ -29,7 +27,7 @@ public class CustomTemplateHandlerFactory extends TemplateHandlerFactory {
 	static ThreadLocal<Layout> layout = new ThreadLocal<>();
 
 	@Override
-	protected void render(RenderEngine.Entry input, HttpExchange exchange) throws IOException {
+	protected void render(RenderEngine.Entry input, HttpExchange exchange) {
 		var l = layout.get();
 		var n = l == null;
 		if (n) {

@@ -21,11 +21,11 @@ import com.janilla.persistence.Index;
 import com.janilla.persistence.Store;
 
 /**
+ * @author Diego Schivo
  * @author Ken Krebs
  * @author Juergen Hoeller
  * @author Sam Brannen
  * @author Arjen Poutsma
- * @author Diego Schivo
  */
 @Store
 @Index

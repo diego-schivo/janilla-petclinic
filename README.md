@@ -45,13 +45,13 @@ The following items should be installed in your system:
 In order to install them all:
 
 1. Download the [Eclipse Installer](https://www.eclipse.org/downloads/packages/installer)
-2. Install the package for Enterprise Java and Web Developers with JRE 21.0.1
+2. Install the package for Enterprise Java and Web Developers with JRE 21
 
 ### Steps
 
 1. Launch Eclipse and choose Import projects from Git (with smart import)
-2. Select GitHub as the repository source, then search for `janilla-conduit fork:true` and complete the wizard
-3. Select a project (eg: `janilla-conduit-fullstack`) and launch Debug as Java Application
+2. Select GitHub as the repository source, then search for `janilla-petclinic fork:true` and complete the wizard
+3. Select the project (`janilla-petclinic`) and launch Debug as Java Application
 4. Open a browser and navigate to <http://localhost:8080/>
 
 ## Looking for something in particular?

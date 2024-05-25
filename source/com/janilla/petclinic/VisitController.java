@@ -31,12 +31,12 @@ import com.janilla.web.Handle;
 import com.janilla.web.Render;
 
 /**
+ * @author Diego Schivo
  * @author Juergen Hoeller
  * @author Ken Krebs
  * @author Arjen Poutsma
  * @author Michael Isvy
  * @author Dave Syer
- * @author Diego Schivo
  */
 public class VisitController {
 
@@ -48,11 +48,11 @@ public class VisitController {
 
 	@Handle(method = "GET", path = "/owners/(\\d+)/pets/(\\d+)/visits/new")
 	public Object initCreate(long owner, long pet) throws IOException {
-		var o = persistence.getCrud(Owner.class).read(owner);
-		var p = persistence.getCrud(Pet.class).read(pet);
-		var t = persistence.getCrud(PetType.class).read(p.type());
+		var o = persistence.crud(Owner.class).read(owner);
+		var p = persistence.crud(Pet.class).read(pet);
+		var t = persistence.crud(PetType.class).read(p.type());
 		var v = new Visit(null, null, LocalDate.now(), null);
-		var c = persistence.getCrud(Visit.class);
+		var c = persistence.crud(Visit.class);
 		var w = c.read(c.filter("pet", pet)).toList();
 		return new Form(o, p, t, v, w, null);
 	}
@@ -64,7 +64,7 @@ public class VisitController {
 		if (!errors.isEmpty())
 			return Form.of(v, errors, persistence);
 
-		persistence.getCrud(Visit.class).create(v);
+		persistence.crud(Visit.class).create(v);
 		return URI.create("/owners/" + owner);
 	}
 
@@ -84,10 +84,10 @@ public class VisitController {
 
 		static Form of(Visit visit, Map<String, Collection<String>> errors, Persistence persistence)
 				throws IOException {
-			var p = persistence.getCrud(Pet.class).read(visit.pet());
-			var o = persistence.getCrud(Owner.class).read(p.owner());
-			var t = persistence.getCrud(PetType.class).read(p.type());
-			var c = persistence.getCrud(Visit.class);
+			var p = persistence.crud(Pet.class).read(visit.pet());
+			var o = persistence.crud(Owner.class).read(p.owner());
+			var t = persistence.crud(PetType.class).read(p.type());
+			var c = persistence.crud(Visit.class);
 			var w = c.read(c.filter("pet", p.id())).toList();
 			return new Form(o, p, t, visit, w, errors);
 		}

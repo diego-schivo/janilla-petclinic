@@ -18,8 +18,8 @@ package com.janilla.petclinic;
 import com.janilla.web.Handle;
 
 /**
- * @author Michael Isvy
  * @author Diego Schivo
+ * @author Michael Isvy
  */
 public class CrashController {
 

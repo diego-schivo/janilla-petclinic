@@ -15,7 +15,6 @@
  */
 package com.janilla.petclinic;
 
-import java.io.IOException;
 import java.util.Properties;
 
 import com.janilla.http.HttpExchange;
@@ -31,7 +30,7 @@ public class CustomMethodHandlerFactory extends MethodHandlerFactory {
 	public Properties configuration;
 
 	@Override
-	protected void handle(MethodInvocation invocation, HttpExchange exchange) throws IOException {
+	protected void handle(MethodInvocation invocation, HttpExchange exchange) {
 		if (Boolean.parseBoolean(configuration.getProperty("petclinic.live-demo")))
 			switch (exchange.getRequest().getMethod().name()) {
 			case "GET":

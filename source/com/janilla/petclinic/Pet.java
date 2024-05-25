@@ -21,10 +21,10 @@ import com.janilla.persistence.Index;
 import com.janilla.persistence.Store;
 
 /**
+ * @author Diego Schivo
  * @author Ken Krebs
  * @author Juergen Hoeller
  * @author Sam Brannen
- * @author Diego Schivo
  */
 @Store
 public record Pet(Long id, String name, LocalDate birthDate, Long type, @Index(sort = "name") Long owner) {

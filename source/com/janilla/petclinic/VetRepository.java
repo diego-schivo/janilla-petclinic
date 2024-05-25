@@ -24,11 +24,11 @@ import com.janilla.persistence.Crud;
 import com.janilla.util.Lazy;
 
 /**
+ * @author Diego Schivo
  * @author Ken Krebs
  * @author Juergen Hoeller
  * @author Sam Brannen
  * @author Michael Isvy
- * @author Diego Schivo
  */
 public class VetRepository extends Crud<Vet> {
 

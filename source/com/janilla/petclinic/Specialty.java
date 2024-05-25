@@ -18,8 +18,8 @@ package com.janilla.petclinic;
 import com.janilla.persistence.Store;
 
 /**
- * @author Juergen Hoeller
  * @author Diego Schivo
+ * @author Juergen Hoeller
  */
 @Store
 public record Specialty(Long id, String name) {
