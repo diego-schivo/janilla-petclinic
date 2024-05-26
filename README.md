@@ -34,6 +34,8 @@ You can change the file location by editing `configuration.properties` in the so
 
 ## Working with Janilla PetClinic in Eclipse IDE
 
+[Step-by-step Video Tutorial](https://youtu.be/YdIv62obVsw) available on our [YouTube Channel](https://www.youtube.com/@janilla).
+
 ### Prerequisites
 
 The following items should be installed in your system:
