@@ -20,7 +20,6 @@ import java.util.Properties;
 import com.janilla.http.HttpExchange;
 import com.janilla.web.HandleException;
 import com.janilla.web.MethodHandlerFactory;
-import com.janilla.web.MethodInvocation;
 
 /**
  * @author Diego Schivo
@@ -30,7 +29,7 @@ public class CustomMethodHandlerFactory extends MethodHandlerFactory {
 	public Properties configuration;
 
 	@Override
-	protected void handle(MethodInvocation invocation, HttpExchange exchange) {
+	protected void handle(Invocation invocation, HttpExchange exchange) {
 		if (Boolean.parseBoolean(configuration.getProperty("petclinic.live-demo")))
 			switch (exchange.getRequest().getMethod().name()) {
 			case "GET":
