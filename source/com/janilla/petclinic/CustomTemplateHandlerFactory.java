@@ -17,6 +17,7 @@ package com.janilla.petclinic;
 
 import com.janilla.frontend.RenderEngine;
 import com.janilla.http.HttpExchange;
+import com.janilla.http.HttpHeader;
 import com.janilla.web.TemplateHandlerFactory;
 
 /**
@@ -27,9 +28,10 @@ public class CustomTemplateHandlerFactory extends TemplateHandlerFactory {
 	@Override
 	protected void render(RenderEngine.Entry input, HttpExchange exchange) {
 		var e = (CustomExchange) exchange;
-		var a = exchange.getRequest().getHeaders().get("Accept");
+		var a = e.getRequest().getHeaders().stream().filter(x -> x.name().equals("Accept")).map(HttpHeader::value)
+				.findFirst().orElse(null);
 		if (e.layout == null && !a.equals("*/*")) {
-			e.layout = new Layout(exchange.getRequest().getURI(), input);
+			e.layout = new Layout(e.getRequest().getUri(), input);
 			input = RenderEngine.Entry.of(null, e.layout, null);
 		}
 		super.render(input, exchange);

@@ -30,7 +30,7 @@ public class CustomExceptionHandlerFactory extends ExceptionHandlerFactory {
 	public WebHandlerFactory mainFactory;
 
 	@Override
-	protected void handle(Error error, HttpExchange exchange) {
+	protected boolean handle(Error error, HttpExchange exchange) {
 		super.handle(error, exchange);
 		var e = exchange.getException();
 		if (e.getClass().isAnnotationPresent(Render.class)) {
@@ -38,5 +38,6 @@ public class CustomExceptionHandlerFactory extends ExceptionHandlerFactory {
 			var h = mainFactory.createHandler(o, exchange);
 			h.handle(exchange);
 		}
+		return true;
 	}
 }

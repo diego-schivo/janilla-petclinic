@@ -17,7 +17,6 @@ package com.janilla.petclinic;
 
 import com.janilla.http.HttpExchange;
 import com.janilla.http.HttpRequest;
-import com.janilla.http.HttpResponse;
 import com.janilla.http.HttpServer;
 import com.janilla.reflect.Factory;
 
@@ -26,10 +25,7 @@ public class CustomServer extends HttpServer {
 	public Factory factory;
 
 	@Override
-	protected HttpExchange buildExchange(HttpRequest request, HttpResponse response) {
-		var e = factory.create(HttpExchange.class);
-		e.setRequest(request);
-		e.setResponse(response);
-		return e;
+	protected HttpExchange createExchange(HttpRequest request) {
+		return factory.create(HttpExchange.class);
 	}
 }
