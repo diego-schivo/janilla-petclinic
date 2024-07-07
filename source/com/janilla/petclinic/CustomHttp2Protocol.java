@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-//package com.janilla.petclinic;
-//
-//import com.janilla.http.HttpExchange;
-//import com.janilla.http.HttpRequest;
-//import com.janilla.net.Server;
-//import com.janilla.reflect.Factory;
-//
-//public class CustomServer extends Server {
-//
-//	public Factory factory;
-//
-//	@Override
-//	protected HttpExchange createExchange(HttpRequest request) {
-//		return factory.create(HttpExchange.class);
-//	}
-//}
+package com.janilla.petclinic;
+
+import com.janilla.http.HttpRequest;
+import com.janilla.http2.Http2Exchange;
+import com.janilla.http2.Http2Protocol;
+import com.janilla.reflect.Factory;
+
+public class CustomHttp2Protocol extends Http2Protocol {
+
+	public Factory factory;
+
+	@Override
+	protected Http2Exchange createExchange(HttpRequest request) {
+		return factory.create(Http2Exchange.class);
+	}
+}
