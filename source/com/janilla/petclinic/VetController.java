@@ -21,7 +21,6 @@ import java.net.URI;
 import java.util.Collection;
 
 import com.janilla.persistence.Persistence;
-import com.janilla.petclinic.VetController.FindOutcome.Result;
 import com.janilla.web.Handle;
 import com.janilla.web.Bind;
 import com.janilla.web.Render;
@@ -51,7 +50,7 @@ public class VetController {
 			var r = c.read(p.ids()).map(v -> {
 				var j = v.specialties().stream().mapToLong(Long::longValue).toArray();
 				var s = persistence.crud(Specialty.class).read(j).toList();
-				return new Result(v, s);
+				return new FindOutcome.Result(v, s);
 			}).toList();
 			var q = new Paginator(i, l, URI.create("/vets.html"));
 			return new FindOutcome(r, q);

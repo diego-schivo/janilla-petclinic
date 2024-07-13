@@ -28,7 +28,7 @@ public class CustomTemplateHandlerFactory extends TemplateHandlerFactory {
 	@Override
 	protected void render(RenderEngine.Entry input, HttpExchange exchange) {
 		var e = (CustomExchange) exchange;
-		var a = e.getRequest().getHeaders().stream().filter(x -> x.name().equals("Accept")).map(HeaderField::value)
+		var a = e.getRequest().getHeaders().stream().filter(x -> x.name().equals("accept")).map(HeaderField::value)
 				.findFirst().orElse(null);
 		if (e.layout == null && !a.equals("*/*")) {
 			e.layout = new Layout(e.getRequest().getUri(), input);

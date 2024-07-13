@@ -27,12 +27,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import com.janilla.persistence.Persistence;
-import com.janilla.petclinic.OwnerController.Details.Pet2;
-import com.janilla.petclinic.OwnerController.FindOutcome.Result;
 import com.janilla.reflect.Reflection;
 import com.janilla.util.Util;
-import com.janilla.web.Handle;
 import com.janilla.web.Bind;
+import com.janilla.web.Handle;
 import com.janilla.web.Render;
 
 /**
@@ -72,7 +70,7 @@ public class OwnerController {
 			var l = (int) ((f.total() + 4) / 5);
 			var r = c.read(f.ids()).map(o -> {
 				var p = d.read(d.filter("owner", o.id())).toList();
-				return new Result(o, p);
+				return new FindOutcome.Result(o, p);
 			}).toList();
 			var p = new Paginator(i, l, URI.create("/owners"));
 			yield new FindOutcome(r, p);
@@ -89,7 +87,7 @@ public class OwnerController {
 		var p = d.read(d.filter("owner", o.id())).map(x -> {
 			var t = persistence.crud(PetType.class).read(x.type());
 			var v = e.read(e.filter("pet", x.id()));
-			return new Pet2(x, t, v);
+			return new Details.Pet2(x, t, v);
 		});
 		return new Details(o, p);
 	}

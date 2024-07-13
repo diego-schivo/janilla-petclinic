@@ -18,8 +18,8 @@ package com.janilla.petclinic;
 import com.janilla.http.HttpExchange;
 
 public class CustomExchange extends HttpExchange {
-	
+
 	public String country;
-	
+
 	public Layout layout;
 }

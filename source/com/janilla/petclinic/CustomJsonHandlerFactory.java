@@ -17,7 +17,7 @@ package com.janilla.petclinic;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Map.Entry;
+import java.util.Map;
 import java.util.Properties;
 
 import com.janilla.http.HttpExchange;
@@ -42,7 +42,7 @@ public class CustomJsonHandlerFactory extends JsonHandlerFactory {
 			@Override
 			public Iterator<JsonToken<?>> buildValueIterator(Object object) {
 				var o = getStack().peek();
-				if (o instanceof Entry e)
+				if (o instanceof Map.Entry e)
 					switch ((String) e.getKey()) {
 					case "specialties":
 						if (object instanceof Collection<?> c) {
