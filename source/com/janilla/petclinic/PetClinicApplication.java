@@ -22,8 +22,8 @@ import java.nio.file.Path;
 import java.util.Properties;
 import java.util.function.Supplier;
 
+import com.janilla.http.HttpProtocol;
 import com.janilla.http.HttpHandler;
-import com.janilla.http2.Http2Protocol;
 import com.janilla.net.Net;
 import com.janilla.net.Server;
 import com.janilla.persistence.ApplicationPersistenceBuilder;
@@ -53,7 +53,7 @@ public class PetClinicApplication {
 		var s = new Server();
 		s.setAddress(new InetSocketAddress(Integer.parseInt(a.configuration.getProperty("petclinic.server.port"))));
 		{
-			var p = a.getFactory().create(Http2Protocol.class);
+			var p = a.getFactory().create(HttpProtocol.class);
 			try (var is = Net.class.getResourceAsStream("testkeys")) {
 				p.setSslContext(Net.getSSLContext("JKS", is, "passphrase".toCharArray()));
 			} catch (IOException e) {
