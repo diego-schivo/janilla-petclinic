@@ -30,13 +30,9 @@ public class CustomMethodHandlerFactory extends MethodHandlerFactory {
 
 	@Override
 	protected void handle(Invocation invocation, HttpExchange exchange) {
-		if (Boolean.parseBoolean(configuration.getProperty("petclinic.live-demo")))
-			switch (exchange.getRequest().getMethod()) {
-			case "GET":
-				break;
-			default:
-				throw new HandleException(new MethodBlockedException());
-			}
+		if (Boolean.parseBoolean(configuration.getProperty("petclinic.live-demo"))
+				&& !exchange.getRequest().getMethod().equals("GET"))
+			throw new HandleException(new MethodBlockedException());
 		super.handle(invocation, exchange);
 	}
 }
