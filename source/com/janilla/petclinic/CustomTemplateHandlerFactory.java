@@ -31,7 +31,8 @@ public class CustomTemplateHandlerFactory extends TemplateHandlerFactory {
 		var a = e.getRequest().getHeaders().stream().filter(x -> x.name().equals("accept")).map(HeaderField::value)
 				.findFirst().orElse(null);
 		if (e.layout == null && !a.equals("*/*")) {
-			e.layout = new Layout(e.getRequest().getUri(), input);
+//			e.layout = new Layout(e.getRequest().getUri(), input);
+			e.layout = new Layout(e.getRequest().getPath(), input);
 			input = RenderEngine.Entry.of(null, e.layout, null);
 		}
 		super.render(input, exchange);

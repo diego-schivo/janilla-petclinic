@@ -18,18 +18,17 @@ package com.janilla.petclinic;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.InetSocketAddress;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Properties;
-import java.util.function.Supplier;
 
-import com.janilla.http.HttpProtocol;
 import com.janilla.http.HttpHandler;
+import com.janilla.http.HttpProtocol;
 import com.janilla.net.Net;
 import com.janilla.net.Server;
 import com.janilla.persistence.ApplicationPersistenceBuilder;
 import com.janilla.persistence.Persistence;
 import com.janilla.reflect.Factory;
-import com.janilla.util.Lazy;
 import com.janilla.util.Util;
 import com.janilla.web.ApplicationHandlerBuilder;
 
@@ -39,70 +38,62 @@ import com.janilla.web.ApplicationHandlerBuilder;
  */
 public class PetClinicApplication {
 
-	public static void main(String[] args) throws Exception {
-		var a = new PetClinicApplication();
-		{
-			var c = new Properties();
-			try (var s = a.getClass().getResourceAsStream("configuration.properties")) {
-				c.load(s);
-			}
-			a.configuration = c;
-		}
-		a.getPersistence();
-
-		var s = new Server();
-		s.setAddress(new InetSocketAddress(Integer.parseInt(a.configuration.getProperty("petclinic.server.port"))));
-		{
-			var p = a.getFactory().create(HttpProtocol.class);
-			try (var is = Net.class.getResourceAsStream("testkeys")) {
-				p.setSslContext(Net.getSSLContext("JKS", is, "passphrase".toCharArray()));
+	public static void main(String[] args) {
+		try {
+			var pp = new Properties();
+			try (var is = PetClinicApplication.class.getResourceAsStream("configuration.properties")) {
+				pp.load(is);
+				if (args.length > 0) {
+					var p = args[0];
+					if (p.startsWith("~"))
+						p = System.getProperty("user.home") + p.substring(1);
+					pp.load(Files.newInputStream(Path.of(p)));
+				}
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
-			p.setHandler(a.getHandler());
-			s.setProtocol(p);
+			var a = new PetClinicApplication(pp);
+			var hp = a.factory.create(HttpProtocol.class);
+			try (var is = Net.class.getResourceAsStream("testkeys")) {
+				hp.setSslContext(Net.getSSLContext("JKS", is, "passphrase".toCharArray()));
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+			hp.setHandler(a.handler);
+			var s = new Server();
+			s.setAddress(new InetSocketAddress(Integer.parseInt(a.configuration.getProperty("petclinic.server.port"))));
+			s.setProtocol(hp);
+			s.serve();
+		} catch (Throwable e) {
+			e.printStackTrace();
 		}
-		s.serve();
 	}
 
 	public Properties configuration;
 
-	private Supplier<Factory> factory = Lazy.of(() -> {
-		var f = new Factory();
-		f.setTypes(Util.getPackageClasses(getClass().getPackageName()).toList());
-		f.setSource(this);
-		return f;
-	});
+	public Factory factory;
 
-	private Supplier<Persistence> persistence = Lazy.of(() -> {
-		var b = getFactory().create(ApplicationPersistenceBuilder.class);
+	public HttpHandler handler;
+
+	public Persistence persistence;
+
+	public PetClinicApplication(Properties configuration) {
+		this.configuration = configuration;
+		factory = new Factory();
+		factory.setTypes(Util.getPackageClasses(getClass().getPackageName()).toList());
+		factory.setSource(this);
+		handler = factory.create(ApplicationHandlerBuilder.class).build();
 		{
+			var pb = factory.create(ApplicationPersistenceBuilder.class);
 			var p = configuration.getProperty("petclinic.database.file");
 			if (p.startsWith("~"))
 				p = System.getProperty("user.home") + p.substring(1);
-			b.setFile(Path.of(p));
+			pb.setFile(Path.of(p));
+			persistence = pb.build();
 		}
-		return b.build();
-	});
-
-	Supplier<HttpHandler> handler = Lazy.of(() -> {
-		var b = getFactory().create(ApplicationHandlerBuilder.class);
-		return b.build();
-	});
+	}
 
 	public PetClinicApplication getApplication() {
 		return this;
-	}
-
-	public Factory getFactory() {
-		return factory.get();
-	}
-
-	public Persistence getPersistence() {
-		return persistence.get();
-	}
-
-	public HttpHandler getHandler() {
-		return handler.get();
 	}
 }
