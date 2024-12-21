@@ -18,12 +18,11 @@ package com.janilla.petclinic;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URI;
-import java.util.Collection;
+import java.util.List;
 
 import com.janilla.persistence.Persistence;
-import com.janilla.web.Handle;
 import com.janilla.web.Bind;
-import com.janilla.web.Render;
+import com.janilla.web.Handle;
 
 /**
  * @author Diego Schivo
@@ -34,11 +33,7 @@ import com.janilla.web.Render;
  */
 public class VetController {
 
-	private Persistence persistence;
-
-	public void setPersistence(Persistence persistence) {
-		this.persistence = persistence;
-	}
+	public Persistence persistence;
 
 	@Handle(method = "GET", path = "/vets.html")
 	public Object find(@Bind("page") Integer page) throws IOException {
@@ -67,13 +62,17 @@ public class VetController {
 		return v;
 	}
 
-	@Render("vetList.html")
-	public record FindOutcome(Collection<Result> results, Paginator paginator) {
+//	@Render("vetList.html")
+	public record FindOutcome(List<Result> results, Paginator paginator) {
 
-		@Render("vetList-result.html")
-		public record Result(Vet vet, @Render(delimiter = ", ") Collection<@Render("""
-				<span>{name}</span>
-				""") Specialty> specialties) {
+//		@Render("vetList-result.html")
+		public record Result(Vet vet,
+//				@Render(delimiter = ", ") 
+				List<
+//				@Render("""
+//				<span>{name}</span>
+//				""") 
+						Specialty> specialties) {
 		}
 	}
 }

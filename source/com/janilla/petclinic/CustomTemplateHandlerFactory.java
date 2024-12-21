@@ -13,28 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.janilla.petclinic;
-
-import com.janilla.frontend.RenderEngine;
-import com.janilla.http.HeaderField;
-import com.janilla.http.HttpExchange;
-import com.janilla.web.TemplateHandlerFactory;
-
-/**
- * @author Diego Schivo
- */
-public class CustomTemplateHandlerFactory extends TemplateHandlerFactory {
-
-	@Override
-	protected void render(RenderEngine.Entry input, HttpExchange exchange) {
-		var e = (CustomExchange) exchange;
-		var a = e.getRequest().getHeaders().stream().filter(x -> x.name().equals("accept")).map(HeaderField::value)
-				.findFirst().orElse(null);
-		if (e.layout == null && !a.equals("*/*")) {
-//			e.layout = new Layout(e.getRequest().getUri(), input);
-			e.layout = new Layout(e.getRequest().getPath(), input);
-			input = RenderEngine.Entry.of(null, e.layout, null);
-		}
-		super.render(input, exchange);
-	}
-}
+//package com.janilla.petclinic;
+//
+//import com.janilla.frontend.RenderEngine;
+//import com.janilla.http.HttpExchange;
+//import com.janilla.web.TemplateHandlerFactory;
+//
+///**
+// * @author Diego Schivo
+// */
+//public class CustomTemplateHandlerFactory extends TemplateHandlerFactory {
+//
+//	@Override
+//	protected void render(RenderEngine.Entry input, HttpExchange exchange) {
+//		var ex = (CustomHttpExchange) exchange;
+//		var a = ex.getRequest().getHeaderValue("accept");
+//		if (ex.layout == null && !a.equals("*/*")) {
+//			ex.layout = new Layout(ex.getRequest().getPath(), input);
+//			input = RenderEngine.Entry.of(null, ex.layout, null);
+//		}
+//		super.render(input, exchange);
+//	}
+//}

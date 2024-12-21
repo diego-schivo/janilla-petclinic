@@ -15,7 +15,7 @@
  */
 package com.janilla.petclinic;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
@@ -45,9 +45,9 @@ public class CustomJsonHandlerFactory extends JsonHandlerFactory {
 				if (o instanceof Map.Entry e)
 					switch ((String) e.getKey()) {
 					case "specialties":
-						if (object instanceof Collection<?> c) {
-							var i = c.stream().mapToLong(x -> (Long) x).toArray();
-							object = persistence.crud(Specialty.class).read(i).toList();
+						if (object instanceof List<?> c) {
+							var ll = c.stream().mapToLong(x -> (long) x).toArray();
+							object = persistence.crud(Specialty.class).read(ll).toList();
 						}
 						break;
 					}

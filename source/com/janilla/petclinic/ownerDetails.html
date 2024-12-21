@@ -2,41 +2,43 @@
 <table class="table table-striped">
 	<tr>
 		<th>Name</th>
-		<td><b>{owner.firstName} {owner.lastName}</b></td>
+		<td>
+			<b>${name}</b>
+		</td>
 	</tr>
 	<tr>
 		<th>Address</th>
-		<td>{owner.address}</td>
+		<td>${address}</td>
 	</tr>
 	<tr>
 		<th>City</th>
-		<td>{owner.city}</td>
+		<td>${city}</td>
 	</tr>
 	<tr>
 		<th>Telephone</th>
-		<td>{owner.telephone}</td>
+		<td>${telephone}</td>
 	</tr>
 </table>
-<a href="/owners/{owner.id}/edit" class="btn btn-primary">Edit Owner</a>
-<a href="/owners/{owner.id}/pets/new" class="btn btn-primary">Add New Pet</a>
+<a href="${edit}" class="btn btn-primary">Edit Owner</a>
+<a href="${newPet}" class="btn btn-primary">Add New Pet</a>
 <br />
 <br />
 <br />
 <h2>Pets and Visits</h2>
 <table class="table table-striped">
-	<{pets}>
+	<!--${pets}-->
 </table>
 
-<template id="ownerDetails-pet">
+<template id="pet">
 	<tr>
 		<td valign="top">
 			<dl class="dl-horizontal">
 				<dt>Name</dt>
-				<dd>{pet.name}</dd>
+				<dd>${name}</dd>
 				<dt>Birth Date</dt>
-				<dd>{pet.birthDate}</dd>
+				<dd>${birthDate}</dd>
 				<dt>Type</dt>
-				<dd>{type.name}</dd>
+				<dd>${type.name}</dd>
 			</dl>
 		</td>
 		<td valign="top">
@@ -47,19 +49,19 @@
 						<th>Description</th>
 					</tr>
 				</thead>
-				<{visits}>
+				<!--${visits}-->
 				<tr>
-					<td><a href="/owners/{pet.owner}/pets/{pet.id}/edit">Edit Pet</a></td>
-					<td><a href="/owners/{pet.owner}/pets/{pet.id}/visits/new">Add Visit</a></td>
+					<td><a href="${edit}">Edit Pet</a></td>
+					<td><a href="${newVisit}">Add Visit</a></td>
 				</tr>
 			</table>
 		</td>
 	</tr>
 </template>
 
-<template id="ownerDetails-visit">
+<template id="visit">
 	<tr>
-		<td>{date}</td>
-		<td>{description}</td>
+		<td>${date}</td>
+		<td>${description}</td>
 	</tr>
 </template>

@@ -93,7 +93,7 @@ public class PetClinicApplication {
 		}
 	}
 
-	public PetClinicApplication getApplication() {
+	public PetClinicApplication application() {
 		return this;
 	}
 }

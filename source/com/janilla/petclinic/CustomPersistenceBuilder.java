@@ -29,21 +29,21 @@ public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 
 	@Override
 	public Persistence build() {
-		var e = Files.exists(file);
+		var fe = Files.exists(file);
 		var p = super.build();
 		p.setTypeResolver(x -> {
 			try {
-				return Class.forName("com.janilla.petclinic." + x.replace('.', '$'));
-			} catch (ClassNotFoundException f) {
-				throw new RuntimeException(f);
+				return Class.forName(getClass().getPackageName() + "." + x.replace('.', '$'));
+			} catch (ClassNotFoundException e) {
+				throw new RuntimeException(e);
 			}
 		});
-		if (!e)
+		if (!fe)
 			seed(p);
 		return p;
 	}
 
-	void seed(Persistence persistence) {
+	private void seed(Persistence persistence) {
 		for (var x : """
 				George	Franklin	110 W. Liberty St.	Madison	6085551023
 				Betty	Davis	638 Cardinal Ave.	Sun Prairie	6085551749

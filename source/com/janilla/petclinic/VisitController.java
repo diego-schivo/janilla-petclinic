@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +27,6 @@ import java.util.function.Function;
 import com.janilla.persistence.Persistence;
 import com.janilla.reflect.Reflection;
 import com.janilla.web.Handle;
-import com.janilla.web.Render;
 
 /**
  * @author Diego Schivo
@@ -40,11 +38,7 @@ import com.janilla.web.Render;
  */
 public class VisitController {
 
-	private Persistence persistence;
-
-	public void setPersistence(Persistence persistence) {
-		this.persistence = persistence;
-	}
+	public Persistence persistence;
 
 	@Handle(method = "GET", path = "/owners/(\\d+)/pets/(\\d+)/visits/new")
 	public Object initCreate(long owner, long pet) throws IOException {
@@ -68,8 +62,8 @@ public class VisitController {
 		return URI.create("/owners/" + owner);
 	}
 
-	protected Map<String, Collection<String>> validate(Visit visit) {
-		var errors = new HashMap<String, Collection<String>>();
+	protected Map<String, List<String>> validate(Visit visit) {
+		var errors = new HashMap<String, List<String>>();
 		if (visit.date() == null)
 			errors.computeIfAbsent("date", k -> new ArrayList<>()).add("must not be blank");
 		if (visit.description() == null || visit.description().isBlank())
@@ -77,13 +71,11 @@ public class VisitController {
 		return errors;
 	}
 
-	@Render("createOrUpdateVisitForm.html")
-	public record Form(Owner owner, Pet pet, PetType petType, Visit visit,
-			List<@Render("createOrUpdateVisitForm-previousVisit.html") Visit> previousVisits,
-			Map<String, Collection<String>> errors) {
+//	@Render("createOrUpdateVisitForm.html")
+	public record Form(Owner owner, Pet pet, PetType petType, Visit visit, List<Visit> previousVisits,
+			Map<String, List<String>> errors) {
 
-		static Form of(Visit visit, Map<String, Collection<String>> errors, Persistence persistence)
-				throws IOException {
+		static Form of(Visit visit, Map<String, List<String>> errors, Persistence persistence) throws IOException {
 			var p = persistence.crud(Pet.class).read(visit.pet());
 			var o = persistence.crud(Owner.class).read(p.owner());
 			var t = persistence.crud(PetType.class).read(p.type());

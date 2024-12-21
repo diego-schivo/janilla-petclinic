@@ -15,11 +15,22 @@
  */
 package com.janilla.petclinic;
 
-import com.janilla.http.HttpExchange;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
-public class CustomExchange extends HttpExchange {
+import com.janilla.persistence.Crud;
+import com.janilla.util.Lazy;
 
-	public String country;
+/**
+ * @author Diego Schivo
+ */
+public class SpecialtyRepository extends Crud<Specialty> {
 
-	public Layout layout;
+	Map<Long, Supplier<Specialty>> readCache = new ConcurrentHashMap<>();
+
+	@Override
+	public Specialty read(long id) {
+		return readCache.computeIfAbsent(id, k -> Lazy.of(() -> super.read(id))).get();
+	}
 }

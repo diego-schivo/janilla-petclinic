@@ -15,6 +15,7 @@
  */
 package com.janilla.petclinic;
 
+import com.janilla.http.HttpExchange;
 import com.janilla.web.Handle;
 import com.janilla.web.Render;
 
@@ -24,7 +25,15 @@ import com.janilla.web.Render;
 public class WelcomeController {
 
 	@Handle(method = "GET", path = "/")
-	public @Render("welcome.html") Object getPage() {
-		return "page";
+	public @Render(PageRenderer.class) Object page() {
+		return new Object();
+	}
+
+	public static class PageRenderer extends LayoutRenderer {
+
+		@Override
+		protected String renderContent(Object value, HttpExchange exchange) {
+			return interpolate(templates("welcome.html").get(null), null);
+		}
 	}
 }

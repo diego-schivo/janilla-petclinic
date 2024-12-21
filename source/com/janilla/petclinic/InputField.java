@@ -15,23 +15,14 @@
  */
 package com.janilla.petclinic;
 
-import java.util.Collection;
+import java.util.List;
 
 import com.janilla.web.Render;
 
 /**
  * @author Diego Schivo
  */
-@Render("inputField.html")
-public record InputField(String label, String name, String type, Object value, @Render(template = """
-		<span class="help-inline">{}</span>
-		""", delimiter = "<br />") Collection<String> errors) implements FormField {
-
-	public String errorClass() {
-		return errors == null || errors.isEmpty() ? "" : "has-error";
-	}
-
-	public String feedbackIcon() {
-		return errors == null || errors.isEmpty() ? "ok" : "remove";
-	}
+@Render(InputFieldRenderer.class)
+public record InputField(String label, String name, String type, Object value, List<String> errors)
+		implements FormField {
 }

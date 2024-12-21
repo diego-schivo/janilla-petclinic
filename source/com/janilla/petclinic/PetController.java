@@ -18,14 +18,13 @@ package com.janilla.petclinic;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.janilla.http.HttpExchange;
 import com.janilla.persistence.Persistence;
 import com.janilla.reflect.Reflection;
 import com.janilla.web.Handle;
@@ -39,11 +38,7 @@ import com.janilla.web.Render;
  */
 public class PetController {
 
-	private Persistence persistence;
-
-	public void setPersistence(Persistence persistence) {
-		this.persistence = persistence;
-	}
+	public Persistence persistence;
 
 	@Handle(method = "GET", path = "/owners/(\\d+)/pets/new")
 	public Object initCreate(long owner) throws IOException {
@@ -54,12 +49,11 @@ public class PetController {
 	@Handle(method = "POST", path = "/owners/(\\d+)/pets/new")
 	public Object create(long owner, Pet pet) throws IOException {
 		var p = new Pet(null, pet.name(), pet.birthDate(), pet.type(), owner);
-		var errors = validate(p);
-		if (!errors.isEmpty())
-			return Form.of(p, errors, persistence);
-
-		persistence.crud(Pet.class).create(p);
-		return URI.create("/owners/" + owner);
+		var ee = validate(p);
+		if (!ee.isEmpty())
+			return Form.of(p, ee, persistence);
+		var p2 = persistence.crud(Pet.class).create(p);
+		return URI.create("/owners/" + p2.owner());
 	}
 
 	@Handle(method = "GET", path = "/owners/(\\d+)/pets/(\\d+)/edit")
@@ -71,61 +65,60 @@ public class PetController {
 	@Handle(method = "POST", path = "/owners/(\\d+)/pets/(\\d+)/edit")
 	public Object update(long owner, long id, Pet pet) throws IOException {
 		var p = new Pet(id, pet.name(), pet.birthDate(), pet.type(), owner);
-		var errors = validate(p);
-		if (!errors.isEmpty())
-			return Form.of(p, errors, persistence);
-
-		var q = persistence.crud(Pet.class).update(id,
+		var ee = validate(p);
+		if (!ee.isEmpty())
+			return Form.of(p, ee, persistence);
+		var p2 = persistence.crud(Pet.class).update(id,
 				x -> Reflection.copy(p, x, y -> !Set.of("id", "owner").contains(y)));
-		return URI.create("/owners/" + q.owner());
+		return URI.create("/owners/" + p2.owner());
 	}
 
-	protected Map<String, Collection<String>> validate(Pet pet) {
-		var errors = new HashMap<String, Collection<String>>();
+	protected Map<String, List<String>> validate(Pet pet) {
+		var m = new LinkedHashMap<String, List<String>>();
 		if (pet.name() == null || pet.name().isBlank())
-			errors.computeIfAbsent("name", k -> new ArrayList<>()).add("must not be blank");
+			m.computeIfAbsent("name", k -> new ArrayList<>()).add("must not be blank");
 		if (pet.birthDate() == null)
-			errors.computeIfAbsent("birthDate", k -> new ArrayList<>()).add("must not be blank");
+			m.computeIfAbsent("birthDate", k -> new ArrayList<>()).add("must not be blank");
 		if (pet.type() == null)
-			errors.computeIfAbsent("type", k -> new ArrayList<>()).add("must not be blank");
-		return errors;
+			m.computeIfAbsent("type", k -> new ArrayList<>()).add("must not be blank");
+		return m;
 	}
 
-	@Render("createOrUpdatePetForm.html")
-	public record Form(Owner owner, Pet pet, Collection<PetType> types, Map<String, Collection<String>> errors) {
+	@Render(FormRenderer.class)
+	public record Form(Owner owner, Pet pet, List<PetType> types, Map<String, List<String>> errors) {
 
-		static Form of(Pet pet, Map<String, Collection<String>> errors, Persistence persistence) throws IOException {
+		static Form of(Pet pet, Map<String, List<String>> errors, Persistence persistence) throws IOException {
 			var o = persistence.crud(Owner.class).read(pet.owner());
-			var c = persistence.crud(PetType.class);
-			var t = c.read(c.filter(null)).toList();
-			return new Form(o, pet, t, errors);
+			var tc = persistence.crud(PetType.class);
+			var tt = tc.read(tc.filter(null)).toList();
+			return new Form(o, pet, tt, errors);
 		}
+	}
 
-		public String heading() {
-			return (pet.id() == null ? "New " : "") + "Pet";
-		}
+	public static class FormRenderer extends LayoutRenderer {
 
 		static Map<String, String> labels = Map.of("name", "Name", "birthDate", "Birth Date", "type", "Type");
 
-		public Function<String, FormField> fields() {
-			return n -> {
-				var l = labels.get(n);
-				var v = Reflection.property(Pet.class, n).get(pet);
-				var e = errors != null ? errors.get(n) : null;
-				return switch (n) {
-				case "birthDate" -> new InputField(l, n, "date", v, e);
-				case "type" -> {
-					var i = types.stream().collect(
-							Collectors.toMap(PetType::id, PetType::name, (a, b) -> a, LinkedHashMap::new));
-					yield new SelectField(l, n, i, v, e);
-				}
-				default -> new InputField(l, n, "text", v, e);
-				};
-			};
-		}
-
-		public String button() {
-			return (pet == null || pet.id() == null ? "Add" : "Update") + " Pet";
+		@Override
+		protected String renderContent(Object value, HttpExchange exchange) {
+			var tt = templates("createOrUpdatePetForm.html");
+			var v = (Form) value;
+			var h = (v.pet.id() == null ? "New " : "") + "Pet";
+			var on = v.owner.firstName() + " " + v.owner.lastName();
+			var tt2 = v.types.stream()
+					.collect(Collectors.toMap(PetType::id, PetType::name, (y, z) -> y, LinkedHashMap::new));
+			var ff = Reflection.properties2(Pet.class)
+					.filter(x -> !x.getName().equals("id") && !x.getName().equals("owner")).map(x -> {
+						var n = x.getName();
+						var l = labels.get(n);
+						var v2 = x.get(v.pet);
+						var ee = v.errors != null ? v.errors.get(n) : null;
+						new SelectField(l, n, tt2, v2, ee);
+						return n.equals("type") ? new SelectField(l, n, tt2, v2, ee)
+								: new InputField(l, n, n.equals("birthDate") ? "date" : "text", v2, ee);
+					}).collect(Collectors.toMap(x -> x.name(), x -> x));
+			var b = (v.pet.id() == null ? "Add" : "Update") + " Pet";
+			return interpolate(tt.get(null), merge(Map.of("heading", h, "ownerName", on), ff, Map.of("button", b)));
 		}
 	}
 }

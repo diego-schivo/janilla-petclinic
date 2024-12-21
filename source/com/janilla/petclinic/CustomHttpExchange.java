@@ -1,6 +1,8 @@
 /*
- * Copyright 2016 the original author or authors.
+ * Copyright 2012-2024 the original author or authors.
  *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *      https://www.apache.org/licenses/LICENSE-2.0
@@ -11,9 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@import url('//cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css');
-@import url('//cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css');
-@import 'base.css';
-@import 'typography.css';
-@import 'header.css';
-@import 'responsive.css';
+package com.janilla.petclinic;
+
+import com.janilla.http.HttpExchange;
+
+/**
+ * @author Diego Schivo
+ */
+public class CustomHttpExchange extends HttpExchange {
+
+	public Layout layout;
+}

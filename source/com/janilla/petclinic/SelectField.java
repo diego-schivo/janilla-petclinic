@@ -15,7 +15,7 @@
  */
 package com.janilla.petclinic;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -25,32 +25,15 @@ import com.janilla.web.Render;
 /**
  * @author Diego Schivo
  */
-@Render("selectField.html")
-public record SelectField(String label, String name, Map<? extends Object, String> items, Object value,
-		@Render(template = """
-				<span class="help-inline">{}</span>
-				""", delimiter = "<br />") Collection<String> errors) implements FormField {
-
-	public String errorClass() {
-		return errors == null || errors.isEmpty() ? "" : "has-error";
-	}
+@Render(SelectFieldRenderer.class)
+public record SelectField(String label, String name, Map<?, String> items, Object value, List<String> errors)
+		implements FormField {
 
 	public Stream<Option> options() {
 		return items.entrySet().stream()
-				.map(e -> new Option(e.getKey(), e.getValue(), Objects.equals(e.getKey(), value)));
+				.map(x -> new Option(x.getKey(), x.getValue(), Objects.equals(x.getKey(), value)));
 	}
 
-	public String feedbackIcon() {
-		return errors == null || errors.isEmpty() ? "ok" : "remove";
-	}
-
-	@Render("""
-			<option value="{value}" data-{selectedAttribute}>{text}</option>
-			""")
 	public record Option(Object value, String text, boolean selected) {
-
-		public String selectedAttribute() {
-			return selected ? "selected=\"selected\"" : "";
-		}
 	}
 }

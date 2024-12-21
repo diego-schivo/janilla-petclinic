@@ -16,8 +16,6 @@
 package com.janilla.petclinic;
 
 import java.net.URI;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import com.janilla.net.Net;
 import com.janilla.util.EntryList;
@@ -26,43 +24,14 @@ import com.janilla.web.Render;
 /**
  * @author Diego Schivo
  */
-@Render("paginator.html")
+@Render(PaginatorRenderer.class)
 public record Paginator(int index, int length, URI uri) {
 
-	public Stream<@Render("paginator-page.html") Element> pages() {
-		return IntStream.rangeClosed(1, length).mapToObj(x -> new Element(x != index + 1 ? uri : null, x));
-	}
-
-	public Paginator.Element first() {
-		return new Element(index != 0 ? uri : null, 1);
-	}
-
-	public Paginator.Element previous() {
-		return new Element(index > 0 ? uri : null, index);
-	}
-
-	public Paginator.Element next() {
-		return new Element(index < length - 1 ? uri : null, index + 2);
-	}
-
-	public Paginator.Element last() {
-		return new Element(index != length - 1 ? uri : null, length);
-	}
-
-	public record Element(URI uri, int page) {
-
-		public String tagName() {
-			return uri != null ? "a" : "span";
-		}
-
-		public URI href() {
-			if (uri == null)
-				return null;
-			var l = Net.parseQueryString(uri.getRawQuery());
-			if (l == null)
-				l = new EntryList<>();
-			l.set("page", String.valueOf(page));
-			return URI.create(uri.getPath() + "?" + Net.formatQueryString(l));
-		}
+	public URI uri(int page) {
+		var el = Net.parseQueryString(uri.getRawQuery());
+		if (el == null)
+			el = new EntryList<>();
+		el.set("page", String.valueOf(page));
+		return URI.create(uri.getPath() + "?" + Net.formatQueryString(el));
 	}
 }

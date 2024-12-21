@@ -1,10 +1,14 @@
-<div class="form-group {errorClass}">
-	<label class="col-sm-2 control-label">{label}</label>
+<div class="${className}">
+	<label class="col-sm-2 control-label">${label}</label>
 	<div class="col-sm-10">
 		<div>
-			<input class="form-control" type="{type}" id="{name}" name="{name}" value="{value}" />
+			<input class="form-control" type="${type}" id="${name}" name="${name}" value="${value}" />
 		</div>
-		<span class="fa fa-{feedbackIcon} form-control-feedback" aria-hidden="true"></span>
-		<{errors}>
+		<span class="${feedbackClass}" aria-hidden="true"></span>
+		<!--${errors}-->
+
+		<template id="error">
+			<span class="help-inline">${}</span>
+		</template>
 	</div>
 </div>

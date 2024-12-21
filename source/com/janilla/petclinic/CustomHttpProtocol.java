@@ -20,6 +20,9 @@ import com.janilla.http.HttpProtocol;
 import com.janilla.http.HttpExchange;
 import com.janilla.reflect.Factory;
 
+/**
+ * @author Diego Schivo
+ */
 public class CustomHttpProtocol extends HttpProtocol {
 
 	public Factory factory;
