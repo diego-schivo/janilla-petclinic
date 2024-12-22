@@ -15,10 +15,12 @@
  */
 package com.janilla.petclinic;
 
+import com.janilla.web.Render;
+
 /**
  * @author Diego Schivo
  */
-//@Render("error.html")
+@Render(ExceptionRenderer.class)
 public class MethodBlockedException extends RuntimeException {
 
 	private static final long serialVersionUID = 4918046711205707493L;

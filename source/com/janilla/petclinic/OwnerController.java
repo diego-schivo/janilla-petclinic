@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.janilla.http.HttpExchange;
 import com.janilla.persistence.Persistence;
@@ -81,9 +80,9 @@ public class OwnerController {
 		var o = oc.read(id);
 		var pp = pc.read(pc.filter("owner", o.id())).map(x -> {
 			var t = tc.read(x.type());
-			var vv = vc.read(vc.filter("pet", x.id()));
+			var vv = vc.read(vc.filter("pet", x.id())).toList();
 			return new Details.Pet2(x, t, vv);
-		});
+		}).toList();
 		return new Details(o, pp);
 	}
 
@@ -173,9 +172,9 @@ public class OwnerController {
 	}
 
 	@Render(DetailsRenderer.class)
-	public record Details(Owner owner, Stream<Pet2> pets) {
+	public record Details(Owner owner, List<Pet2> pets) {
 
-		public record Pet2(Pet pet, PetType type, Stream<Visit> visits) {
+		public record Pet2(Pet pet, PetType type, List<Visit> visits) {
 		}
 	}
 
@@ -188,9 +187,9 @@ public class OwnerController {
 			var n = v.owner.firstName() + " " + v.owner.lastName();
 			var eo = URI.create("/owners/" + v.owner.id() + "/edit");
 			var np = URI.create("/owners/" + v.owner.id() + "/pets/new");
-			var pp = v.pets.map(x -> {
+			var pp = v.pets.stream().map(x -> {
 				var t = x.type;
-				var vv = x.visits.map(y -> {
+				var vv = x.visits.stream().map(y -> {
 					return interpolate(tt.get("visit"), y);
 				}).collect(Collectors.joining());
 				var ep = URI.create("/owners/" + v.owner.id() + "/pets/" + x.pet.id() + "/edit");
@@ -220,7 +219,7 @@ public class OwnerController {
 				var l = labels.get(n);
 				var v2 = x.get(v.owner);
 				var ee = v.errors != null ? v.errors.get(n) : null;
-				return new InputField(l, n, "text", v2, ee);
+				return new InputField(l, n, v2, ee, "text");
 			}).collect(Collectors.toMap(x -> x.name(), x -> x));
 			var b = (v.owner == null || v.owner.id() == null ? "Add" : "Update") + " Owner";
 			return interpolate(tt.get(null), merge(ff, Map.of("button", b)));

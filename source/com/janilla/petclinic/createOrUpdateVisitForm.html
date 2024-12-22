@@ -10,20 +10,19 @@
 		</tr>
 	</thead>
 	<tr>
-		<td>{pet.name}</td>
-		<td>{pet.birthDate}</td>
-		<td>{petType.name}</td>
-		<td>{owner.firstName} {owner.lastName}</td>
+		<td>${pet.name}</td>
+		<td>${pet.birthDate}</td>
+		<td>${petType.name}</td>
+		<td>${ownerName}</td>
 	</tr>
 </table>
 <form class="form-horizontal" method="post">
 	<div class="form-group has-feedback">
-		<{fields.date}>
-		<{fields.description}>
+		<!--${date}-->
+		<!--${description}-->
 	</div>
 	<div class="form-group">
 		<div class="col-sm-offset-2 col-sm-10">
-			<input type="hidden" name="petId" value="8" />
 			<button class="btn btn-primary" type="submit">Add Visit</button>
 		</div>
 	</div>
@@ -35,12 +34,12 @@
 		<th>Date</th>
 		<th>Description</th>
 	</tr>
-	<{previousVisits}>
+	<!--${visits}-->
 </table>
 
-<template id="createOrUpdateVisitForm-previousVisit">
+<template id="visit">
 	<tr>
-		<td>{date}</td>
-		<td>{description}</td>
+		<td>${date}</td>
+		<td>${description}</td>
 	</tr>
 </template>

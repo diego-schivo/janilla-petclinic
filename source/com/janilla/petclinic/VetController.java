@@ -19,10 +19,14 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+import com.janilla.http.HttpExchange;
 import com.janilla.persistence.Persistence;
 import com.janilla.web.Bind;
 import com.janilla.web.Handle;
+import com.janilla.web.Render;
 
 /**
  * @author Diego Schivo
@@ -38,17 +42,18 @@ public class VetController {
 	@Handle(method = "GET", path = "/vets.html")
 	public Object find(@Bind("page") Integer page) throws IOException {
 		try {
-			var c = persistence.crud(Vet.class);
+			var vc = persistence.crud(Vet.class);
+			var sc = persistence.crud(Specialty.class);
 			var i = page != null ? page - 1 : 0;
-			var p = c.list(i * 5, 5);
-			var l = (int) ((p.total() + 4) / 5);
-			var r = c.read(p.ids()).map(v -> {
-				var j = v.specialties().stream().mapToLong(Long::longValue).toArray();
-				var s = persistence.crud(Specialty.class).read(j).toList();
-				return new FindOutcome.Result(v, s);
+			var vv = vc.list(i * 5, 5);
+			var l = (int) ((vv.total() + 4) / 5);
+			var ss = sc.read(sc.list()).toList();
+			var rr = vc.read(vv.ids()).map(x -> {
+				var ss2 = ss.stream().filter(y -> x.specialties().contains(y.id())).toList();
+				return new FindOutcome.Result(x, ss2);
 			}).toList();
-			var q = new Paginator(i, l, URI.create("/vets.html"));
-			return new FindOutcome(r, q);
+			var p = new Paginator(i, l, URI.create("/vets.html"));
+			return new FindOutcome(rr, p);
 		} catch (UncheckedIOException e) {
 			throw e.getCause();
 		}
@@ -58,21 +63,32 @@ public class VetController {
 	public Object find() throws IOException {
 		var c = persistence.crud(Vet.class);
 		var v = c.read(c.list()).toList();
-//		return new Vets(v);
 		return v;
 	}
 
-//	@Render("vetList.html")
+	@Render(FindOutcomeRenderer.class)
 	public record FindOutcome(List<Result> results, Paginator paginator) {
 
-//		@Render("vetList-result.html")
-		public record Result(Vet vet,
-//				@Render(delimiter = ", ") 
-				List<
-//				@Render("""
-//				<span>{name}</span>
-//				""") 
-						Specialty> specialties) {
+		public record Result(Vet vet, List<Specialty> specialties) {
+		}
+	}
+
+	public static class FindOutcomeRenderer extends LayoutRenderer {
+
+		@Override
+		protected String renderContent(Object value, HttpExchange exchange) {
+			var tt = templates("vetList.html");
+			var v = (FindOutcome) value;
+			var rr = v.results.stream().map(x -> {
+				var n = x.vet.firstName() + " " + x.vet.lastName();
+				var ss = x.specialties.stream().map(y -> {
+					return interpolate(tt.get("specialty"), y);
+				}).collect(Collectors.joining());
+				if (ss.isEmpty())
+					ss = interpolate(tt.get("specialty"), Map.of("name", "none"));
+				return interpolate(tt.get("result"), merge(x, Map.of("name", n, "specialties", ss)));
+			}).collect(Collectors.joining());
+			return interpolate(tt.get(null), merge(v, Map.of("results", rr)));
 		}
 	}
 }

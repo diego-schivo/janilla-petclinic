@@ -15,14 +15,14 @@
  */
 package com.janilla.petclinic;
 
-import java.util.List;
+import com.janilla.http.HttpExchange;
 
-import com.janilla.web.Render;
+public class ExceptionRenderer extends LayoutRenderer {
 
-/**
- * @author Diego Schivo
- */
-@Render(InputFieldRenderer.class)
-public record InputField(String label, String name, Object value, List<String> errors, String type)
-		implements FormField {
+	@Override
+	protected String renderContent(Object value, HttpExchange exchange) {
+		var tt = templates("error.html");
+		var e = (Exception) value;
+		return interpolate(tt.get(null), e);
+	}
 }

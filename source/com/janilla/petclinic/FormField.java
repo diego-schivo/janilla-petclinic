@@ -15,10 +15,18 @@
  */
 package com.janilla.petclinic;
 
+import java.util.List;
+
 /**
  * @author Diego Schivo
  */
 public interface FormField {
 
+	String label();
+
 	String name();
+
+	Object value();
+
+	List<String> errors();
 }

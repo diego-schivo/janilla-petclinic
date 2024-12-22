@@ -7,14 +7,18 @@
 		</tr>
 	</thead>
 	<tbody>
-		<{results}>
+		<!--${results}-->
 	</tbody>
-</table>
-<{paginator}>
 
-<template id="vetList-result">
-	<tr>
-		<td>{vet.firstName} {vet.lastName}</td>
-		<td><{specialties}></td>
-	</tr>
-</template>
+	<template id="result">
+		<tr>
+			<td>${name}</td>
+			<td><!--${specialties}--></td>
+		</tr>
+	</template>
+
+	<template id="specialty">
+		<span>${name}</span>
+	</template>
+</table>
+<!--${paginator}-->

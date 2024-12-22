@@ -113,9 +113,8 @@ public class PetController {
 						var l = labels.get(n);
 						var v2 = x.get(v.pet);
 						var ee = v.errors != null ? v.errors.get(n) : null;
-						new SelectField(l, n, tt2, v2, ee);
-						return n.equals("type") ? new SelectField(l, n, tt2, v2, ee)
-								: new InputField(l, n, n.equals("birthDate") ? "date" : "text", v2, ee);
+						return n.equals("type") ? new SelectField(l, n, v2, ee, tt2)
+								: new InputField(l, n, v2, ee, n.equals("birthDate") ? "date" : "text");
 					}).collect(Collectors.toMap(x -> x.name(), x -> x));
 			var b = (v.pet.id() == null ? "Add" : "Update") + " Pet";
 			return interpolate(tt.get(null), merge(Map.of("heading", h, "ownerName", on), ff, Map.of("button", b)));

@@ -22,11 +22,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.stream.Collectors;
 
+import com.janilla.http.HttpExchange;
 import com.janilla.persistence.Persistence;
 import com.janilla.reflect.Reflection;
 import com.janilla.web.Handle;
+import com.janilla.web.Render;
 
 /**
  * @author Diego Schivo
@@ -71,7 +73,7 @@ public class VisitController {
 		return errors;
 	}
 
-//	@Render("createOrUpdateVisitForm.html")
+	@Render(FormRenderer.class)
 	public record Form(Owner owner, Pet pet, PetType petType, Visit visit, List<Visit> previousVisits,
 			Map<String, List<String>> errors) {
 
@@ -83,17 +85,29 @@ public class VisitController {
 			var w = c.read(c.filter("pet", p.id())).toList();
 			return new Form(o, p, t, visit, w, errors);
 		}
+	}
+
+	public static class FormRenderer extends LayoutRenderer {
 
 		static Map<String, String> labels = Map.of("date", "Date", "description", "Description");
 
-		public Function<String, FormField> fields() {
-			return n -> {
-				var l = labels.get(n);
-				var t = n.equals("date") ? "date" : "text";
-				var v = Reflection.property(Visit.class, n).get(visit);
-				var e = errors != null ? errors.get(n) : null;
-				return new InputField(l, n, t, v, e);
-			};
+		@Override
+		protected String renderContent(Object value, HttpExchange exchange) {
+			var tt = templates("createOrUpdateVisitForm.html");
+			var v = (Form) value;
+			var on = v.owner.firstName() + " " + v.owner.lastName();
+			var ff = Reflection.properties2(Visit.class)
+					.filter(x -> !x.getName().equals("id") && !x.getName().equals("pet")).map(x -> {
+						var n = x.getName();
+						var l = labels.get(n);
+						var v2 = x.get(v.visit);
+						var ee = v.errors != null ? v.errors.get(n) : null;
+						return new InputField(l, n, v2, ee, n.equals("date") ? "date" : "text");
+					}).collect(Collectors.toMap(x -> x.name(), x -> x));
+			var vv = v.previousVisits.stream().map(x -> {
+				return interpolate(tt.get("visit"), x);
+			}).collect(Collectors.joining());
+			return interpolate(tt.get(null), merge(v, Map.of("ownerName", on), ff, Map.of("visits", vv)));
 		}
 	}
 }

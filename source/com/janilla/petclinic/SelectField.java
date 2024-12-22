@@ -26,7 +26,7 @@ import com.janilla.web.Render;
  * @author Diego Schivo
  */
 @Render(SelectFieldRenderer.class)
-public record SelectField(String label, String name, Map<?, String> items, Object value, List<String> errors)
+public record SelectField(String label, String name, Object value, List<String> errors, Map<?, String> items)
 		implements FormField {
 
 	public Stream<Option> options() {
