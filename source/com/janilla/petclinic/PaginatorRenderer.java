@@ -21,28 +21,27 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import com.janilla.http.HttpExchange;
-import com.janilla.web.Render;
+import com.janilla.web.Renderer;
 
-public class PaginatorRenderer extends Render.Renderer {
+public class PaginatorRenderer extends Renderer<Paginator> {
 
 	@Override
-	public String apply(Object value, HttpExchange exchange) {
+	public String apply(Paginator paginator, HttpExchange exchange) {
 		var tt = templates("paginator.html");
-		var p = (Paginator) value;
-		var pp = IntStream.range(0, p.length()).mapToObj(x -> {
-			var i = new Item(x != p.index() ? p.uri(x + 1) : null, null, null, x + 1);
+		var pp = IntStream.range(0, paginator.length()).mapToObj(x -> {
+			var i = new Item(x != paginator.index() ? paginator.uri(x + 1) : null, null, null, x + 1);
 			return interpolate(tt.get(i.href != null ? "item-on" : "item-off"), i);
 		}).collect(Collectors.joining());
 		var aa = IntStream.range(0, 4).mapToObj(x -> {
 			var h = switch (x) {
-			case 0, 1 -> p.index() != 0;
-			default -> p.index() != p.length() - 1;
+			case 0, 1 -> paginator.index() != 0;
+			default -> paginator.index() != paginator.length() - 1;
 			};
-			var i = new Item(h ? p.uri(switch (x) {
+			var i = new Item(h ? paginator.uri(switch (x) {
 			case 0 -> 1;
-			case 1 -> p.index();
-			case 2 -> p.index() + 2;
-			default -> p.length();
+			case 1 -> paginator.index();
+			case 2 -> paginator.index() + 2;
+			default -> paginator.length();
 			}) : null, switch (x) {
 			case 0 -> "First";
 			case 1 -> "Previous";

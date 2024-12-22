@@ -19,20 +19,19 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.janilla.http.HttpExchange;
-import com.janilla.web.Render;
+import com.janilla.web.Renderer;
 
-public class InputFieldRenderer extends Render.Renderer {
+public class InputFieldRenderer extends Renderer<InputField> {
 
 	@Override
-	public String apply(Object value, HttpExchange exchange) {
+	public String apply(InputField field, HttpExchange exchange) {
 		var tt = templates("inputField.html");
-		var v = (InputField) value;
-		var z = v.errors() != null && !v.errors().isEmpty();
-		var cn = "form-group " + (z ? "has-error" : "");
-		var fc = "fa fa-" + (z ? "remove" : "ok") + " form-control-feedback";
-		var ee = z ? v.errors().stream().map(x -> {
+		var v = field.errors() == null || field.errors().isEmpty();
+		var cn = "form-group " + (v ? "" : "has-error");
+		var fc = "fa fa-" + (v ? "ok" : "remove") + " form-control-feedback";
+		var ee = v ? "" : field.errors().stream().map(x -> {
 			return interpolate(tt.get("error"), x);
-		}).collect(Collectors.joining("<br />")) : "";
-		return interpolate(tt.get(null), merge(v, Map.of("className", cn, "feedbackClass", fc, "errors", ee)));
+		}).collect(Collectors.joining("<br />"));
+		return interpolate(tt.get(null), merge(field, Map.of("className", cn, "feedbackClass", fc, "errors", ee)));
 	}
 }

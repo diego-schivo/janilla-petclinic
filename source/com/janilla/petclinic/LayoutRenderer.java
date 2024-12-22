@@ -15,21 +15,27 @@
  */
 package com.janilla.petclinic;
 
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import com.janilla.http.HttpExchange;
-import com.janilla.web.Render;
+import com.janilla.web.Renderer;
 
-public abstract class LayoutRenderer extends Render.Renderer {
+public abstract class LayoutRenderer<T> extends Renderer<T> {
 
-	static Pattern pathPrefix = Pattern.compile("^/\\w*");
+	protected static List<NavItem> navItems = List.of(new NavItem("home", "Home", "/", "home page"),
+			new NavItem("search", "Find owners", "/owners/find", "find owners"),
+			new NavItem("list", "Veterinarians", "/vets.html", "veterinarians"), new NavItem("exclamation-triangle",
+					"Error", "/oups", "trigger a RuntimeException to see how it is handled"));
+
+	protected static Pattern pathPrefix = Pattern.compile("^/\\w*");
 
 	@Override
-	public String apply(Object value, HttpExchange exchange) {
+	public String apply(T value, HttpExchange exchange) {
 		var tt = templates("layout.html");
-		return interpolate(tt.get(null), Map.<String, Object>of("navItems", Layout.navItems.stream().map(x -> {
+		return interpolate(tt.get(null), Map.<String, Object>of("navItems", navItems.stream().map(x -> {
 			var m1 = pathPrefix.matcher(x.href());
 			var m2 = pathPrefix.matcher(exchange.getRequest().getPath());
 			return interpolate(tt.get("nav-item"),
@@ -39,5 +45,8 @@ public abstract class LayoutRenderer extends Render.Renderer {
 		}).collect(Collectors.joining()), "content", renderContent(value, exchange)));
 	}
 
-	protected abstract String renderContent(Object value, HttpExchange exchange);
+	protected abstract String renderContent(T value, HttpExchange exchange);
+
+	public record NavItem(String icon, String text, String href, String title) {
+	}
 }

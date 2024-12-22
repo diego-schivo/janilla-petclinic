@@ -19,23 +19,23 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.janilla.http.HttpExchange;
-import com.janilla.web.Render;
+import com.janilla.web.Renderer;
 
-public class SelectFieldRenderer extends Render.Renderer {
+public class SelectFieldRenderer extends Renderer<SelectField> {
 
 	@Override
-	public String apply(Object value, HttpExchange exchange) {
+	public String apply(SelectField field, HttpExchange exchange) {
 		var tt = templates("selectField.html");
-		var v = (SelectField) value;
-		var z = v.errors() != null && !v.errors().isEmpty();
-		var cn = "form-group " + (z ? "has-error" : "");
-		var oo = v.options().map(x -> {
+		var v = field.errors() == null || field.errors().isEmpty();
+		var cn = "form-group " + (v ? "" : "has-error");
+		var oo = field.options().map(x -> {
 			return interpolate(tt.get("option"), x);
 		}).collect(Collectors.joining());
-		var fc = "fa fa-" + (z ? "remove" : "ok") + " form-control-feedback";
-		var ee = z ? v.errors().stream().map(x -> {
+		var fc = "fa fa-" + (v ? "ok" : "remove") + " form-control-feedback";
+		var ee = v ? "" : field.errors().stream().map(x -> {
 			return interpolate(tt.get("error"), x);
-		}).collect(Collectors.joining("<br />")) : "";
-		return interpolate(tt.get(null), merge(v, Map.of("className", cn, "options", oo, "feedbackClass", fc, "errors", ee)));
+		}).collect(Collectors.joining("<br />"));
+		return interpolate(tt.get(null),
+				merge(field, Map.of("className", cn, "options", oo, "feedbackClass", fc, "errors", ee)));
 	}
 }

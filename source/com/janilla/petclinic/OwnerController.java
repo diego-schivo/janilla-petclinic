@@ -139,12 +139,11 @@ public class OwnerController {
 	public record FindForm(Owner owner, Map<String, List<String>> errors) {
 	}
 
-	public static class FindFormRenderer extends LayoutRenderer {
+	public static class FindFormRenderer extends LayoutRenderer<FindForm> {
 
 		@Override
-		protected String renderContent(Object value, HttpExchange exchange) {
-			var v = (FindForm) value;
-			return interpolate(templates("findOwners.html").get(null), v);
+		protected String renderContent(FindForm form, HttpExchange exchange) {
+			return interpolate(templates("findOwners.html").get(null), form);
 		}
 	}
 
@@ -155,19 +154,18 @@ public class OwnerController {
 		}
 	}
 
-	public static class FindOutcomeRenderer extends LayoutRenderer {
+	public static class FindOutcomeRenderer extends LayoutRenderer<FindOutcome> {
 
 		@Override
-		protected String renderContent(Object value, HttpExchange exchange) {
+		protected String renderContent(FindOutcome outcome, HttpExchange exchange) {
 			var tt = templates("ownersList.html");
-			var v = (FindOutcome) value;
-			var rr = v.results.stream().map(x -> {
+			var rr = outcome.results.stream().map(x -> {
 				var h = "/owners/" + x.owner.id();
 				var n = x.owner.firstName() + " " + x.owner.lastName();
 				var pp = x.pets.stream().map(y -> y.name()).collect(Collectors.joining(", "));
 				return interpolate(tt.get("result"), merge(x, Map.of("href", h, "name", n, "pets", pp)));
 			}).collect(Collectors.joining());
-			return interpolate(tt.get(null), merge(v, Map.of("results", rr)));
+			return interpolate(tt.get(null), merge(outcome, Map.of("results", rr)));
 		}
 	}
 
@@ -178,26 +176,26 @@ public class OwnerController {
 		}
 	}
 
-	public static class DetailsRenderer extends LayoutRenderer {
+	public static class DetailsRenderer extends LayoutRenderer<Details> {
 
 		@Override
-		protected String renderContent(Object value, HttpExchange exchange) {
+		protected String renderContent(Details details, HttpExchange exchange) {
 			var tt = templates("ownerDetails.html");
-			var v = (Details) value;
-			var n = v.owner.firstName() + " " + v.owner.lastName();
-			var eo = URI.create("/owners/" + v.owner.id() + "/edit");
-			var np = URI.create("/owners/" + v.owner.id() + "/pets/new");
-			var pp = v.pets.stream().map(x -> {
+			var n = details.owner.firstName() + " " + details.owner.lastName();
+			var eo = URI.create("/owners/" + details.owner.id() + "/edit");
+			var np = URI.create("/owners/" + details.owner.id() + "/pets/new");
+			var pp = details.pets.stream().map(x -> {
 				var t = x.type;
 				var vv = x.visits.stream().map(y -> {
 					return interpolate(tt.get("visit"), y);
 				}).collect(Collectors.joining());
-				var ep = URI.create("/owners/" + v.owner.id() + "/pets/" + x.pet.id() + "/edit");
-				var nv = URI.create("/owners/" + v.owner.id() + "/pets/" + x.pet.id() + "/visits/new");
+				var ep = URI.create("/owners/" + details.owner.id() + "/pets/" + x.pet.id() + "/edit");
+				var nv = URI.create("/owners/" + details.owner.id() + "/pets/" + x.pet.id() + "/visits/new");
 				return interpolate(tt.get("pet"),
 						merge(x.pet, Map.of("type", t, "visits", vv, "edit", ep, "newVisit", nv)));
 			}).collect(Collectors.joining());
-			return interpolate(tt.get(null), merge(v.owner, Map.of("name", n, "edit", eo, "newPet", np, "pets", pp)));
+			return interpolate(tt.get(null),
+					merge(details.owner, Map.of("name", n, "edit", eo, "newPet", np, "pets", pp)));
 		}
 	}
 
@@ -205,23 +203,22 @@ public class OwnerController {
 	public record Form(Owner owner, Map<String, List<String>> errors) {
 	}
 
-	public static class FormRenderer extends LayoutRenderer {
+	public static class FormRenderer extends LayoutRenderer<Form> {
 
 		static Map<String, String> labels = Map.of("firstName", "First Name", "lastName", "Last Name", "address",
 				"Address", "city", "City", "telephone", "Telephone");
 
 		@Override
-		protected String renderContent(Object value, HttpExchange exchange) {
+		protected String renderContent(Form form, HttpExchange exchange) {
 			var tt = templates("createOrUpdateOwnerForm.html");
-			var v = (Form) value;
 			var ff = Reflection.properties2(Owner.class).filter(x -> !x.getName().equals("id")).map(x -> {
 				var n = x.getName();
 				var l = labels.get(n);
-				var v2 = x.get(v.owner);
-				var ee = v.errors != null ? v.errors.get(n) : null;
+				var v2 = x.get(form.owner);
+				var ee = form.errors != null ? form.errors.get(n) : null;
 				return new InputField(l, n, v2, ee, "text");
 			}).collect(Collectors.toMap(x -> x.name(), x -> x));
-			var b = (v.owner == null || v.owner.id() == null ? "Add" : "Update") + " Owner";
+			var b = (form.owner == null || form.owner.id() == null ? "Add" : "Update") + " Owner";
 			return interpolate(tt.get(null), merge(ff, Map.of("button", b)));
 		}
 	}

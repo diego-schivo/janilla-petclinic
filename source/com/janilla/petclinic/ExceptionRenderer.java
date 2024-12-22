@@ -17,12 +17,11 @@ package com.janilla.petclinic;
 
 import com.janilla.http.HttpExchange;
 
-public class ExceptionRenderer extends LayoutRenderer {
+public class ExceptionRenderer extends LayoutRenderer<Exception> {
 
 	@Override
-	protected String renderContent(Object value, HttpExchange exchange) {
+	protected String renderContent(Exception exception, HttpExchange exchange) {
 		var tt = templates("error.html");
-		var e = (Exception) value;
-		return interpolate(tt.get(null), e);
+		return interpolate(tt.get(null), exception);
 	}
 }

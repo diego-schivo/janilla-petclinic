@@ -29,11 +29,11 @@ public class WelcomeController {
 		return new Object();
 	}
 
-	public static class PageRenderer extends LayoutRenderer {
+	public static class PageRenderer extends LayoutRenderer<Object> {
 
 		@Override
-		protected String renderContent(Object value, HttpExchange exchange) {
-			return interpolate(templates("welcome.html").get(null), null);
+		protected String renderContent(Object page, HttpExchange exchange) {
+			return interpolate(templates("welcome.html").get(null), page);
 		}
 	}
 }

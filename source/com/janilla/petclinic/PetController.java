@@ -95,28 +95,27 @@ public class PetController {
 		}
 	}
 
-	public static class FormRenderer extends LayoutRenderer {
+	public static class FormRenderer extends LayoutRenderer<Form> {
 
 		static Map<String, String> labels = Map.of("name", "Name", "birthDate", "Birth Date", "type", "Type");
 
 		@Override
-		protected String renderContent(Object value, HttpExchange exchange) {
+		protected String renderContent(Form form, HttpExchange exchange) {
 			var tt = templates("createOrUpdatePetForm.html");
-			var v = (Form) value;
-			var h = (v.pet.id() == null ? "New " : "") + "Pet";
-			var on = v.owner.firstName() + " " + v.owner.lastName();
-			var tt2 = v.types.stream()
+			var h = (form.pet.id() == null ? "New " : "") + "Pet";
+			var on = form.owner.firstName() + " " + form.owner.lastName();
+			var tt2 = form.types.stream()
 					.collect(Collectors.toMap(PetType::id, PetType::name, (y, z) -> y, LinkedHashMap::new));
 			var ff = Reflection.properties2(Pet.class)
 					.filter(x -> !x.getName().equals("id") && !x.getName().equals("owner")).map(x -> {
 						var n = x.getName();
 						var l = labels.get(n);
-						var v2 = x.get(v.pet);
-						var ee = v.errors != null ? v.errors.get(n) : null;
+						var v2 = x.get(form.pet);
+						var ee = form.errors != null ? form.errors.get(n) : null;
 						return n.equals("type") ? new SelectField(l, n, v2, ee, tt2)
 								: new InputField(l, n, v2, ee, n.equals("birthDate") ? "date" : "text");
 					}).collect(Collectors.toMap(x -> x.name(), x -> x));
-			var b = (v.pet.id() == null ? "Add" : "Update") + " Pet";
+			var b = (form.pet.id() == null ? "Add" : "Update") + " Pet";
 			return interpolate(tt.get(null), merge(Map.of("heading", h, "ownerName", on), ff, Map.of("button", b)));
 		}
 	}

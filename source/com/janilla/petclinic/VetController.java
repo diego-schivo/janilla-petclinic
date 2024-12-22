@@ -73,13 +73,12 @@ public class VetController {
 		}
 	}
 
-	public static class FindOutcomeRenderer extends LayoutRenderer {
+	public static class FindOutcomeRenderer extends LayoutRenderer<FindOutcome> {
 
 		@Override
-		protected String renderContent(Object value, HttpExchange exchange) {
+		protected String renderContent(FindOutcome outcome, HttpExchange exchange) {
 			var tt = templates("vetList.html");
-			var v = (FindOutcome) value;
-			var rr = v.results.stream().map(x -> {
+			var rr = outcome.results.stream().map(x -> {
 				var n = x.vet.firstName() + " " + x.vet.lastName();
 				var ss = x.specialties.stream().map(y -> {
 					return interpolate(tt.get("specialty"), y);
@@ -88,7 +87,7 @@ public class VetController {
 					ss = interpolate(tt.get("specialty"), Map.of("name", "none"));
 				return interpolate(tt.get("result"), merge(x, Map.of("name", n, "specialties", ss)));
 			}).collect(Collectors.joining());
-			return interpolate(tt.get(null), merge(v, Map.of("results", rr)));
+			return interpolate(tt.get(null), merge(outcome, Map.of("results", rr)));
 		}
 	}
 }

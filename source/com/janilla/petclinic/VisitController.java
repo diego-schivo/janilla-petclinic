@@ -87,27 +87,26 @@ public class VisitController {
 		}
 	}
 
-	public static class FormRenderer extends LayoutRenderer {
+	public static class FormRenderer extends LayoutRenderer<Form> {
 
 		static Map<String, String> labels = Map.of("date", "Date", "description", "Description");
 
 		@Override
-		protected String renderContent(Object value, HttpExchange exchange) {
+		protected String renderContent(Form form, HttpExchange exchange) {
 			var tt = templates("createOrUpdateVisitForm.html");
-			var v = (Form) value;
-			var on = v.owner.firstName() + " " + v.owner.lastName();
+			var on = form.owner.firstName() + " " + form.owner.lastName();
 			var ff = Reflection.properties2(Visit.class)
 					.filter(x -> !x.getName().equals("id") && !x.getName().equals("pet")).map(x -> {
 						var n = x.getName();
 						var l = labels.get(n);
-						var v2 = x.get(v.visit);
-						var ee = v.errors != null ? v.errors.get(n) : null;
+						var v2 = x.get(form.visit);
+						var ee = form.errors != null ? form.errors.get(n) : null;
 						return new InputField(l, n, v2, ee, n.equals("date") ? "date" : "text");
 					}).collect(Collectors.toMap(x -> x.name(), x -> x));
-			var vv = v.previousVisits.stream().map(x -> {
+			var vv = form.previousVisits.stream().map(x -> {
 				return interpolate(tt.get("visit"), x);
 			}).collect(Collectors.joining());
-			return interpolate(tt.get(null), merge(v, Map.of("ownerName", on), ff, Map.of("visits", vv)));
+			return interpolate(tt.get(null), merge(form, Map.of("ownerName", on), ff, Map.of("visits", vv)));
 		}
 	}
 }
