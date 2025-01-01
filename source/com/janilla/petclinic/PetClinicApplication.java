@@ -31,6 +31,7 @@ import com.janilla.persistence.Persistence;
 import com.janilla.reflect.Factory;
 import com.janilla.util.Util;
 import com.janilla.web.ApplicationHandlerBuilder;
+import com.janilla.web.RenderableFactory;
 
 /**
  * @author Diego Schivo
@@ -73,6 +74,8 @@ public class PetClinicApplication {
 
 	public Factory factory;
 
+	public RenderableFactory renderableFactory;
+
 	public HttpHandler handler;
 
 	public Persistence persistence;
@@ -82,6 +85,7 @@ public class PetClinicApplication {
 		factory = new Factory();
 		factory.setTypes(Util.getPackageClasses(getClass().getPackageName()).toList());
 		factory.setSource(this);
+		renderableFactory = new RenderableFactory();
 		handler = factory.create(ApplicationHandlerBuilder.class).build();
 		{
 			var pb = factory.create(ApplicationPersistenceBuilder.class);

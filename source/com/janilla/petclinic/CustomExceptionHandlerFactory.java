@@ -18,7 +18,7 @@ package com.janilla.petclinic;
 import com.janilla.http.HttpExchange;
 import com.janilla.web.Error;
 import com.janilla.web.ExceptionHandlerFactory;
-import com.janilla.web.Renderable;
+import com.janilla.web.RenderableFactory;
 import com.janilla.web.WebHandlerFactory;
 
 /**
@@ -28,10 +28,12 @@ public class CustomExceptionHandlerFactory extends ExceptionHandlerFactory {
 
 	public WebHandlerFactory mainFactory;
 
+	public RenderableFactory renderableFactory;
+
 	@Override
 	protected boolean handle(Error error, HttpExchange exchange) {
 		super.handle(error, exchange);
-		var r = Renderable.of(exchange.getException());
+		var r = renderableFactory.createRenderable(null, exchange.getException());
 		if (r != null) {
 			var h = mainFactory.createHandler(r, exchange);
 			h.handle(exchange);

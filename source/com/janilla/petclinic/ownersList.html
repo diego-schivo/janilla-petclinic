@@ -16,7 +16,7 @@
 	<template id="result">
 		<tr>
 			<td>
-				<a href="${href}">${name}</a>
+				<a href="/owners/${owner.id}">${owner.firstName} ${owner.lastName}</a>
 			</td>
 			<td>${owner.address}</td>
 			<td>${owner.city}</td>
@@ -26,5 +26,7 @@
 			</td>
 		</tr>
 	</template>
+
+	<template id="pet">${name}</template>
 </table>
 <!--${paginator}-->

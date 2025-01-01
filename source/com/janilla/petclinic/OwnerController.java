@@ -22,9 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
-import com.janilla.http.HttpExchange;
 import com.janilla.persistence.Persistence;
 import com.janilla.reflect.Reflection;
 import com.janilla.util.Util;
@@ -135,91 +133,47 @@ public class OwnerController {
 		return m;
 	}
 
-	@Render(FindFormRenderer.class)
+	@Render(template = "findOwners.html")
 	public record FindForm(Owner owner, Map<String, List<String>> errors) {
 	}
 
-	public static class FindFormRenderer extends LayoutRenderer<FindForm> {
-
-		@Override
-		protected String renderContent(FindForm form, HttpExchange exchange) {
-			return interpolate(templates("findOwners.html").get(null), form);
-		}
-	}
-
-	@Render(FindOutcomeRenderer.class)
+	@Render(template = "ownersList.html")
 	public record FindOutcome(List<Result> results, Paginator paginator) {
 
-		public record Result(Owner owner, List<Pet> pets) {
+		@Render(template = "result")
+		public record Result(Owner owner, List<@Render(template = "pet", delimiter = ", ") Pet> pets) {
 		}
 	}
 
-	public static class FindOutcomeRenderer extends LayoutRenderer<FindOutcome> {
-
-		@Override
-		protected String renderContent(FindOutcome outcome, HttpExchange exchange) {
-			var tt = templates("ownersList.html");
-			var rr = outcome.results.stream().map(x -> {
-				var h = "/owners/" + x.owner.id();
-				var n = x.owner.firstName() + " " + x.owner.lastName();
-				var pp = x.pets.stream().map(y -> y.name()).collect(Collectors.joining(", "));
-				return interpolate(tt.get("result"), merge(x, Map.of("href", h, "name", n, "pets", pp)));
-			}).collect(Collectors.joining());
-			return interpolate(tt.get(null), merge(outcome, Map.of("results", rr)));
-		}
-	}
-
-	@Render(DetailsRenderer.class)
+	@Render(template = "ownerDetails.html")
 	public record Details(Owner owner, List<Pet2> pets) {
 
-		public record Pet2(Pet pet, PetType type, List<Visit> visits) {
+		@Render(template = "pet")
+		public record Pet2(Pet pet, PetType type, List<@Render(template = "visit") Visit> visits) {
 		}
 	}
 
-	public static class DetailsRenderer extends LayoutRenderer<Details> {
-
-		@Override
-		protected String renderContent(Details details, HttpExchange exchange) {
-			var tt = templates("ownerDetails.html");
-			var n = details.owner.firstName() + " " + details.owner.lastName();
-			var eo = URI.create("/owners/" + details.owner.id() + "/edit");
-			var np = URI.create("/owners/" + details.owner.id() + "/pets/new");
-			var pp = details.pets.stream().map(x -> {
-				var t = x.type;
-				var vv = x.visits.stream().map(y -> {
-					return interpolate(tt.get("visit"), y);
-				}).collect(Collectors.joining());
-				var ep = URI.create("/owners/" + details.owner.id() + "/pets/" + x.pet.id() + "/edit");
-				var nv = URI.create("/owners/" + details.owner.id() + "/pets/" + x.pet.id() + "/visits/new");
-				return interpolate(tt.get("pet"),
-						merge(x.pet, Map.of("type", t, "visits", vv, "edit", ep, "newVisit", nv)));
-			}).collect(Collectors.joining());
-			return interpolate(tt.get(null),
-					merge(details.owner, Map.of("name", n, "edit", eo, "newPet", np, "pets", pp)));
-		}
-	}
-
-	@Render(FormRenderer.class)
+	@Render(template = "createOrUpdateOwnerForm.html")
 	public record Form(Owner owner, Map<String, List<String>> errors) {
 	}
 
-	public static class FormRenderer extends LayoutRenderer<Form> {
-
-		static Map<String, String> labels = Map.of("firstName", "First Name", "lastName", "Last Name", "address",
-				"Address", "city", "City", "telephone", "Telephone");
-
-		@Override
-		protected String renderContent(Form form, HttpExchange exchange) {
-			var tt = templates("createOrUpdateOwnerForm.html");
-			var ff = Reflection.properties2(Owner.class).filter(x -> !x.getName().equals("id")).map(x -> {
-				var n = x.getName();
-				var l = labels.get(n);
-				var v2 = x.get(form.owner);
-				var ee = form.errors != null ? form.errors.get(n) : null;
-				return new InputField(l, n, v2, ee, "text");
-			}).collect(Collectors.toMap(x -> x.name(), x -> x));
-			var b = (form.owner == null || form.owner.id() == null ? "Add" : "Update") + " Owner";
-			return interpolate(tt.get(null), merge(ff, Map.of("button", b)));
-		}
-	}
+//	public static class FormRenderer extends LayoutRenderer<Form> {
+//
+//		static Map<String, String> labels = Map.of("firstName", "First Name", "lastName", "Last Name", "address",
+//				"Address", "city", "City", "telephone", "Telephone");
+//
+//		@Override
+//		protected String renderContent(Form form, HttpExchange exchange) {
+//			var tt = templates("createOrUpdateOwnerForm.html");
+//			var ff = Reflection.properties2(Owner.class).filter(x -> !x.getName().equals("id")).map(x -> {
+//				var n = x.getName();
+//				var l = labels.get(n);
+//				var v2 = x.get(form.owner);
+//				var ee = form.errors != null ? form.errors.get(n) : null;
+//				return new InputField(l, n, v2, ee, "text");
+//			}).collect(Collectors.toMap(x -> x.name(), x -> x));
+//			var b = (form.owner == null || form.owner.id() == null ? "Add" : "Update") + " Owner";
+//			return interpolate(tt.get(null), merge(ff, Map.of("button", b)));
+//		}
+//	}
 }

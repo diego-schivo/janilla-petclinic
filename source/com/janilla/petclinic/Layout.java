@@ -16,37 +16,36 @@
 package com.janilla.petclinic;
 
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
-import com.janilla.http.HttpExchange;
-import com.janilla.web.Renderer;
+import com.janilla.http.HttpProtocol;
+import com.janilla.web.Render;
+import com.janilla.web.Renderable;
 
-public abstract class LayoutRenderer<T> extends Renderer<T> {
+/**
+ * @author Diego Schivo
+ */
+@Render(template = "layout.html")
+public record Layout(Renderable<?> content) {
 
-	protected static List<NavItem> navItems = List.of(new NavItem("home", "Home", "/", "home page"),
+	protected static final List<NavItem> NAV_ITEMS = List.of(new NavItem("home", "Home", "/", "home page"),
 			new NavItem("search", "Find owners", "/owners/find", "find owners"),
 			new NavItem("list", "Veterinarians", "/vets.html", "veterinarians"), new NavItem("exclamation-triangle",
 					"Error", "/oups", "trigger a RuntimeException to see how it is handled"));
 
-	protected static Pattern pathPrefix = Pattern.compile("^/\\w*");
+	private static final Pattern PATH_PREFIX = Pattern.compile("^/[^/]*");
 
-	@Override
-	public String apply(T value, HttpExchange exchange) {
-		var tt = templates("layout.html");
-		return interpolate(tt.get(null), Map.<String, Object>of("navItems", navItems.stream().map(x -> {
-			var m1 = pathPrefix.matcher(x.href());
-			var m2 = pathPrefix.matcher(exchange.getRequest().getPath());
-			return interpolate(tt.get("nav-item"),
-					merge(x, Map.of("className",
-							"nav-link " + (m1.find() && m2.find() && m1.group().equals(m2.group()) ? "active" : ""),
-							"iconClass", "fa fa-" + x.icon())));
-		}).collect(Collectors.joining()), "content", renderContent(value, exchange)));
+	public List<NavItem> navItems() {
+		return NAV_ITEMS;
 	}
 
-	protected abstract String renderContent(T value, HttpExchange exchange);
-
+	@Render(template = "nav-item")
 	public record NavItem(String icon, String text, String href, String title) {
+
+		public String active() {
+			var m1 = PATH_PREFIX.matcher(href);
+			var m2 = PATH_PREFIX.matcher(HttpProtocol.HTTP_EXCHANGE.get().getRequest().getPath());
+			return m1.find() && m2.find() && m1.group().equals(m2.group()) ? "active" : null;
+		}
 	}
 }

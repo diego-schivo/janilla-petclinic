@@ -3,24 +3,24 @@
 	<tr>
 		<th>Name</th>
 		<td>
-			<b>${name}</b>
+			<b>${owner.firstName} ${owner.lastName}</b>
 		</td>
 	</tr>
 	<tr>
 		<th>Address</th>
-		<td>${address}</td>
+		<td>${owner.address}</td>
 	</tr>
 	<tr>
 		<th>City</th>
-		<td>${city}</td>
+		<td>${owner.city}</td>
 	</tr>
 	<tr>
 		<th>Telephone</th>
-		<td>${telephone}</td>
+		<td>${owner.telephone}</td>
 	</tr>
 </table>
-<a href="${edit}" class="btn btn-primary">Edit Owner</a>
-<a href="${newPet}" class="btn btn-primary">Add New Pet</a>
+<a href="/owners/${owner.id}/edit" class="btn btn-primary">Edit Owner</a>
+<a href="/owners/${owner.id}/pets/new" class="btn btn-primary">Add New Pet</a>
 <br />
 <br />
 <br />
@@ -34,9 +34,9 @@
 		<td valign="top">
 			<dl class="dl-horizontal">
 				<dt>Name</dt>
-				<dd>${name}</dd>
+				<dd>${pet.name}</dd>
 				<dt>Birth Date</dt>
-				<dd>${birthDate}</dd>
+				<dd>${pet.birthDate}</dd>
 				<dt>Type</dt>
 				<dd>${type.name}</dd>
 			</dl>
@@ -51,8 +51,8 @@
 				</thead>
 				<!--${visits}-->
 				<tr>
-					<td><a href="${edit}">Edit Pet</a></td>
-					<td><a href="${newVisit}">Add Visit</a></td>
+					<td><a href="/owners/${owner.id}/pets/${pet.id}/edit">Edit Pet</a></td>
+					<td><a href="/owners/${owner.id}/pets/${pet.id}/visits/new">Add Visit</a></td>
 				</tr>
 			</table>
 		</td>
