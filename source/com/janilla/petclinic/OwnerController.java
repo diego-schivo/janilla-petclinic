@@ -15,7 +15,6 @@
  */
 package com.janilla.petclinic;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -40,6 +39,8 @@ import com.janilla.web.Render;
  */
 public class OwnerController {
 
+	protected static final Pattern TEN_DIGITS = Pattern.compile("\\d{10}");
+
 	public Persistence persistence;
 
 	@Handle(method = "GET", path = "/owners/find")
@@ -48,7 +49,7 @@ public class OwnerController {
 	}
 
 	@Handle(method = "GET", path = "/owners")
-	public Object find(Owner owner, @Bind("page") Integer page) throws IOException {
+	public Object find(Owner owner, @Bind("page") Integer page) {
 		var oc = persistence.crud(Owner.class);
 		var i = page != null ? page - 1 : 0;
 		var op = owner.lastName() != null && !owner.lastName().isBlank()
@@ -71,7 +72,7 @@ public class OwnerController {
 	}
 
 	@Handle(method = "GET", path = "/owners/(\\d+)")
-	public Object show(long id) throws IOException {
+	public Object show(long id) {
 		var oc = persistence.crud(Owner.class);
 		var pc = persistence.crud(Pet.class);
 		var tc = persistence.crud(PetType.class);
@@ -91,7 +92,7 @@ public class OwnerController {
 	}
 
 	@Handle(method = "POST", path = "/owners/new")
-	public Object create(Owner owner) throws IOException {
+	public Object create(Owner owner) {
 		var ee = validate(owner);
 		if (!ee.isEmpty())
 			return new Form(owner, ee);
@@ -100,21 +101,19 @@ public class OwnerController {
 	}
 
 	@Handle(method = "GET", path = "/owners/(\\d+)/edit")
-	public Object initUpdate(long id) throws IOException {
+	public Object initUpdate(long id) {
 		var o = persistence.crud(Owner.class).read(id);
 		return new Form(o, null);
 	}
 
 	@Handle(method = "POST", path = "/owners/(\\d+)/edit")
-	public Object update(long id, Owner owner) throws IOException {
+	public Object update(long id, Owner owner) {
 		var ee = validate(owner);
 		if (!ee.isEmpty())
 			return new Form(owner, ee);
 		var o = persistence.crud(Owner.class).update(id, x -> Reflection.copy(owner, x, y -> !y.equals("id")));
 		return URI.create("/owners/" + o.id());
 	}
-
-	static Pattern tenDigits = Pattern.compile("\\d{10}");
 
 	protected Map<String, List<String>> validate(Owner owner) {
 		var m = new LinkedHashMap<String, List<String>>();
@@ -128,7 +127,7 @@ public class OwnerController {
 			m.computeIfAbsent("city", _ -> new ArrayList<>()).add("must not be blank");
 		if (owner.telephone() == null || owner.telephone().isBlank())
 			m.computeIfAbsent("telephone", _ -> new ArrayList<>()).add("must not be blank");
-		if (owner.telephone() == null || !tenDigits.matcher(owner.telephone()).matches())
+		if (owner.telephone() == null || !TEN_DIGITS.matcher(owner.telephone()).matches())
 			m.computeIfAbsent("telephone", _ -> new ArrayList<>())
 					.add("numeric value out of bounds (<10 digits>.<0 digits> expected)");
 		return m;

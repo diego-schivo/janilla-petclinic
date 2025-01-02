@@ -16,12 +16,21 @@
 package com.janilla.petclinic;
 
 import com.janilla.http.HttpExchange;
+import com.janilla.web.Renderable;
+import com.janilla.web.RenderableFactory;
+import com.janilla.web.TemplateHandlerFactory;
 
-public class ExceptionRenderer extends LayoutRenderer<Exception> {
+/**
+ * @author Diego Schivo
+ */
+public class CustomTemplateHandlerFactory extends TemplateHandlerFactory {
+
+	public RenderableFactory renderableFactory;
 
 	@Override
-	protected String renderContent(Exception exception, HttpExchange exchange) {
-		var tt = templates("error.html");
-		return interpolate(tt.get(null), exception);
+	protected void render(Renderable<?> input, HttpExchange exchange) {
+		var l = new Layout(input);
+		var i = renderableFactory.createRenderable(null, l);
+		super.render(i, exchange);
 	}
 }

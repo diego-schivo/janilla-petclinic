@@ -20,7 +20,6 @@ import java.util.Properties;
 import com.janilla.http.HttpExchange;
 import com.janilla.web.HandleException;
 import com.janilla.web.MethodHandlerFactory;
-import com.janilla.web.Renderable;
 
 /**
  * @author Diego Schivo
@@ -35,11 +34,5 @@ public class CustomMethodHandlerFactory extends MethodHandlerFactory {
 				&& !exchange.getRequest().getMethod().equals("GET"))
 			throw new HandleException(new MethodBlockedException());
 		super.handle(invocation, exchange);
-	}
-
-	@Override
-	protected void render(Renderable<?> renderable, HttpExchange exchange) {
-		var l = new Layout(renderable);
-		super.render(renderableFactory.createRenderable(null, l), exchange);
 	}
 }

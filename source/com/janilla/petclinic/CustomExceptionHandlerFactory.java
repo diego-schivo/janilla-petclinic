@@ -34,10 +34,8 @@ public class CustomExceptionHandlerFactory extends ExceptionHandlerFactory {
 	protected boolean handle(Error error, HttpExchange exchange) {
 		super.handle(error, exchange);
 		var r = renderableFactory.createRenderable(null, exchange.getException());
-		if (r != null) {
-			var h = mainFactory.createHandler(r, exchange);
-			h.handle(exchange);
-		}
+		var h = mainFactory.createHandler(r, exchange);
+		h.handle(exchange);
 		return true;
 	}
 }

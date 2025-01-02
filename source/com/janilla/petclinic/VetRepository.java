@@ -40,7 +40,7 @@ public class VetRepository extends Crud<Vet> {
 
 	@Override
 	public Vet read(long id) {
-		return readCache.computeIfAbsent(id, k -> Lazy.of(() -> super.read(id))).get();
+		return readCache.computeIfAbsent(id, _ -> Lazy.of(() -> super.read(id))).get();
 	}
 
 	@Override
@@ -50,6 +50,6 @@ public class VetRepository extends Crud<Vet> {
 
 	@Override
 	public Page list(long skip, long limit) {
-		return listCache2.computeIfAbsent(List.of(skip, limit), k -> Lazy.of(() -> super.list(skip, limit))).get();
+		return listCache2.computeIfAbsent(List.of(skip, limit), _ -> Lazy.of(() -> super.list(skip, limit))).get();
 	}
 }

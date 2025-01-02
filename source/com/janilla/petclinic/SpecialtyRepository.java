@@ -27,10 +27,10 @@ import com.janilla.util.Lazy;
  */
 public class SpecialtyRepository extends Crud<Specialty> {
 
-	Map<Long, Supplier<Specialty>> readCache = new ConcurrentHashMap<>();
+	protected Map<Long, Supplier<Specialty>> readCache = new ConcurrentHashMap<>();
 
 	@Override
 	public Specialty read(long id) {
-		return readCache.computeIfAbsent(id, k -> Lazy.of(() -> super.read(id))).get();
+		return readCache.computeIfAbsent(id, _ -> Lazy.of(() -> super.read(id))).get();
 	}
 }

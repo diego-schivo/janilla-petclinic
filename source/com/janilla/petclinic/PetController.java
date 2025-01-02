@@ -15,7 +15,6 @@
  */
 package com.janilla.petclinic;
 
-import java.io.IOException;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -42,13 +41,13 @@ public class PetController {
 	public Persistence persistence;
 
 	@Handle(method = "GET", path = "/owners/(\\d+)/pets/new")
-	public Object initCreate(long owner) throws IOException {
+	public Object initCreate(long owner) {
 		var p = new Pet(null, null, null, null, owner);
 		return Form.of(p, null, persistence);
 	}
 
 	@Handle(method = "POST", path = "/owners/(\\d+)/pets/new")
-	public Object create(long owner, Pet pet) throws IOException {
+	public Object create(long owner, Pet pet) {
 		var p = new Pet(null, pet.name(), pet.birthDate(), pet.type(), owner);
 		var ee = validate(p);
 		if (!ee.isEmpty())
@@ -58,13 +57,13 @@ public class PetController {
 	}
 
 	@Handle(method = "GET", path = "/owners/(\\d+)/pets/(\\d+)/edit")
-	public Object initUpdate(long owner, long id) throws IOException {
+	public Object initUpdate(long owner, long id) {
 		var p = persistence.crud(Pet.class).read(id);
 		return Form.of(p, null, persistence);
 	}
 
 	@Handle(method = "POST", path = "/owners/(\\d+)/pets/(\\d+)/edit")
-	public Object update(long owner, long id, Pet pet) throws IOException {
+	public Object update(long owner, long id, Pet pet) {
 		var p = new Pet(id, pet.name(), pet.birthDate(), pet.type(), owner);
 		var ee = validate(p);
 		if (!ee.isEmpty())
@@ -88,15 +87,15 @@ public class PetController {
 	@Render(template = "createOrUpdatePetForm.html")
 	public record Form(Owner owner, Pet pet, List<PetType> types, Map<String, List<String>> errors) {
 
-		static Form of(Pet pet, Map<String, List<String>> errors, Persistence persistence) throws IOException {
+		private static final Map<String, String> LABELS = Map.of("name", "Name", "birthDate", "Birth Date", "type",
+				"Type");
+
+		public static Form of(Pet pet, Map<String, List<String>> errors, Persistence persistence) {
 			var o = persistence.crud(Owner.class).read(pet.owner());
 			var tc = persistence.crud(PetType.class);
 			var tt = tc.read(tc.filter(null)).toList();
 			return new Form(o, pet, tt, errors);
 		}
-
-		private static final Map<String, String> LABELS = Map.of("name", "Name", "birthDate", "Birth Date", "type",
-				"Type");
 
 		public String heading() {
 			return pet.id() == null ? "New Pet" : "Pet";
@@ -113,7 +112,7 @@ public class PetController {
 							.collect(Collectors.toMap(PetType::id, PetType::name, (y, _) -> y, LinkedHashMap::new));
 					yield new SelectField<>(l, x, (Long) v, ee, ii);
 				}
-				case "birthDate" -> new InputField<>(l, x, (LocalDate) v, ee, "text");
+				case "birthDate" -> new InputField<>(l, x, (LocalDate) v, ee, "date");
 				default -> new InputField<>(l, x, (String) v, ee, "text");
 				};
 			};

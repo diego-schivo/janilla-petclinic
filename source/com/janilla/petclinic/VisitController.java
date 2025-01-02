@@ -15,16 +15,14 @@
  */
 package com.janilla.petclinic;
 
-import java.io.IOException;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.function.Function;
 
-import com.janilla.http.HttpExchange;
 import com.janilla.persistence.Persistence;
 import com.janilla.reflect.Reflection;
 import com.janilla.web.Handle;
@@ -43,7 +41,7 @@ public class VisitController {
 	public Persistence persistence;
 
 	@Handle(method = "GET", path = "/owners/(\\d+)/pets/(\\d+)/visits/new")
-	public Object initCreate(long owner, long pet) throws IOException {
+	public Object initCreate(long owner, long pet) {
 		var o = persistence.crud(Owner.class).read(owner);
 		var p = persistence.crud(Pet.class).read(pet);
 		var t = persistence.crud(PetType.class).read(p.type());
@@ -54,12 +52,11 @@ public class VisitController {
 	}
 
 	@Handle(method = "POST", path = "/owners/(\\d+)/pets/(\\d+)/visits/new")
-	public Object create(long owner, long pet, Visit visit) throws IOException {
+	public Object create(long owner, long pet, Visit visit) {
 		var v = new Visit(null, pet, visit.date(), visit.description());
 		var errors = validate(v);
 		if (!errors.isEmpty())
 			return Form.of(v, errors, persistence);
-
 		persistence.crud(Visit.class).create(v);
 		return URI.create("/owners/" + owner);
 	}
@@ -67,17 +64,19 @@ public class VisitController {
 	protected Map<String, List<String>> validate(Visit visit) {
 		var errors = new HashMap<String, List<String>>();
 		if (visit.date() == null)
-			errors.computeIfAbsent("date", k -> new ArrayList<>()).add("must not be blank");
+			errors.computeIfAbsent("date", _ -> new ArrayList<>()).add("must not be blank");
 		if (visit.description() == null || visit.description().isBlank())
-			errors.computeIfAbsent("description", k -> new ArrayList<>()).add("must not be blank");
+			errors.computeIfAbsent("description", _ -> new ArrayList<>()).add("must not be blank");
 		return errors;
 	}
 
-	@Render(FormRenderer.class)
-	public record Form(Owner owner, Pet pet, PetType petType, Visit visit, List<Visit> previousVisits,
-			Map<String, List<String>> errors) {
+	@Render(template = "createOrUpdateVisitForm.html")
+	public record Form(Owner owner, Pet pet, PetType petType, Visit visit,
+			List<@Render(template = "visit") Visit> previousVisits, Map<String, List<String>> errors) {
 
-		static Form of(Visit visit, Map<String, List<String>> errors, Persistence persistence) throws IOException {
+		private static final Map<String, String> LABELS = Map.of("date", "Date", "description", "Description");
+
+		public static Form of(Visit visit, Map<String, List<String>> errors, Persistence persistence) {
 			var p = persistence.crud(Pet.class).read(visit.pet());
 			var o = persistence.crud(Owner.class).read(p.owner());
 			var t = persistence.crud(PetType.class).read(p.type());
@@ -85,28 +84,17 @@ public class VisitController {
 			var w = c.read(c.filter("pet", p.id())).toList();
 			return new Form(o, p, t, visit, w, errors);
 		}
-	}
 
-	public static class FormRenderer extends LayoutRenderer<Form> {
-
-		static Map<String, String> labels = Map.of("date", "Date", "description", "Description");
-
-		@Override
-		protected String renderContent(Form form, HttpExchange exchange) {
-			var tt = templates("createOrUpdateVisitForm.html");
-			var on = form.owner.firstName() + " " + form.owner.lastName();
-			var ff = Reflection.properties2(Visit.class)
-					.filter(x -> !x.getName().equals("id") && !x.getName().equals("pet")).map(x -> {
-						var n = x.getName();
-						var l = labels.get(n);
-						var v2 = x.get(form.visit);
-						var ee = form.errors != null ? form.errors.get(n) : null;
-						return new InputField(l, n, v2, ee, n.equals("date") ? "date" : "text");
-					}).collect(Collectors.toMap(x -> x.name(), x -> x));
-			var vv = form.previousVisits.stream().map(x -> {
-				return interpolate(tt.get("visit"), x);
-			}).collect(Collectors.joining());
-			return interpolate(tt.get(null), merge(form, Map.of("ownerName", on), ff, Map.of("visits", vv)));
+		public Function<String, FormField<?>> fields() {
+			return x -> {
+				var l = LABELS.get(x);
+				var v = Reflection.property(Visit.class, x).get(visit);
+				var ee = errors != null ? errors.get(x) : null;
+				return switch (x) {
+				case "date" -> new InputField<>(l, x, (LocalDate) v, ee, "date");
+				default -> new InputField<>(l, x, (String) v, ee, "text");
+				};
+			};
 		}
 	}
 }
