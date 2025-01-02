@@ -25,15 +25,16 @@ import com.janilla.web.Render;
 /**
  * @author Diego Schivo
  */
-@Render(SelectFieldRenderer.class)
-public record SelectField(String label, String name, Object value, List<String> errors, Map<?, String> items)
-		implements FormField {
+@Render(template = "selectField.html")
+public record SelectField<T>(String label, String name, T value, List<String> errors, Map<T, String> items)
+		implements FormField<T> {
 
-	public Stream<Option> options() {
+	public Stream<Option<T>> options() {
 		return items.entrySet().stream()
-				.map(x -> new Option(x.getKey(), x.getValue(), Objects.equals(x.getKey(), value)));
+				.map(x -> new Option<>(x.getKey(), x.getValue(), Objects.equals(x.getKey(), value)));
 	}
 
-	public record Option(Object value, String text, boolean selected) {
+	@Render(template = "option")
+	public record Option<T>(T value, String text, boolean selected) {
 	}
 }

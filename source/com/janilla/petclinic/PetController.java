@@ -17,14 +17,15 @@ package com.janilla.petclinic;
 
 import java.io.IOException;
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import com.janilla.http.HttpExchange;
 import com.janilla.persistence.Persistence;
 import com.janilla.reflect.Reflection;
 import com.janilla.web.Handle;
@@ -76,15 +77,15 @@ public class PetController {
 	protected Map<String, List<String>> validate(Pet pet) {
 		var m = new LinkedHashMap<String, List<String>>();
 		if (pet.name() == null || pet.name().isBlank())
-			m.computeIfAbsent("name", k -> new ArrayList<>()).add("must not be blank");
+			m.computeIfAbsent("name", _ -> new ArrayList<>()).add("must not be blank");
 		if (pet.birthDate() == null)
-			m.computeIfAbsent("birthDate", k -> new ArrayList<>()).add("must not be blank");
+			m.computeIfAbsent("birthDate", _ -> new ArrayList<>()).add("must not be blank");
 		if (pet.type() == null)
-			m.computeIfAbsent("type", k -> new ArrayList<>()).add("must not be blank");
+			m.computeIfAbsent("type", _ -> new ArrayList<>()).add("must not be blank");
 		return m;
 	}
 
-	@Render(FormRenderer.class)
+	@Render(template = "createOrUpdatePetForm.html")
 	public record Form(Owner owner, Pet pet, List<PetType> types, Map<String, List<String>> errors) {
 
 		static Form of(Pet pet, Map<String, List<String>> errors, Persistence persistence) throws IOException {
@@ -93,30 +94,33 @@ public class PetController {
 			var tt = tc.read(tc.filter(null)).toList();
 			return new Form(o, pet, tt, errors);
 		}
-	}
 
-	public static class FormRenderer extends LayoutRenderer<Form> {
+		private static final Map<String, String> LABELS = Map.of("name", "Name", "birthDate", "Birth Date", "type",
+				"Type");
 
-		static Map<String, String> labels = Map.of("name", "Name", "birthDate", "Birth Date", "type", "Type");
+		public String heading() {
+			return pet.id() == null ? "New Pet" : "Pet";
+		}
 
-		@Override
-		protected String renderContent(Form form, HttpExchange exchange) {
-			var tt = templates("createOrUpdatePetForm.html");
-			var h = (form.pet.id() == null ? "New " : "") + "Pet";
-			var on = form.owner.firstName() + " " + form.owner.lastName();
-			var tt2 = form.types.stream()
-					.collect(Collectors.toMap(PetType::id, PetType::name, (y, z) -> y, LinkedHashMap::new));
-			var ff = Reflection.properties2(Pet.class)
-					.filter(x -> !x.getName().equals("id") && !x.getName().equals("owner")).map(x -> {
-						var n = x.getName();
-						var l = labels.get(n);
-						var v2 = x.get(form.pet);
-						var ee = form.errors != null ? form.errors.get(n) : null;
-						return n.equals("type") ? new SelectField(l, n, v2, ee, tt2)
-								: new InputField(l, n, v2, ee, n.equals("birthDate") ? "date" : "text");
-					}).collect(Collectors.toMap(x -> x.name(), x -> x));
-			var b = (form.pet.id() == null ? "Add" : "Update") + " Pet";
-			return interpolate(tt.get(null), merge(Map.of("heading", h, "ownerName", on), ff, Map.of("button", b)));
+		public Function<String, FormField<?>> fields() {
+			return x -> {
+				var l = LABELS.get(x);
+				var v = Reflection.property(Pet.class, x).get(pet);
+				var ee = errors != null ? errors.get(x) : null;
+				return switch (x) {
+				case "type" -> {
+					var ii = types.stream()
+							.collect(Collectors.toMap(PetType::id, PetType::name, (y, _) -> y, LinkedHashMap::new));
+					yield new SelectField<>(l, x, (Long) v, ee, ii);
+				}
+				case "birthDate" -> new InputField<>(l, x, (LocalDate) v, ee, "text");
+				default -> new InputField<>(l, x, (String) v, ee, "text");
+				};
+			};
+		}
+
+		public String button() {
+			return pet.id() == null ? "Add Pet" : "Update Pet";
 		}
 	}
 }

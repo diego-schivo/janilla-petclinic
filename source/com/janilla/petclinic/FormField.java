@@ -20,13 +20,13 @@ import java.util.List;
 /**
  * @author Diego Schivo
  */
-public interface FormField {
+public interface FormField<T> {
 
 	String label();
 
 	String name();
 
-	Object value();
+	T value();
 
 	List<String> errors();
 }

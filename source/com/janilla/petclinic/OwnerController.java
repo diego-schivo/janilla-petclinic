@@ -119,17 +119,17 @@ public class OwnerController {
 	protected Map<String, List<String>> validate(Owner owner) {
 		var m = new LinkedHashMap<String, List<String>>();
 		if (owner.firstName() == null || owner.firstName().isBlank())
-			m.computeIfAbsent("firstName", k -> new ArrayList<>()).add("must not be blank");
+			m.computeIfAbsent("firstName", _ -> new ArrayList<>()).add("must not be blank");
 		if (owner.lastName() == null || owner.lastName().isBlank())
-			m.computeIfAbsent("lastName", k -> new ArrayList<>()).add("must not be blank");
+			m.computeIfAbsent("lastName", _ -> new ArrayList<>()).add("must not be blank");
 		if (owner.address() == null || owner.address().isBlank())
-			m.computeIfAbsent("address", k -> new ArrayList<>()).add("must not be blank");
+			m.computeIfAbsent("address", _ -> new ArrayList<>()).add("must not be blank");
 		if (owner.city() == null || owner.city().isBlank())
-			m.computeIfAbsent("city", k -> new ArrayList<>()).add("must not be blank");
+			m.computeIfAbsent("city", _ -> new ArrayList<>()).add("must not be blank");
 		if (owner.telephone() == null || owner.telephone().isBlank())
-			m.computeIfAbsent("telephone", k -> new ArrayList<>()).add("must not be blank");
+			m.computeIfAbsent("telephone", _ -> new ArrayList<>()).add("must not be blank");
 		if (owner.telephone() == null || !tenDigits.matcher(owner.telephone()).matches())
-			m.computeIfAbsent("telephone", k -> new ArrayList<>())
+			m.computeIfAbsent("telephone", _ -> new ArrayList<>())
 					.add("numeric value out of bounds (<10 digits>.<0 digits> expected)");
 		return m;
 	}
@@ -157,40 +157,20 @@ public class OwnerController {
 	@Render(template = "createOrUpdateOwnerForm.html")
 	public record Form(Owner owner, Map<String, List<String>> errors) {
 
-		static Map<String, String> labels = Map.of("firstName", "First Name", "lastName", "Last Name", "address",
-				"Address", "city", "City", "telephone", "Telephone");
+		private static final Map<String, String> LABELS = Map.of("firstName", "First Name", "lastName", "Last Name",
+				"address", "Address", "city", "City", "telephone", "Telephone");
 
-		public Function<String, FormField> fields() {
+		public Function<String, FormField<?>> fields() {
 			return x -> {
-				var l = labels.get(x);
+				var l = LABELS.get(x);
 				var v = Reflection.property(Owner.class, x).get(owner);
 				var ee = errors != null ? errors.get(x) : null;
-				return new InputField(l, x, v, ee, "text");
+				return new InputField<>(l, x, (String) v, ee, "text");
 			};
 		}
 
 		public String button() {
-			return (owner == null || owner.id() == null ? "Add" : "Update") + " Owner";
+			return owner == null || owner.id() == null ? "Add Owner" : "Update Owner";
 		}
 	}
-
-//	public static class FormRenderer extends LayoutRenderer<Form> {
-//
-//		static Map<String, String> labels = Map.of("firstName", "First Name", "lastName", "Last Name", "address",
-//				"Address", "city", "City", "telephone", "Telephone");
-//
-//		@Override
-//		protected String renderContent(Form form, HttpExchange exchange) {
-//			var tt = templates("createOrUpdateOwnerForm.html");
-//			var ff = Reflection.properties2(Owner.class).filter(x -> !x.getName().equals("id")).map(x -> {
-//				var n = x.getName();
-//				var l = labels.get(n);
-//				var v2 = x.get(form.owner);
-//				var ee = form.errors != null ? form.errors.get(n) : null;
-//				return new InputField(l, n, v2, ee, "text");
-//			}).collect(Collectors.toMap(x -> x.name(), x -> x));
-//			var b = (form.owner == null || form.owner.id() == null ? "Add" : "Update") + " Owner";
-//			return interpolate(tt.get(null), merge(ff, Map.of("button", b)));
-//		}
-//	}
 }
