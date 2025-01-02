@@ -22,7 +22,15 @@ import com.janilla.web.Render;
 /**
  * @author Diego Schivo
  */
-@Render(InputFieldRenderer.class)
-public record InputField(String label, String name, Object value, List<String> errors, String type)
-		implements FormField {
+@Render(template = "inputField.html")
+public record InputField(String label, String name, Object value,
+		@Render(template = "errors", delimiter = "<br />") List<String> errors, String type) implements FormField {
+
+	public String hasError() {
+		return errors != null && !errors.isEmpty() ? "has-error" : null;
+	}
+
+	public String icon() {
+		return errors != null && !errors.isEmpty() ? "remove" : "ok";
+	}
 }

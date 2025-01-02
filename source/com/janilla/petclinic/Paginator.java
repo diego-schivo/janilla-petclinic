@@ -79,7 +79,7 @@ public record Paginator(int index, int length, URI uri) {
 
 		@Override
 		protected String template(Item value) {
-			return templates.get(value.href != null ? "item-on" : "item-off");
+			return factory.template(templateKey1, value.href != null ? "item-on" : "item-off");
 		}
 	}
 }

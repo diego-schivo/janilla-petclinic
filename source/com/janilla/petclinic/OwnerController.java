@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import com.janilla.persistence.Persistence;
@@ -141,7 +142,7 @@ public class OwnerController {
 	public record FindOutcome(List<Result> results, Paginator paginator) {
 
 		@Render(template = "result")
-		public record Result(Owner owner, List<@Render(template = "pet", delimiter = ", ") Pet> pets) {
+		public record Result(Owner owner, @Render(delimiter = ", ") List<@Render(template = "pet") Pet> pets) {
 		}
 	}
 
@@ -155,6 +156,22 @@ public class OwnerController {
 
 	@Render(template = "createOrUpdateOwnerForm.html")
 	public record Form(Owner owner, Map<String, List<String>> errors) {
+
+		static Map<String, String> labels = Map.of("firstName", "First Name", "lastName", "Last Name", "address",
+				"Address", "city", "City", "telephone", "Telephone");
+
+		public Function<String, FormField> fields() {
+			return x -> {
+				var l = labels.get(x);
+				var v = Reflection.property(Owner.class, x).get(owner);
+				var ee = errors != null ? errors.get(x) : null;
+				return new InputField(l, x, v, ee, "text");
+			};
+		}
+
+		public String button() {
+			return (owner == null || owner.id() == null ? "Add" : "Update") + " Owner";
+		}
 	}
 
 //	public static class FormRenderer extends LayoutRenderer<Form> {
