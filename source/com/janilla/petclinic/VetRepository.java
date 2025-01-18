@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 import com.janilla.persistence.Crud;
-import com.janilla.util.Lazy;
+import com.janilla.persistence.Persistence;
 
 /**
  * @author Diego Schivo
@@ -37,6 +37,10 @@ public class VetRepository extends Crud<Vet> {
 	Supplier<long[]> listCache1 = Lazy.of(() -> super.list());
 
 	Map<List<Long>, Supplier<Page>> listCache2 = new ConcurrentHashMap<>();
+
+	public VetRepository(Class<Vet> type, Persistence persistence) {
+		super(type, persistence);
+	}
 
 	@Override
 	public Vet read(long id) {

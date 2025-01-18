@@ -15,6 +15,9 @@
  */
 package com.janilla.petclinic;
 
+import java.util.Collection;
+
+import com.janilla.database.Database;
 import com.janilla.persistence.Crud;
 import com.janilla.persistence.Persistence;
 
@@ -23,18 +26,22 @@ import com.janilla.persistence.Persistence;
  */
 public class CustomPersistence extends Persistence {
 
+	public CustomPersistence(Database database, Collection<Class<?>> types) {
+		super(database, types);
+	}
+
 	@Override
-	protected <E> Crud<E> createCrud(Class<E> type) {
+	protected <E> Crud<E> newCrud(Class<E> type) {
 		if (type == Vet.class) {
 			@SuppressWarnings("unchecked")
-			var c = (Crud<E>) new VetRepository();
+			var c = (Crud<E>) new VetRepository(Vet.class, this);
 			return c;
 		}
 		if (type == Specialty.class) {
 			@SuppressWarnings("unchecked")
-			var c = (Crud<E>) new SpecialtyRepository();
+			var c = (Crud<E>) new SpecialtyRepository(Specialty.class, this);
 			return c;
 		}
-		return super.createCrud(type);
+		return super.newCrud(type);
 	}
 }

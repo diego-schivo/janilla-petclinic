@@ -21,8 +21,8 @@ import java.util.stream.Stream;
 
 import com.janilla.net.Net;
 import com.janilla.util.EntryList;
+import com.janilla.web.HtmlRenderer;
 import com.janilla.web.Render;
-import com.janilla.web.Renderer;
 
 /**
  * @author Diego Schivo
@@ -75,7 +75,7 @@ public record Paginator(int index, int length, URI uri) {
 		}
 	}
 
-	public static class ItemRenderer extends Renderer<Item> {
+	public static class ItemRenderer extends HtmlRenderer<Item> {
 
 		@Override
 		protected String template(Item value) {

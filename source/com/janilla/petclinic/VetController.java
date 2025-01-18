@@ -21,8 +21,8 @@ import java.util.List;
 import com.janilla.persistence.Persistence;
 import com.janilla.web.Bind;
 import com.janilla.web.Handle;
+import com.janilla.web.HtmlRenderer;
 import com.janilla.web.Render;
-import com.janilla.web.Renderer;
 
 /**
  * @author Diego Schivo
@@ -66,7 +66,7 @@ public class VetController {
 				@Render(renderer = SpecialtiesRenderer.class) List<@Render(template = "specialty") Specialty> specialties) {
 		}
 
-		public static class SpecialtiesRenderer extends Renderer<List<Specialty>> {
+		public static class SpecialtiesRenderer extends HtmlRenderer<List<Specialty>> {
 
 			@Override
 			public String apply(List<Specialty> value) {

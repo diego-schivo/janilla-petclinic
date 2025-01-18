@@ -40,8 +40,8 @@ public class CustomJsonHandlerFactory extends JsonHandlerFactory {
 		var i = new ReflectionJsonIterator() {
 
 			@Override
-			public Iterator<JsonToken<?>> buildValueIterator(Object object) {
-				var o = getStack().peek();
+			public Iterator<JsonToken<?>> newValueIterator(Object object) {
+				var o = stack().peek();
 				if (o instanceof Map.Entry e)
 					switch ((String) e.getKey()) {
 					case "specialties":
@@ -51,7 +51,7 @@ public class CustomJsonHandlerFactory extends JsonHandlerFactory {
 						}
 						break;
 					}
-				return super.buildValueIterator(object);
+				return super.newValueIterator(object);
 			}
 		};
 		i.setObject(object);

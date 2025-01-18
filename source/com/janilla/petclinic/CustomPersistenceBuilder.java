@@ -16,28 +16,34 @@
 package com.janilla.petclinic;
 
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.Arrays;
 
 import com.janilla.persistence.ApplicationPersistenceBuilder;
 import com.janilla.persistence.Persistence;
+import com.janilla.reflect.Factory;
 
 /**
  * @author Diego Schivo
  */
 public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 
+	public CustomPersistenceBuilder(Path databaseFile, Factory factory) {
+		super(databaseFile, factory);
+	}
+
 	@Override
 	public Persistence build() {
-		var fe = Files.exists(file);
+		var fe = Files.exists(databaseFile);
 		var p = super.build();
-		p.setTypeResolver(x -> {
-			try {
-				return Class.forName(getClass().getPackageName() + "." + x.replace('.', '$'));
-			} catch (ClassNotFoundException e) {
-				throw new RuntimeException(e);
-			}
-		});
+//		p.setTypeResolver(x -> {
+//			try {
+//				return Class.forName(getClass().getPackageName() + "." + x.replace('.', '$'));
+//			} catch (ClassNotFoundException e) {
+//				throw new RuntimeException(e);
+//			}
+//		});
 		if (!fe)
 			seed(p);
 		return p;

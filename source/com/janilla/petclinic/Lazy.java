@@ -15,26 +15,41 @@
  */
 package com.janilla.petclinic;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
-import com.janilla.persistence.Crud;
-import com.janilla.persistence.Persistence;
+public class Lazy<T> implements Supplier<T> {
 
-/**
- * @author Diego Schivo
- */
-public class SpecialtyRepository extends Crud<Specialty> {
-
-	public SpecialtyRepository(Class<Specialty> type, Persistence persistence) {
-		super(type, persistence);
+	public static <T> Lazy<T> of(Supplier<T> supplier) {
+		return new Lazy<T>(supplier);
 	}
 
-	protected Map<Long, Supplier<Specialty>> readCache = new ConcurrentHashMap<>();
+	final Supplier<T> supplier;
+
+	final Lock lock = new ReentrantLock();
+
+	volatile boolean got;
+
+	T result;
+
+	private Lazy(Supplier<T> supplier) {
+		this.supplier = supplier;
+	}
 
 	@Override
-	public Specialty read(long id) {
-		return readCache.computeIfAbsent(id, _ -> Lazy.of(() -> super.read(id))).get();
+	public T get() {
+		if (!got) {
+			lock.lock();
+			try {
+				if (!got) {
+					result = supplier.get();
+					got = true;
+				}
+			} finally {
+				lock.unlock();
+			}
+		}
+		return result;
 	}
 }
