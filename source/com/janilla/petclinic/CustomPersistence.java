@@ -34,12 +34,12 @@ public class CustomPersistence extends Persistence {
 	protected <E> Crud<E> newCrud(Class<E> type) {
 		if (type == Vet.class) {
 			@SuppressWarnings("unchecked")
-			var c = (Crud<E>) new VetRepository(Vet.class, this);
+			var c = (Crud<E>) new VetRepository(this);
 			return c;
 		}
 		if (type == Specialty.class) {
 			@SuppressWarnings("unchecked")
-			var c = (Crud<E>) new SpecialtyRepository(Specialty.class, this);
+			var c = (Crud<E>) new SpecialtyRepository(this);
 			return c;
 		}
 		return super.newCrud(type);

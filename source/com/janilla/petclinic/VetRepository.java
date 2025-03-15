@@ -38,8 +38,8 @@ public class VetRepository extends Crud<Vet> {
 
 	Map<List<Long>, Supplier<Page>> listCache2 = new ConcurrentHashMap<>();
 
-	public VetRepository(Class<Vet> type, Persistence persistence) {
-		super(type, persistence);
+	public VetRepository(Persistence persistence) {
+		super(Vet.class, persistence);
 	}
 
 	@Override

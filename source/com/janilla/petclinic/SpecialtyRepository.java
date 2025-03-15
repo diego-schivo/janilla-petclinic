@@ -27,8 +27,8 @@ import com.janilla.persistence.Persistence;
  */
 public class SpecialtyRepository extends Crud<Specialty> {
 
-	public SpecialtyRepository(Class<Specialty> type, Persistence persistence) {
-		super(type, persistence);
+	public SpecialtyRepository(Persistence persistence) {
+		super(Specialty.class, persistence);
 	}
 
 	protected Map<Long, Supplier<Specialty>> readCache = new ConcurrentHashMap<>();
