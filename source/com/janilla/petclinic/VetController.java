@@ -42,8 +42,8 @@ public class VetController {
 		var i = page != null ? page - 1 : 0;
 		var vv = vc.list(i * 5, 5);
 		var l = (int) Math.ceilDiv(vv.total(), 5);
-		var ss = sc.read(sc.list()).toList();
-		var rr = vc.read(vv.ids()).map(x -> {
+		var ss = sc.read(sc.list());
+		var rr = vc.read(vv.ids()).stream().map(x -> {
 			var ss2 = ss.stream().filter(y -> x.specialties().contains(y.id())).toList();
 			return new FindOutcome.Result(x, ss2);
 		}).toList();
@@ -54,7 +54,7 @@ public class VetController {
 	@Handle(method = "GET", path = "/vets")
 	public Object find() {
 		var c = persistence.crud(Vet.class);
-		var v = c.read(c.list()).toList();
+		var v = c.read(c.list());
 		return v;
 	}
 

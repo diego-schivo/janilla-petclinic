@@ -61,8 +61,8 @@ public class OwnerController {
 		default -> {
 			var pc = persistence.crud(Pet.class);
 			var l = (int) Math.ceilDiv(op.total(), 5);
-			var rr = oc.read(op.ids()).map(o -> {
-				var pp = pc.read(pc.filter("owner", o.id())).toList();
+			var rr = oc.read(op.ids()).stream().map(o -> {
+				var pp = pc.read(pc.filter("owner", o.id()));
 				return new FindOutcome.Result(o, pp);
 			}).toList();
 			var p = new Paginator(i, l, URI.create("/owners"));
@@ -78,9 +78,9 @@ public class OwnerController {
 		var tc = persistence.crud(PetType.class);
 		var vc = persistence.crud(Visit.class);
 		var o = oc.read(id);
-		var pp = pc.read(pc.filter("owner", o.id())).map(x -> {
+		var pp = pc.read(pc.filter("owner", o.id())).stream().map(x -> {
 			var t = tc.read(x.type());
-			var vv = vc.read(vc.filter("pet", x.id())).toList();
+			var vv = vc.read(vc.filter("pet", x.id()));
 			return new Details.Pet2(x, t, vv);
 		}).toList();
 		return new Details(o, pp);

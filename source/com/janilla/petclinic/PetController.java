@@ -93,7 +93,7 @@ public class PetController {
 		public static Form of(Pet pet, Map<String, List<String>> errors, Persistence persistence) {
 			var o = persistence.crud(Owner.class).read(pet.owner());
 			var tc = persistence.crud(PetType.class);
-			var tt = tc.read(tc.filter(null)).toList();
+			var tt = tc.read(tc.filter(null));
 			return new Form(o, pet, tt, errors);
 		}
 

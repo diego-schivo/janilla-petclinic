@@ -36,7 +36,7 @@ public class VetRepository extends Crud<Vet> {
 
 	Supplier<long[]> listCache1 = Lazy.of(() -> super.list());
 
-	Map<List<Long>, Supplier<Page>> listCache2 = new ConcurrentHashMap<>();
+	Map<List<Long>, Supplier<IdPage>> listCache2 = new ConcurrentHashMap<>();
 
 	public VetRepository(Persistence persistence) {
 		super(Vet.class, persistence);
@@ -53,7 +53,7 @@ public class VetRepository extends Crud<Vet> {
 	}
 
 	@Override
-	public Page list(long skip, long limit) {
+	public IdPage list(long skip, long limit) {
 		return listCache2.computeIfAbsent(List.of(skip, limit), _ -> Lazy.of(() -> super.list(skip, limit))).get();
 	}
 }
