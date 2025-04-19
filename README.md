@@ -20,7 +20,7 @@ cd janilla-petclinic
 mvn compile exec:java
 ```
 
-You can then access the PetClinic at <http://localhost:8080/>.
+You can then access the PetClinic at <https://localhost:8443/>.
 
 ## In case you find a bug/suggested improvement for Janilla PetClinic
 
@@ -40,21 +40,21 @@ You can change the file location by editing `configuration.properties` in the so
 
 The following items should be installed in your system:
 
-- Java 21 or newer
+- Java 24
 - [Git command line tool](https://help.github.com/articles/set-up-git)
 - Eclipse with the [m2e plugin](https://www.eclipse.org/m2e/)
 
 In order to install them all:
 
 1. Download the [Eclipse Installer](https://www.eclipse.org/downloads/packages/installer)
-2. Install the package for Enterprise Java and Web Developers with JRE 21
+2. Install the package for Enterprise Java and Web Developers with JRE 24
 
 ### Steps
 
 1. Launch Eclipse and choose Import projects from Git (with smart import)
 2. Select GitHub as the repository source, then search for `janilla-petclinic fork:true` and complete the wizard
 3. Select the project (`janilla-petclinic`) and launch Debug as Java Application
-4. Open a browser and navigate to <http://localhost:8080/>
+4. Open a browser and navigate to <https://localhost:8443/>
 
 ## Looking for something in particular?
 
