@@ -25,7 +25,7 @@ import com.janilla.persistence.Persistence;
 /**
  * @author Diego Schivo
  */
-public class SpecialtyRepository extends Crud<Specialty> {
+public class SpecialtyRepository extends Crud<Long, Specialty> {
 
 	public SpecialtyRepository(Persistence persistence) {
 		super(Specialty.class, persistence);
@@ -34,7 +34,7 @@ public class SpecialtyRepository extends Crud<Specialty> {
 	protected Map<Long, Supplier<Specialty>> readCache = new ConcurrentHashMap<>();
 
 	@Override
-	public Specialty read(long id) {
+	public Specialty read(Long id) {
 		return readCache.computeIfAbsent(id, _ -> Lazy.of(() -> super.read(id))).get();
 	}
 }

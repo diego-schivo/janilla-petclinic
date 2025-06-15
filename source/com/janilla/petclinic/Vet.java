@@ -17,6 +17,7 @@ package com.janilla.petclinic;
 
 import java.util.List;
 
+import com.janilla.persistence.Entity;
 import com.janilla.persistence.Index;
 import com.janilla.persistence.Store;
 
@@ -29,5 +30,5 @@ import com.janilla.persistence.Store;
  */
 @Store
 @Index
-public record Vet(Long id, String firstName, String lastName, List<Long> specialties) {
+public record Vet(Long id, String firstName, String lastName, List<Long> specialties) implements Entity<Long> {
 }

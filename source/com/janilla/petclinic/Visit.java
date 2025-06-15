@@ -17,6 +17,7 @@ package com.janilla.petclinic;
 
 import java.time.LocalDate;
 
+import com.janilla.persistence.Entity;
 import com.janilla.persistence.Index;
 import com.janilla.persistence.Store;
 
@@ -26,5 +27,6 @@ import com.janilla.persistence.Store;
  * @author Dave Syer
  */
 @Store
-public record Visit(Long id, @Index(sort = "date") Long pet, LocalDate date, String description) {
+public record Visit(Long id, @Index(sort = "date") Long pet, LocalDate date, String description)
+		implements Entity<Long> {
 }

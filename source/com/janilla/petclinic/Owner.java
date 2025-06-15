@@ -15,6 +15,7 @@
  */
 package com.janilla.petclinic;
 
+import com.janilla.persistence.Entity;
 import com.janilla.persistence.Index;
 import com.janilla.persistence.Store;
 
@@ -27,5 +28,6 @@ import com.janilla.persistence.Store;
  * @author Oliver Drotbohm
  */
 @Store
-public record Owner(Long id, String firstName, @Index String lastName, String address, String city, String telephone) {
+public record Owner(Long id, String firstName, @Index String lastName, String address, String city, String telephone)
+		implements Entity<Long> {
 }

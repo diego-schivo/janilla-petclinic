@@ -18,6 +18,7 @@ package com.janilla.petclinic;
 import com.janilla.database.Database;
 import com.janilla.json.MapAndType.TypeResolver;
 import com.janilla.persistence.Crud;
+import com.janilla.persistence.Entity;
 import com.janilla.persistence.Persistence;
 
 /**
@@ -25,20 +26,20 @@ import com.janilla.persistence.Persistence;
  */
 public class CustomPersistence extends Persistence {
 
-	public CustomPersistence(Database database, Iterable<Class<?>> types, TypeResolver typeResolver) {
+	public CustomPersistence(Database database, Iterable<Class<? extends Entity<?>>> types, TypeResolver typeResolver) {
 		super(database, types, typeResolver);
 	}
 
 	@Override
-	protected <E> Crud<E> newCrud(Class<E> type) {
+	protected <E extends Entity<?>> Crud<?, E> newCrud(Class<E> type) {
 		if (type == Vet.class) {
 			@SuppressWarnings("unchecked")
-			var c = (Crud<E>) new VetRepository(this);
+			var c = (Crud<?, E>) new VetRepository(this);
 			return c;
 		}
 		if (type == Specialty.class) {
 			@SuppressWarnings("unchecked")
-			var c = (Crud<E>) new SpecialtyRepository(this);
+			var c = (Crud<?, E>) new SpecialtyRepository(this);
 			return c;
 		}
 		return super.newCrud(type);

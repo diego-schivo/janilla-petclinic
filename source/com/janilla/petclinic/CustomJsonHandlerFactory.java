@@ -46,7 +46,7 @@ public class CustomJsonHandlerFactory extends JsonHandlerFactory {
 					switch ((String) e.getKey()) {
 					case "specialties":
 						if (object instanceof List<?> c) {
-							var ll = c.stream().mapToLong(x -> (long) x).toArray();
+							var ll = c.stream().map(x -> (Long) x).toList();
 							object = persistence.crud(Specialty.class).read(ll);
 						}
 						break;

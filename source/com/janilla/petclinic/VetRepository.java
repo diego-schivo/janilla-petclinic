@@ -30,30 +30,30 @@ import com.janilla.persistence.Persistence;
  * @author Sam Brannen
  * @author Michael Isvy
  */
-public class VetRepository extends Crud<Vet> {
+public class VetRepository extends Crud<Long, Vet> {
 
 	Map<Long, Supplier<Vet>> readCache = new ConcurrentHashMap<>();
 
-	Supplier<long[]> listCache1 = Lazy.of(() -> super.list());
+	Supplier<List<Long>> listCache1 = Lazy.of(() -> super.list());
 
-	Map<List<Long>, Supplier<IdPage>> listCache2 = new ConcurrentHashMap<>();
+	Map<List<Long>, Supplier<IdPage<Long>>> listCache2 = new ConcurrentHashMap<>();
 
 	public VetRepository(Persistence persistence) {
 		super(Vet.class, persistence);
 	}
 
 	@Override
-	public Vet read(long id) {
+	public Vet read(Long id) {
 		return readCache.computeIfAbsent(id, _ -> Lazy.of(() -> super.read(id))).get();
 	}
 
 	@Override
-	public long[] list() {
+	public List<Long> list() {
 		return listCache1.get();
 	}
 
 	@Override
-	public IdPage list(long skip, long limit) {
+	public IdPage<Long> list(long skip, long limit) {
 		return listCache2.computeIfAbsent(List.of(skip, limit), _ -> Lazy.of(() -> super.list(skip, limit))).get();
 	}
 }

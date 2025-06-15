@@ -57,7 +57,7 @@ public class OwnerController {
 				: oc.list(i * 5, 5);
 		return switch ((int) op.total()) {
 		case 0 -> new FindForm(owner, Map.of("lastName", List.of("has not been found")));
-		case 1 -> URI.create("/owners/" + op.ids()[0]);
+		case 1 -> URI.create("/owners/" + op.ids().getFirst());
 		default -> {
 			var pc = persistence.crud(Pet.class);
 			var l = (int) Math.ceilDiv(op.total(), 5);
