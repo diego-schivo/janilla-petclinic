@@ -15,6 +15,8 @@
  */
 package com.janilla.petclinic;
 
+import java.util.Set;
+
 import com.janilla.database.Database;
 import com.janilla.json.MapAndType.TypeResolver;
 import com.janilla.persistence.Crud;
@@ -26,7 +28,7 @@ import com.janilla.persistence.Persistence;
  */
 public class CustomPersistence extends Persistence {
 
-	public CustomPersistence(Database database, Iterable<Class<? extends Entity<?>>> types, TypeResolver typeResolver) {
+	public CustomPersistence(Database database, Set<Class<? extends Entity<?>>> types, TypeResolver typeResolver) {
 		super(database, types, typeResolver);
 	}
 

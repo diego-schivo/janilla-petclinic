@@ -15,11 +15,16 @@
  */
 package com.janilla.petclinic;
 
+import java.util.Comparator;
 import java.util.Properties;
+import java.util.Set;
+import java.util.function.Function;
 
 import com.janilla.http.HttpExchange;
 import com.janilla.web.HandleException;
 import com.janilla.web.MethodHandlerFactory;
+import com.janilla.web.RenderableFactory;
+import com.janilla.web.WebHandlerFactory;
 
 /**
  * @author Diego Schivo
@@ -28,11 +33,17 @@ public class CustomMethodHandlerFactory extends MethodHandlerFactory {
 
 	public Properties configuration;
 
+	public CustomMethodHandlerFactory(Set<Class<?>> types, Function<Class<?>, Object> targetResolver,
+			Comparator<Invocation> invocationComparator, RenderableFactory renderableFactory,
+			WebHandlerFactory rootFactory) {
+		super(types, targetResolver, invocationComparator, renderableFactory, rootFactory);
+	}
+
 	@Override
-	protected void handle(Invocation invocation, HttpExchange exchange) {
+	protected boolean handle(Invocation invocation, HttpExchange exchange) {
 		if (Boolean.parseBoolean(configuration.getProperty("petclinic.live-demo"))
 				&& !exchange.getRequest().getMethod().equals("GET"))
 			throw new HandleException(new MethodBlockedException());
-		super.handle(invocation, exchange);
+		return super.handle(invocation, exchange);
 	}
 }

@@ -27,6 +27,10 @@ public class CustomTemplateHandlerFactory extends TemplateHandlerFactory {
 
 	public RenderableFactory renderableFactory;
 
+	public CustomTemplateHandlerFactory(Object application) {
+		super(application);
+	}
+
 	@Override
 	protected void render(Renderable<?> input, HttpExchange exchange) {
 		var l = new Layout(input);

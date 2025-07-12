@@ -26,16 +26,20 @@ import com.janilla.web.WebHandlerFactory;
  */
 public class CustomExceptionHandlerFactory extends ExceptionHandlerFactory {
 
-	public WebHandlerFactory mainFactory;
+	protected final RenderableFactory renderableFactory;
 
-	public RenderableFactory renderableFactory;
+	protected final WebHandlerFactory rootFactory;
+
+	public CustomExceptionHandlerFactory(RenderableFactory renderableFactory, WebHandlerFactory rootFactory) {
+		this.renderableFactory = renderableFactory;
+		this.rootFactory = rootFactory;
+	}
 
 	@Override
 	protected boolean handle(Error error, HttpExchange exchange) {
 		super.handle(error, exchange);
 		var r = renderableFactory.createRenderable(null, exchange.getException());
-		var h = mainFactory.createHandler(r, exchange);
-		h.handle(exchange);
-		return true;
+		var h = rootFactory.createHandler(r, exchange);
+		return h.handle(exchange);
 	}
 }
