@@ -18,22 +18,24 @@ package com.janilla.petclinic;
 import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.net.ssl.SSLContext;
 
 import com.janilla.http.HttpHandler;
 import com.janilla.http.HttpServer;
-import com.janilla.json.MapAndType;
+import com.janilla.json.DollarTypeResolver;
+import com.janilla.json.TypeResolver;
 import com.janilla.net.Net;
 import com.janilla.persistence.ApplicationPersistenceBuilder;
 import com.janilla.persistence.Persistence;
 import com.janilla.reflect.Factory;
 import com.janilla.util.Util;
-import com.janilla.web.ApplicationHandlerBuilder;
+import com.janilla.web.ApplicationHandlerFactory;
+import com.janilla.web.NotFoundException;
 import com.janilla.web.RenderableFactory;
 
 /**
@@ -82,15 +84,15 @@ public class PetClinicApplication {
 
 	public HttpHandler handler;
 
-	public MapAndType.TypeResolver typeResolver;
+	public TypeResolver typeResolver;
 
-	public Set<Class<?>> types;
+	public List<Class<?>> types;
 
 	public PetClinicApplication(Properties configuration) {
 		this.configuration = configuration;
-		types = Util.getPackageClasses(getClass().getPackageName()).collect(Collectors.toSet());
+		types = Util.getPackageClasses(getClass().getPackageName()).toList();
 		factory = new Factory(types, this);
-		typeResolver = factory.create(MapAndType.DollarTypeResolver.class);
+		typeResolver = factory.create(DollarTypeResolver.class);
 		{
 			var p = configuration.getProperty("petclinic.database.file");
 			if (p.startsWith("~"))
@@ -99,7 +101,16 @@ public class PetClinicApplication {
 			persistence = pb.build();
 		}
 		renderableFactory = new RenderableFactory();
-		handler = factory.create(ApplicationHandlerBuilder.class).build();
+
+		{
+			var f = factory.create(ApplicationHandlerFactory.class);
+			handler = x -> {
+				var h = f.createHandler(Objects.requireNonNullElse(x.exception(), x.request()));
+				if (h == null)
+					throw new NotFoundException(x.request().getMethod() + " " + x.request().getTarget());
+				return h.handle(x);
+			};
+		}
 	}
 
 	public PetClinicApplication application() {

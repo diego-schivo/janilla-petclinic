@@ -15,16 +15,17 @@
  */
 package com.janilla.petclinic;
 
+import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Properties;
-import java.util.Set;
 import java.util.function.Function;
 
 import com.janilla.http.HttpExchange;
+import com.janilla.http.HttpHandlerFactory;
 import com.janilla.web.HandleException;
 import com.janilla.web.MethodHandlerFactory;
 import com.janilla.web.RenderableFactory;
-import com.janilla.web.WebHandlerFactory;
 
 /**
  * @author Diego Schivo
@@ -33,16 +34,16 @@ public class CustomMethodHandlerFactory extends MethodHandlerFactory {
 
 	public Properties configuration;
 
-	public CustomMethodHandlerFactory(Set<Class<?>> types, Function<Class<?>, Object> targetResolver,
+	public CustomMethodHandlerFactory(Collection<Method> methods, Function<Class<?>, Object> targetResolver,
 			Comparator<Invocation> invocationComparator, RenderableFactory renderableFactory,
-			WebHandlerFactory rootFactory) {
-		super(types, targetResolver, invocationComparator, renderableFactory, rootFactory);
+			HttpHandlerFactory rootFactory) {
+		super(methods, targetResolver, invocationComparator, renderableFactory, rootFactory);
 	}
 
 	@Override
 	protected boolean handle(Invocation invocation, HttpExchange exchange) {
 		if (Boolean.parseBoolean(configuration.getProperty("petclinic.live-demo"))
-				&& !exchange.getRequest().getMethod().equals("GET"))
+				&& !exchange.request().getMethod().equals("GET"))
 			throw new HandleException(new MethodBlockedException());
 		return super.handle(invocation, exchange);
 	}

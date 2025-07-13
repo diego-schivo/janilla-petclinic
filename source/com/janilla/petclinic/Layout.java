@@ -44,7 +44,7 @@ public record Layout(Renderable<?> content) {
 
 		public String active() {
 			var m1 = PATH_PREFIX.matcher(href);
-			var m2 = PATH_PREFIX.matcher(HttpServer.HTTP_EXCHANGE.get().getRequest().getPath());
+			var m2 = PATH_PREFIX.matcher(HttpServer.HTTP_EXCHANGE.get().request().getPath());
 			return m1.find() && m2.find() && m1.group().equals(m2.group()) ? "active" : null;
 		}
 	}

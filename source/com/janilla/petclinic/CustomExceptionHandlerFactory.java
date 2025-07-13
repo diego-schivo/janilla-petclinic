@@ -16,10 +16,10 @@
 package com.janilla.petclinic;
 
 import com.janilla.http.HttpExchange;
+import com.janilla.http.HttpHandlerFactory;
 import com.janilla.web.Error;
 import com.janilla.web.ExceptionHandlerFactory;
 import com.janilla.web.RenderableFactory;
-import com.janilla.web.WebHandlerFactory;
 
 /**
  * @author Diego Schivo
@@ -28,9 +28,9 @@ public class CustomExceptionHandlerFactory extends ExceptionHandlerFactory {
 
 	protected final RenderableFactory renderableFactory;
 
-	protected final WebHandlerFactory rootFactory;
+	protected final HttpHandlerFactory rootFactory;
 
-	public CustomExceptionHandlerFactory(RenderableFactory renderableFactory, WebHandlerFactory rootFactory) {
+	public CustomExceptionHandlerFactory(RenderableFactory renderableFactory, HttpHandlerFactory rootFactory) {
 		this.renderableFactory = renderableFactory;
 		this.rootFactory = rootFactory;
 	}
@@ -38,8 +38,8 @@ public class CustomExceptionHandlerFactory extends ExceptionHandlerFactory {
 	@Override
 	protected boolean handle(Error error, HttpExchange exchange) {
 		super.handle(error, exchange);
-		var r = renderableFactory.createRenderable(null, exchange.getException());
-		var h = rootFactory.createHandler(r, exchange);
+		var r = renderableFactory.createRenderable(null, exchange.exception());
+		var h = rootFactory.createHandler(r);
 		return h.handle(exchange);
 	}
 }
