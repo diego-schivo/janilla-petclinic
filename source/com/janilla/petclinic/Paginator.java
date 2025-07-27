@@ -16,11 +16,12 @@
 package com.janilla.petclinic;
 
 import java.net.URI;
+import java.util.Map;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import com.janilla.java.Java;
 import com.janilla.net.Net;
-import com.janilla.util.EntryList;
 import com.janilla.web.HtmlRenderer;
 import com.janilla.web.Render;
 
@@ -62,9 +63,11 @@ public record Paginator(int index, int length, URI uri) {
 	private URI uri(int page) {
 		var el = Net.parseQueryString(uri.getRawQuery());
 		if (el == null)
-			el = new EntryList<>();
+			el = new Java.EntryList<>();
 		el.set("page", String.valueOf(page));
-		return URI.create(uri.getPath() + "?" + Net.formatQueryString(el));
+		@SuppressWarnings("unchecked")
+		var ee = (Map.Entry<String, String>[]) el.toArray(Map.Entry[]::new);
+		return URI.create(Net.uriString(uri.getPath(), ee));
 	}
 
 	@Render(renderer = ItemRenderer.class)

@@ -36,11 +36,12 @@ import com.janilla.web.Render;
  * @author Michael Isvy
  * @author Dave Syer
  */
+@Handle(path = "/owners/(\\d+)/pets/(\\d+)/visits")
 public class VisitController {
 
 	public Persistence persistence;
 
-	@Handle(method = "GET", path = "/owners/(\\d+)/pets/(\\d+)/visits/new")
+	@Handle(method = "GET", path = "new")
 	public Object initCreate(long owner, long pet) {
 		var o = persistence.crud(Owner.class).read(owner);
 		var p = persistence.crud(Pet.class).read(pet);
@@ -51,7 +52,7 @@ public class VisitController {
 		return new Form(o, p, t, v, w, null);
 	}
 
-	@Handle(method = "POST", path = "/owners/(\\d+)/pets/(\\d+)/visits/new")
+	@Handle(method = "POST", path = "new")
 	public Object create(long owner, long pet, Visit visit) {
 		var v = new Visit(null, pet, visit.date(), visit.description());
 		var errors = validate(v);

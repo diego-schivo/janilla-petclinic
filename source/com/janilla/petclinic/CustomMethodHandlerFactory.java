@@ -15,7 +15,6 @@
  */
 package com.janilla.petclinic;
 
-import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Properties;
@@ -23,6 +22,7 @@ import java.util.function.Function;
 
 import com.janilla.http.HttpExchange;
 import com.janilla.http.HttpHandlerFactory;
+import com.janilla.reflect.ClassAndMethod;
 import com.janilla.web.HandleException;
 import com.janilla.web.MethodHandlerFactory;
 import com.janilla.web.RenderableFactory;
@@ -34,7 +34,7 @@ public class CustomMethodHandlerFactory extends MethodHandlerFactory {
 
 	public Properties configuration;
 
-	public CustomMethodHandlerFactory(Collection<Method> methods, Function<Class<?>, Object> targetResolver,
+	public CustomMethodHandlerFactory(Collection<ClassAndMethod> methods, Function<Class<?>, Object> targetResolver,
 			Comparator<Invocation> invocationComparator, RenderableFactory renderableFactory,
 			HttpHandlerFactory rootFactory) {
 		super(methods, targetResolver, invocationComparator, renderableFactory, rootFactory);

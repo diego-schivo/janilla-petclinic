@@ -25,7 +25,6 @@ import java.util.regex.Pattern;
 
 import com.janilla.persistence.Persistence;
 import com.janilla.reflect.Reflection;
-import com.janilla.util.Util;
 import com.janilla.web.Bind;
 import com.janilla.web.Handle;
 import com.janilla.web.Render;
@@ -37,23 +36,24 @@ import com.janilla.web.Render;
  * @author Arjen Poutsma
  * @author Michael Isvy
  */
+@Handle(path = "/owners")
 public class OwnerController {
 
 	protected static final Pattern TEN_DIGITS = Pattern.compile("\\d{10}");
 
 	public Persistence persistence;
 
-	@Handle(method = "GET", path = "/owners/find")
+	@Handle(method = "GET", path = "find")
 	public Object initFind() {
 		return new FindForm(null, null);
 	}
 
-	@Handle(method = "GET", path = "/owners")
+	@Handle(method = "GET")
 	public Object find(Owner owner, @Bind("page") Integer page) {
 		var oc = persistence.crud(Owner.class);
 		var i = page != null ? page - 1 : 0;
 		var op = owner.lastName() != null && !owner.lastName().isBlank()
-				? oc.filter("lastName", x -> Util.startsWithIgnoreCase((String) x, owner.lastName()), i * 5, 5)
+				? oc.filter("lastName", x -> startsWithIgnoreCase((String) x, owner.lastName()), i * 5, 5)
 				: oc.list(i * 5, 5);
 		return switch ((int) op.total()) {
 		case 0 -> new FindForm(owner, Map.of("lastName", List.of("has not been found")));
@@ -71,7 +71,7 @@ public class OwnerController {
 		};
 	}
 
-	@Handle(method = "GET", path = "/owners/(\\d+)")
+	@Handle(method = "GET", path = "(\\d+)")
 	public Object show(long id) {
 		var oc = persistence.crud(Owner.class);
 		var pc = persistence.crud(Pet.class);
@@ -86,12 +86,12 @@ public class OwnerController {
 		return new Details(o, pp);
 	}
 
-	@Handle(method = "GET", path = "/owners/new")
+	@Handle(method = "GET", path = "new")
 	public Object initCreate() {
 		return new Form(null, null);
 	}
 
-	@Handle(method = "POST", path = "/owners/new")
+	@Handle(method = "POST", path = "new")
 	public Object create(Owner owner) {
 		var ee = validate(owner);
 		if (!ee.isEmpty())
@@ -100,13 +100,13 @@ public class OwnerController {
 		return URI.create("/owners/" + o.id());
 	}
 
-	@Handle(method = "GET", path = "/owners/(\\d+)/edit")
+	@Handle(method = "GET", path = "(\\d+)/edit")
 	public Object initUpdate(long id) {
 		var o = persistence.crud(Owner.class).read(id);
 		return new Form(o, null);
 	}
 
-	@Handle(method = "POST", path = "/owners/(\\d+)/edit")
+	@Handle(method = "POST", path = "(\\d+)/edit")
 	public Object update(long id, Owner owner) {
 		var ee = validate(owner);
 		if (!ee.isEmpty())
@@ -131,6 +131,11 @@ public class OwnerController {
 			m.computeIfAbsent("telephone", _ -> new ArrayList<>())
 					.add("numeric value out of bounds (<10 digits>.<0 digits> expected)");
 		return m;
+	}
+
+	protected static boolean startsWithIgnoreCase(String string, String prefix) {
+		return string == prefix || (prefix != null && prefix.length() <= string.length()
+				&& string.regionMatches(true, 0, prefix, 0, prefix.length()));
 	}
 
 	@Render(template = "findOwners.html")

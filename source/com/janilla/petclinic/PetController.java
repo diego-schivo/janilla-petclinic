@@ -36,17 +36,18 @@ import com.janilla.web.Render;
  * @author Ken Krebs
  * @author Arjen Poutsma
  */
+@Handle(path = "/owners/(\\d+)/pets")
 public class PetController {
 
 	public Persistence persistence;
 
-	@Handle(method = "GET", path = "/owners/(\\d+)/pets/new")
+	@Handle(method = "GET", path = "new")
 	public Object initCreate(long owner) {
 		var p = new Pet(null, null, null, null, owner);
 		return Form.of(p, null, persistence);
 	}
 
-	@Handle(method = "POST", path = "/owners/(\\d+)/pets/new")
+	@Handle(method = "POST", path = "new")
 	public Object create(long owner, Pet pet) {
 		var p = new Pet(null, pet.name(), pet.birthDate(), pet.type(), owner);
 		var ee = validate(p);
@@ -56,13 +57,13 @@ public class PetController {
 		return URI.create("/owners/" + p2.owner());
 	}
 
-	@Handle(method = "GET", path = "/owners/(\\d+)/pets/(\\d+)/edit")
+	@Handle(method = "GET", path = "(\\d+)/edit")
 	public Object initUpdate(long owner, long id) {
 		var p = persistence.crud(Pet.class).read(id);
 		return Form.of(p, null, persistence);
 	}
 
-	@Handle(method = "POST", path = "/owners/(\\d+)/pets/(\\d+)/edit")
+	@Handle(method = "POST", path = "(\\d+)/edit")
 	public Object update(long owner, long id, Pet pet) {
 		var p = new Pet(id, pet.name(), pet.birthDate(), pet.type(), owner);
 		var ee = validate(p);

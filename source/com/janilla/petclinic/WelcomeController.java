@@ -21,9 +21,10 @@ import com.janilla.web.Render;
 /**
  * @author Diego Schivo
  */
+@Handle(path = "/")
 public class WelcomeController {
 
-	@Handle(method = "GET", path = "/")
+	@Handle(method = "GET")
 	public @Render(template = "welcome.html") Object page() {
 		return this;
 	}

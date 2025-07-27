@@ -21,9 +21,10 @@ import com.janilla.web.Handle;
  * @author Diego Schivo
  * @author Michael Isvy
  */
+@Handle(path = "/oups")
 public class CrashController {
 
-	@Handle(method = "GET", path = "/oups")
+	@Handle(method = "GET")
 	public void triggerException() {
 		throw new ShowcaseException();
 	}

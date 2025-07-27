@@ -27,13 +27,13 @@ import javax.net.ssl.SSLContext;
 
 import com.janilla.http.HttpHandler;
 import com.janilla.http.HttpServer;
+import com.janilla.java.Java;
 import com.janilla.json.DollarTypeResolver;
 import com.janilla.json.TypeResolver;
 import com.janilla.net.Net;
 import com.janilla.persistence.ApplicationPersistenceBuilder;
 import com.janilla.persistence.Persistence;
 import com.janilla.reflect.Factory;
-import com.janilla.util.Util;
 import com.janilla.web.ApplicationHandlerFactory;
 import com.janilla.web.NotFoundException;
 import com.janilla.web.RenderableFactory;
@@ -46,29 +46,34 @@ public class PetClinicApplication {
 
 	public static void main(String[] args) {
 		try {
-			var pp = new Properties();
-			try (var s1 = PetClinicApplication.class.getResourceAsStream("configuration.properties")) {
-				pp.load(s1);
+			PetClinicApplication a;
+			{
+				var c = new Properties();
+				try (var x = PetClinicApplication.class.getResourceAsStream("configuration.properties")) {
+					c.load(x);
+				}
 				if (args.length > 0) {
-					var p = args[0];
-					if (p.startsWith("~"))
-						p = System.getProperty("user.home") + p.substring(1);
-					try (var s2 = Files.newInputStream(Path.of(p))) {
-						pp.load(s2);
+					var f = args[0];
+					if (f.startsWith("~"))
+						f = System.getProperty("user.home") + f.substring(1);
+					try (var x = Files.newInputStream(Path.of(f))) {
+						c.load(x);
 					}
 				}
+				a = new PetClinicApplication(c);
 			}
-			var pca = new PetClinicApplication(pp);
+
 			HttpServer s;
 			{
-				SSLContext sc;
-				try (var is = Net.class.getResourceAsStream("testkeys")) {
-					sc = Net.getSSLContext("JKS", is, "passphrase".toCharArray());
+				SSLContext c;
+				try (var x = Net.class.getResourceAsStream("testkeys")) {
+					c = Net.getSSLContext(Map.entry("JKS", x), "passphrase".toCharArray());
 				}
-				s = pca.factory.create(HttpServer.class, Map.of("sslContext", sc, "handler", pca.handler));
+				var p = Integer.parseInt(a.configuration.getProperty("petclinic.server.port"));
+				s = a.factory.create(HttpServer.class,
+						Map.of("sslContext", c, "endpoint", new InetSocketAddress(p), "handler", a.handler));
 			}
-			var p = Integer.parseInt(pca.configuration.getProperty("petclinic.server.port"));
-			s.serve(new InetSocketAddress(p));
+			s.serve();
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
@@ -90,7 +95,7 @@ public class PetClinicApplication {
 
 	public PetClinicApplication(Properties configuration) {
 		this.configuration = configuration;
-		types = Util.getPackageClasses(getClass().getPackageName()).toList();
+		types = Java.getPackageClasses(PetClinicApplication.class.getPackageName());
 		factory = new Factory(types, this);
 		typeResolver = factory.create(DollarTypeResolver.class);
 		{

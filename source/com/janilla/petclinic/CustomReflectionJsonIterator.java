@@ -16,27 +16,37 @@
 package com.janilla.petclinic;
 
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
-import com.janilla.http.HttpExchange;
-import com.janilla.java.Java;
 import com.janilla.json.JsonToken;
 import com.janilla.json.ReflectionJsonIterator;
-import com.janilla.reflect.Factory;
-import com.janilla.web.JsonHandlerFactory;
+import com.janilla.persistence.Persistence;
 
 /**
  * @author Diego Schivo
  */
-public class CustomJsonHandlerFactory extends JsonHandlerFactory {
+public class CustomReflectionJsonIterator extends ReflectionJsonIterator {
 
-	protected final Factory factory;
+	protected final Persistence persistence;
 
-	public CustomJsonHandlerFactory(Factory factory) {
-		this.factory = factory;
+	public CustomReflectionJsonIterator(Object object, boolean includeType, Persistence persistence) {
+		super(object, includeType);
+		this.persistence = persistence;
 	}
 
 	@Override
-	protected Iterator<JsonToken<?>> buildJsonIterator(Object object, HttpExchange exchange) {
-		return factory.create(ReflectionJsonIterator.class, Java.hashMap("object", object, "includeType", false));
+	public Iterator<JsonToken<?>> newValueIterator(Object object) {
+		var o = stack().peek();
+		if (o instanceof Map.Entry e)
+			switch ((String) e.getKey()) {
+			case "specialties":
+				if (object instanceof List<?> c) {
+					var ll = c.stream().map(x -> (Long) x).toList();
+					object = persistence.crud(Specialty.class).read(ll);
+				}
+				break;
+			}
+		return super.newValueIterator(object);
 	}
 }

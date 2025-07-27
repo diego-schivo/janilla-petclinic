@@ -31,6 +31,7 @@ import com.janilla.web.Render;
  * @author Ken Krebs
  * @author Arjen Poutsma
  */
+@Handle(path = "/vets")
 public class VetController {
 
 	public Persistence persistence;
@@ -51,7 +52,7 @@ public class VetController {
 		return new FindOutcome(rr, p);
 	}
 
-	@Handle(method = "GET", path = "/vets")
+	@Handle(method = "GET")
 	public Object find() {
 		var c = persistence.crud(Vet.class);
 		var v = c.read(c.list());
