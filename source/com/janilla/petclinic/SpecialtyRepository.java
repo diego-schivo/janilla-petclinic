@@ -28,12 +28,7 @@ import com.janilla.persistence.Persistence;
 public class SpecialtyRepository extends Crud<Long, Specialty> {
 
 	public SpecialtyRepository(Persistence persistence) {
-		super(Specialty.class, x -> {
-			var v = x.get("nextId");
-			var l = v != null ? (long) v : 1L;
-			x.put("nextId", l + 1);
-			return l;
-		}, persistence);
+		super(Specialty.class, null, persistence);
 	}
 
 	protected Map<Long, Supplier<Specialty>> readCache = new ConcurrentHashMap<>();

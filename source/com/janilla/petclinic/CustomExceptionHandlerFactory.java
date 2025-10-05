@@ -15,10 +15,13 @@
  */
 package com.janilla.petclinic;
 
+import java.io.IO;
+
 import com.janilla.http.HttpExchange;
 import com.janilla.http.HttpHandlerFactory;
 import com.janilla.web.Error;
 import com.janilla.web.ExceptionHandlerFactory;
+import com.janilla.web.HtmlRenderer;
 import com.janilla.web.RenderableFactory;
 
 /**
@@ -37,9 +40,15 @@ public class CustomExceptionHandlerFactory extends ExceptionHandlerFactory {
 
 	@Override
 	protected boolean handle(Error error, HttpExchange exchange) {
-		super.handle(error, exchange);
+		IO.println(
+				"CustomExceptionHandlerFactory.handle, " + exchange.request().getPath() + ", " + exchange.exception());
+		var x = super.handle(error, exchange);
 		var r = renderableFactory.createRenderable(null, exchange.exception());
-		var h = rootFactory.createHandler(r);
-		return h.handle(exchange);
+		if (r.renderer() instanceof HtmlRenderer) {
+			var h = rootFactory.createHandler(r);
+			IO.println("r=" + r + ", h=" + h);
+			x = h.handle(exchange);
+		}
+		return x;
 	}
 }

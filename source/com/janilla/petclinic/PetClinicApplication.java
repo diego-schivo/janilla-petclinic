@@ -18,10 +18,13 @@ package com.janilla.petclinic;
 import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Stream;
 
 import javax.net.ssl.SSLContext;
 
@@ -33,6 +36,7 @@ import com.janilla.json.TypeResolver;
 import com.janilla.net.Net;
 import com.janilla.persistence.ApplicationPersistenceBuilder;
 import com.janilla.persistence.Persistence;
+import com.janilla.reflect.ClassAndMethod;
 import com.janilla.reflect.Factory;
 import com.janilla.web.ApplicationHandlerFactory;
 import com.janilla.web.NotFoundException;
@@ -43,6 +47,8 @@ import com.janilla.web.RenderableFactory;
  * @author Dave Syer
  */
 public class PetClinicApplication {
+
+	public static final AtomicReference<PetClinicApplication> INSTANCE = new AtomicReference<>();
 
 	public static void main(String[] args) {
 		try {
@@ -94,9 +100,11 @@ public class PetClinicApplication {
 	public List<Class<?>> types;
 
 	public PetClinicApplication(Properties configuration) {
+		if (!INSTANCE.compareAndSet(null, this))
+			throw new IllegalStateException();
 		this.configuration = configuration;
 		types = Java.getPackageClasses(PetClinicApplication.class.getPackageName());
-		factory = new Factory(types, this);
+		factory = new Factory(types, INSTANCE::get);
 		typeResolver = factory.create(DollarTypeResolver.class);
 		{
 			var p = configuration.getProperty("petclinic.database.file");
@@ -105,10 +113,14 @@ public class PetClinicApplication {
 			var pb = factory.create(ApplicationPersistenceBuilder.class, Map.of("databaseFile", Path.of(p)));
 			persistence = pb.build();
 		}
-		renderableFactory = new RenderableFactory();
+		renderableFactory = factory.create(RenderableFactory.class);
 
 		{
-			var f = factory.create(ApplicationHandlerFactory.class);
+			var f = factory.create(ApplicationHandlerFactory.class, Map.of("methods",
+					types.stream().flatMap(x -> Arrays.stream(x.getMethods()).map(y -> new ClassAndMethod(x, y)))
+							.toList(),
+					"files", Stream.of("com.janilla.frontend", PetClinicApplication.class.getPackageName())
+							.flatMap(x -> Java.getPackagePaths(x).stream().filter(Files::isRegularFile)).toList()));
 			handler = x -> {
 				var h = f.createHandler(Objects.requireNonNullElse(x.exception(), x.request()));
 				if (h == null)

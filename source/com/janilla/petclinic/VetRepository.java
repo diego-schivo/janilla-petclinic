@@ -39,12 +39,7 @@ public class VetRepository extends Crud<Long, Vet> {
 	Map<List<Long>, Supplier<IdPage<Long>>> listCache2 = new ConcurrentHashMap<>();
 
 	public VetRepository(Persistence persistence) {
-		super(Vet.class, x -> {
-			var v = x.get("nextId");
-			var l = v != null ? (long) v : 1L;
-			x.put("nextId", l + 1);
-			return l;
-		}, persistence);
+		super(Vet.class, null, persistence);
 	}
 
 	@Override
