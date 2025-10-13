@@ -15,7 +15,7 @@
  */
 package com.janilla.petclinic;
 
-import java.io.IO;
+//import java.io.IO;
 
 import com.janilla.http.HttpExchange;
 import com.janilla.http.HttpHandlerFactory;
