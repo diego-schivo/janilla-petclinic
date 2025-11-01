@@ -15,6 +15,7 @@
  */
 package com.janilla.petclinic;
 
+import java.lang.reflect.Modifier;
 import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -54,19 +55,10 @@ public class PetClinicApplication {
 		try {
 			PetClinicApplication a;
 			{
-				var c = new Properties();
-				try (var x = PetClinicApplication.class.getResourceAsStream("configuration.properties")) {
-					c.load(x);
-				}
-				if (args.length > 0) {
-					var f = args[0];
-					if (f.startsWith("~"))
-						f = System.getProperty("user.home") + f.substring(1);
-					try (var x = Files.newInputStream(Path.of(f))) {
-						c.load(x);
-					}
-				}
-				a = new PetClinicApplication(c);
+				var f = new Factory(Java.getPackageClasses(PetClinicApplication.class.getPackageName()),
+						PetClinicApplication.INSTANCE::get);
+				a = f.create(PetClinicApplication.class,
+						Java.hashMap("factory", f, "configurationFile", args.length > 0 ? args[0] : null));
 			}
 
 			HttpServer s;
@@ -116,10 +108,11 @@ public class PetClinicApplication {
 		renderableFactory = factory.create(RenderableFactory.class);
 
 		{
-			var f = factory.create(ApplicationHandlerFactory.class, Map.of("methods",
-					types.stream().flatMap(x -> Arrays.stream(x.getMethods()).map(y -> new ClassAndMethod(x, y)))
-							.toList(),
-					"files", Stream.of("com.janilla.frontend", PetClinicApplication.class.getPackageName())
+			var f = factory.create(ApplicationHandlerFactory.class, Map.of("methods", types.stream()
+					.flatMap(x -> Arrays.stream(x.getMethods()).filter(y -> !Modifier.isStatic(y.getModifiers()))
+							.map(y -> new ClassAndMethod(x, y)))
+					.toList(), "files",
+					Stream.of("com.janilla.frontend", PetClinicApplication.class.getPackageName())
 							.flatMap(x -> Java.getPackagePaths(x).stream().filter(Files::isRegularFile)).toList()));
 			handler = x -> {
 				var h = f.createHandler(Objects.requireNonNullElse(x.exception(), x.request()));

@@ -21,6 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 import com.janilla.persistence.Crud;
+import com.janilla.persistence.IdPage;
 import com.janilla.persistence.Persistence;
 
 /**
