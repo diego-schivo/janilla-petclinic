@@ -20,7 +20,8 @@ import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
@@ -58,7 +59,11 @@ public class PetClinicApplication {
 				var f = new Factory(Java.getPackageClasses(PetClinicApplication.class.getPackageName()),
 						PetClinicApplication.INSTANCE::get);
 				a = f.create(PetClinicApplication.class,
-						Java.hashMap("factory", f, "configurationFile", args.length > 0 ? args[0] : null));
+						Java.hashMap("factory", f, "configurationFile",
+								args.length > 0 ? Path.of(
+										args[0].startsWith("~") ? System.getProperty("user.home") + args[0].substring(1)
+												: args[0])
+										: null));
 			}
 
 			HttpServer s;
@@ -89,14 +94,11 @@ public class PetClinicApplication {
 
 	public TypeResolver typeResolver;
 
-	public List<Class<?>> types;
-
-	public PetClinicApplication(Properties configuration) {
+	public PetClinicApplication(Factory factory, Path configurationFile) {
+		this.factory = factory;
 		if (!INSTANCE.compareAndSet(null, this))
 			throw new IllegalStateException();
-		this.configuration = configuration;
-		types = Java.getPackageClasses(PetClinicApplication.class.getPackageName());
-		factory = new Factory(types, INSTANCE::get);
+		configuration = factory.create(Properties.class, Collections.singletonMap("file", configurationFile));
 		typeResolver = factory.create(DollarTypeResolver.class);
 		{
 			var p = configuration.getProperty("petclinic.database.file");
@@ -108,7 +110,7 @@ public class PetClinicApplication {
 		renderableFactory = factory.create(RenderableFactory.class);
 
 		{
-			var f = factory.create(ApplicationHandlerFactory.class, Map.of("methods", types.stream()
+			var f = factory.create(ApplicationHandlerFactory.class, Map.of("methods", types().stream()
 					.flatMap(x -> Arrays.stream(x.getMethods()).filter(y -> !Modifier.isStatic(y.getModifiers()))
 							.map(y -> new ClassAndMethod(x, y)))
 					.toList(), "files",
@@ -125,5 +127,33 @@ public class PetClinicApplication {
 
 	public PetClinicApplication application() {
 		return this;
+	}
+
+	public Properties configuration() {
+		return configuration;
+	}
+
+	public Factory factory() {
+		return factory;
+	}
+
+	public Persistence persistence() {
+		return persistence;
+	}
+
+	public RenderableFactory renderableFactory() {
+		return renderableFactory;
+	}
+
+	public HttpHandler handler() {
+		return handler;
+	}
+
+	public TypeResolver typeResolver() {
+		return typeResolver;
+	}
+
+	public Collection<Class<?>> types() {
+		return factory.types();
 	}
 }
