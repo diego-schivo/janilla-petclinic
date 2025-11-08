@@ -32,6 +32,7 @@ import javax.net.ssl.SSLContext;
 
 import com.janilla.http.HttpHandler;
 import com.janilla.http.HttpServer;
+import com.janilla.ioc.DependencyInjector;
 import com.janilla.java.Java;
 import com.janilla.json.DollarTypeResolver;
 import com.janilla.json.TypeResolver;
@@ -39,7 +40,6 @@ import com.janilla.net.Net;
 import com.janilla.persistence.ApplicationPersistenceBuilder;
 import com.janilla.persistence.Persistence;
 import com.janilla.reflect.ClassAndMethod;
-import com.janilla.reflect.Factory;
 import com.janilla.web.ApplicationHandlerFactory;
 import com.janilla.web.NotFoundException;
 import com.janilla.web.RenderableFactory;
@@ -56,7 +56,7 @@ public class PetClinicApplication {
 		try {
 			PetClinicApplication a;
 			{
-				var f = new Factory(Java.getPackageClasses(PetClinicApplication.class.getPackageName()),
+				var f = new DependencyInjector(Java.getPackageClasses(PetClinicApplication.class.getPackageName()),
 						PetClinicApplication.INSTANCE::get);
 				a = f.create(PetClinicApplication.class,
 						Java.hashMap("factory", f, "configurationFile",
@@ -73,7 +73,7 @@ public class PetClinicApplication {
 					c = Net.getSSLContext(Map.entry("JKS", x), "passphrase".toCharArray());
 				}
 				var p = Integer.parseInt(a.configuration.getProperty("petclinic.server.port"));
-				s = a.factory.create(HttpServer.class,
+				s = a.injector.create(HttpServer.class,
 						Map.of("sslContext", c, "endpoint", new InetSocketAddress(p), "handler", a.handler));
 			}
 			s.serve();
@@ -84,7 +84,7 @@ public class PetClinicApplication {
 
 	public Properties configuration;
 
-	public Factory factory;
+	public DependencyInjector injector;
 
 	public Persistence persistence;
 
@@ -94,23 +94,23 @@ public class PetClinicApplication {
 
 	public TypeResolver typeResolver;
 
-	public PetClinicApplication(Factory factory, Path configurationFile) {
-		this.factory = factory;
+	public PetClinicApplication(DependencyInjector injector, Path configurationFile) {
+		this.injector = injector;
 		if (!INSTANCE.compareAndSet(null, this))
 			throw new IllegalStateException();
-		configuration = factory.create(Properties.class, Collections.singletonMap("file", configurationFile));
-		typeResolver = factory.create(DollarTypeResolver.class);
+		configuration = injector.create(Properties.class, Collections.singletonMap("file", configurationFile));
+		typeResolver = injector.create(DollarTypeResolver.class);
 		{
 			var p = configuration.getProperty("petclinic.database.file");
 			if (p.startsWith("~"))
 				p = System.getProperty("user.home") + p.substring(1);
-			var pb = factory.create(ApplicationPersistenceBuilder.class, Map.of("databaseFile", Path.of(p)));
+			var pb = injector.create(ApplicationPersistenceBuilder.class, Map.of("databaseFile", Path.of(p)));
 			persistence = pb.build();
 		}
-		renderableFactory = factory.create(RenderableFactory.class);
+		renderableFactory = injector.create(RenderableFactory.class);
 
 		{
-			var f = factory.create(ApplicationHandlerFactory.class, Map.of("methods", types().stream()
+			var f = injector.create(ApplicationHandlerFactory.class, Map.of("methods", types().stream()
 					.flatMap(x -> Arrays.stream(x.getMethods()).filter(y -> !Modifier.isStatic(y.getModifiers()))
 							.map(y -> new ClassAndMethod(x, y)))
 					.toList(), "files",
@@ -133,8 +133,8 @@ public class PetClinicApplication {
 		return configuration;
 	}
 
-	public Factory factory() {
-		return factory;
+	public DependencyInjector injector() {
+		return injector;
 	}
 
 	public Persistence persistence() {
@@ -154,6 +154,6 @@ public class PetClinicApplication {
 	}
 
 	public Collection<Class<?>> types() {
-		return factory.types();
+		return injector.types();
 	}
 }
