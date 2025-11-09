@@ -32,7 +32,7 @@ import javax.net.ssl.SSLContext;
 
 import com.janilla.http.HttpHandler;
 import com.janilla.http.HttpServer;
-import com.janilla.ioc.DependencyInjector;
+import com.janilla.ioc.DiFactory;
 import com.janilla.java.Java;
 import com.janilla.json.DollarTypeResolver;
 import com.janilla.json.TypeResolver;
@@ -56,10 +56,10 @@ public class PetClinicApplication {
 		try {
 			PetClinicApplication a;
 			{
-				var f = new DependencyInjector(Java.getPackageClasses(PetClinicApplication.class.getPackageName()),
+				var f = new DiFactory(Java.getPackageClasses(PetClinicApplication.class.getPackageName()),
 						PetClinicApplication.INSTANCE::get);
 				a = f.create(PetClinicApplication.class,
-						Java.hashMap("factory", f, "configurationFile",
+						Java.hashMap("diFactory", f, "configurationFile",
 								args.length > 0 ? Path.of(
 										args[0].startsWith("~") ? System.getProperty("user.home") + args[0].substring(1)
 												: args[0])
@@ -73,7 +73,7 @@ public class PetClinicApplication {
 					c = Net.getSSLContext(Map.entry("JKS", x), "passphrase".toCharArray());
 				}
 				var p = Integer.parseInt(a.configuration.getProperty("petclinic.server.port"));
-				s = a.injector.create(HttpServer.class,
+				s = a.diFactory.create(HttpServer.class,
 						Map.of("sslContext", c, "endpoint", new InetSocketAddress(p), "handler", a.handler));
 			}
 			s.serve();
@@ -84,7 +84,7 @@ public class PetClinicApplication {
 
 	public Properties configuration;
 
-	public DependencyInjector injector;
+	public DiFactory diFactory;
 
 	public Persistence persistence;
 
@@ -94,23 +94,23 @@ public class PetClinicApplication {
 
 	public TypeResolver typeResolver;
 
-	public PetClinicApplication(DependencyInjector injector, Path configurationFile) {
-		this.injector = injector;
+	public PetClinicApplication(DiFactory diFactory, Path configurationFile) {
+		this.diFactory = diFactory;
 		if (!INSTANCE.compareAndSet(null, this))
 			throw new IllegalStateException();
-		configuration = injector.create(Properties.class, Collections.singletonMap("file", configurationFile));
-		typeResolver = injector.create(DollarTypeResolver.class);
+		configuration = diFactory.create(Properties.class, Collections.singletonMap("file", configurationFile));
+		typeResolver = diFactory.create(DollarTypeResolver.class);
 		{
 			var p = configuration.getProperty("petclinic.database.file");
 			if (p.startsWith("~"))
 				p = System.getProperty("user.home") + p.substring(1);
-			var pb = injector.create(ApplicationPersistenceBuilder.class, Map.of("databaseFile", Path.of(p)));
+			var pb = diFactory.create(ApplicationPersistenceBuilder.class, Map.of("databaseFile", Path.of(p)));
 			persistence = pb.build();
 		}
-		renderableFactory = injector.create(RenderableFactory.class);
+		renderableFactory = diFactory.create(RenderableFactory.class);
 
 		{
-			var f = injector.create(ApplicationHandlerFactory.class, Map.of("methods", types().stream()
+			var f = diFactory.create(ApplicationHandlerFactory.class, Map.of("methods", types().stream()
 					.flatMap(x -> Arrays.stream(x.getMethods()).filter(y -> !Modifier.isStatic(y.getModifiers()))
 							.map(y -> new ClassAndMethod(x, y)))
 					.toList(), "files",
@@ -133,8 +133,8 @@ public class PetClinicApplication {
 		return configuration;
 	}
 
-	public DependencyInjector injector() {
-		return injector;
+	public DiFactory diFactory() {
+		return diFactory;
 	}
 
 	public Persistence persistence() {
@@ -154,6 +154,6 @@ public class PetClinicApplication {
 	}
 
 	public Collection<Class<?>> types() {
-		return injector.types();
+		return diFactory.types();
 	}
 }

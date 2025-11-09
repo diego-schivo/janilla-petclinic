@@ -20,7 +20,7 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.Arrays;
 
-import com.janilla.ioc.DependencyInjector;
+import com.janilla.ioc.DiFactory;
 import com.janilla.persistence.ApplicationPersistenceBuilder;
 import com.janilla.persistence.Persistence;
 
@@ -29,8 +29,8 @@ import com.janilla.persistence.Persistence;
  */
 public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 
-	public CustomPersistenceBuilder(Path databaseFile, DependencyInjector injector) {
-		super(databaseFile, injector);
+	public CustomPersistenceBuilder(Path databaseFile, DiFactory diFactory) {
+		super(databaseFile, diFactory);
 	}
 
 	@Override
