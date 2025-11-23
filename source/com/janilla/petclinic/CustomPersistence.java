@@ -17,7 +17,7 @@ package com.janilla.petclinic;
 
 import java.util.Collection;
 
-import com.janilla.json.TypeResolver;
+import com.janilla.java.TypeResolver;
 import com.janilla.persistence.Crud;
 import com.janilla.persistence.Entity;
 import com.janilla.persistence.Persistence;

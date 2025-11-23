@@ -61,13 +61,14 @@ public record Paginator(int index, int length, URI uri) {
 	}
 
 	private URI uri(int page) {
-		var el = Net.parseQueryString(uri.getRawQuery());
-		if (el == null)
-			el = new Java.EntryList<>();
-		el.set("page", String.valueOf(page));
-		@SuppressWarnings("unchecked")
-		var ee = (Map.Entry<String, String>[]) el.toArray(Map.Entry[]::new);
-		return URI.create(Net.uriString(uri.getPath(), ee));
+//		var el = Net.parseQueryString(uri.getRawQuery());
+//		if (el == null)
+//			el = new Java.EntryList<>();
+//		el.set("page", String.valueOf(page));
+//		@SuppressWarnings("unchecked")
+//		var ee = (Map.Entry<String, String>[]) el.toArray(Map.Entry[]::new);
+//		return URI.create(Net.uriString(uri.getPath(), ee));
+		throw new RuntimeException();
 	}
 
 	@Render(renderer = ItemRenderer.class)
