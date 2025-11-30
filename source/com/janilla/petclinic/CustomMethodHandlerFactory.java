@@ -15,30 +15,30 @@
  */
 package com.janilla.petclinic;
 
-import java.util.Collection;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Properties;
 import java.util.function.Function;
 
 import com.janilla.http.HttpExchange;
 import com.janilla.http.HttpHandlerFactory;
-import com.janilla.web.Invocable;
 import com.janilla.web.HandleException;
+import com.janilla.web.Invocable;
 import com.janilla.web.Invocation;
-import com.janilla.web.MethodHandlerFactory;
+import com.janilla.web.InvocationHandlerFactory;
 import com.janilla.web.RenderableFactory;
 
 /**
  * @author Diego Schivo
  */
-public class CustomMethodHandlerFactory extends MethodHandlerFactory {
+public class CustomMethodHandlerFactory extends InvocationHandlerFactory {
 
 	public Properties configuration;
 
-	public CustomMethodHandlerFactory(Collection<Invocable> methods, Function<Class<?>, Object> targetResolver,
+	public CustomMethodHandlerFactory(List<Invocable> invocables, Function<Class<?>, Object> instanceResolver,
 			Comparator<Invocation> invocationComparator, RenderableFactory renderableFactory,
 			HttpHandlerFactory rootFactory) {
-		super(methods, targetResolver, invocationComparator, renderableFactory, rootFactory);
+		super(invocables, instanceResolver, invocationComparator, renderableFactory, rootFactory);
 	}
 
 	@Override
