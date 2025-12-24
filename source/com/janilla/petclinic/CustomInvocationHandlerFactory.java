@@ -31,11 +31,11 @@ import com.janilla.web.RenderableFactory;
 /**
  * @author Diego Schivo
  */
-public class CustomMethodHandlerFactory extends InvocationHandlerFactory {
+public class CustomInvocationHandlerFactory extends InvocationHandlerFactory {
 
 	public Properties configuration;
 
-	public CustomMethodHandlerFactory(List<Invocable> invocables, Function<Class<?>, Object> instanceResolver,
+	public CustomInvocationHandlerFactory(List<Invocable> invocables, Function<Class<?>, Object> instanceResolver,
 			Comparator<Invocation> invocationComparator, RenderableFactory renderableFactory,
 			HttpHandlerFactory rootFactory) {
 		super(invocables, instanceResolver, invocationComparator, renderableFactory, rootFactory);
