@@ -16,7 +16,6 @@
 package com.janilla.petclinic;
 
 import com.janilla.persistence.Entity;
-import com.janilla.persistence.Index;
 import com.janilla.persistence.Store;
 
 /**
@@ -24,6 +23,5 @@ import com.janilla.persistence.Store;
  * @author Juergen Hoeller
  */
 @Store
-@Index(sort = "name")
 public record Specialty(Long id, String name) implements Entity<Long> {
 }

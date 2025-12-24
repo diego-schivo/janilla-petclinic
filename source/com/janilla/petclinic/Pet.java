@@ -28,6 +28,5 @@ import com.janilla.persistence.Store;
  * @author Sam Brannen
  */
 @Store
-public record Pet(Long id, String name, LocalDate birthDate, Long type, @Index(sort = "name") Long owner)
-		implements Entity<Long> {
+public record Pet(Long id, String name, LocalDate birthDate, Long type, @Index Long owner) implements Entity<Long> {
 }

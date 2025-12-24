@@ -27,6 +27,5 @@ import com.janilla.persistence.Store;
  * @author Dave Syer
  */
 @Store
-public record Visit(Long id, @Index(sort = "date") Long pet, LocalDate date, String description)
-		implements Entity<Long> {
+public record Visit(Long id, @Index Long pet, LocalDate date, String description) implements Entity<Long> {
 }
