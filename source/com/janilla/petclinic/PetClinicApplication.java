@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2025 the original author or authors.
+ * Copyright 2012-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
@@ -33,9 +34,7 @@ import javax.net.ssl.SSLContext;
 import com.janilla.http.HttpHandler;
 import com.janilla.http.HttpServer;
 import com.janilla.ioc.DiFactory;
-import com.janilla.java.DollarTypeResolver;
 import com.janilla.java.Java;
-import com.janilla.java.TypeResolver;
 import com.janilla.net.Net;
 import com.janilla.persistence.ApplicationPersistenceBuilder;
 import com.janilla.persistence.Persistence;
@@ -56,8 +55,8 @@ public class PetClinicApplication {
 		try {
 			PetClinicApplication a;
 			{
-				var f = new DiFactory(Java.getPackageClasses(PetClinicApplication.class.getPackageName()),
-						PetClinicApplication.INSTANCE::get);
+				var f = new DiFactory(Stream.of(PetClinicApplication.class.getPackageName(), "com.janilla.web")
+						.flatMap(x -> Java.getPackageClasses(x).stream()).toList(), INSTANCE::get);
 				a = f.create(PetClinicApplication.class,
 						Java.hashMap("diFactory", f, "configurationFile",
 								args.length > 0 ? Path.of(
@@ -82,24 +81,25 @@ public class PetClinicApplication {
 		}
 	}
 
-	public Properties configuration;
+	protected final Properties configuration;
 
-	public DiFactory diFactory;
+	protected final DiFactory diFactory;
 
-	public Persistence persistence;
+	protected final List<Path> files;
 
-	public RenderableFactory renderableFactory;
+	protected final HttpHandler handler;
 
-	public HttpHandler handler;
+	protected final List<Invocable> invocables;
 
-	public TypeResolver typeResolver;
+	protected final Persistence persistence;
+
+	protected final RenderableFactory renderableFactory;
 
 	public PetClinicApplication(DiFactory diFactory, Path configurationFile) {
 		this.diFactory = diFactory;
 		if (!INSTANCE.compareAndSet(null, this))
 			throw new IllegalStateException();
 		configuration = diFactory.create(Properties.class, Collections.singletonMap("file", configurationFile));
-		typeResolver = diFactory.create(DollarTypeResolver.class);
 		{
 			var p = configuration.getProperty("petclinic.database.file");
 			if (p.startsWith("~"))
@@ -107,15 +107,17 @@ public class PetClinicApplication {
 			var pb = diFactory.create(ApplicationPersistenceBuilder.class, Map.of("databaseFile", Path.of(p)));
 			persistence = pb.build();
 		}
-		renderableFactory = diFactory.create(RenderableFactory.class);
 
+		invocables = types().stream()
+				.flatMap(x -> Arrays.stream(x.getMethods())
+						.filter(y -> !Modifier.isStatic(y.getModifiers()) && !y.isBridge())
+						.map(y -> new Invocable(x, y)))
+				.toList();
+		files = Stream.of("com.janilla.frontend", PetClinicApplication.class.getPackageName())
+				.flatMap(x -> Java.getPackagePaths(x).stream().filter(Files::isRegularFile)).toList();
+		renderableFactory = diFactory.create(RenderableFactory.class);
 		{
-			var f = diFactory.create(ApplicationHandlerFactory.class, Map.of("methods", types().stream()
-					.flatMap(x -> Arrays.stream(x.getMethods()).filter(y -> !Modifier.isStatic(y.getModifiers()))
-							.map(y -> new Invocable(x, y)))
-					.toList(), "files",
-					Stream.of("com.janilla.frontend", PetClinicApplication.class.getPackageName())
-							.flatMap(x -> Java.getPackagePaths(x).stream().filter(Files::isRegularFile)).toList()));
+			var f = diFactory.create(ApplicationHandlerFactory.class);
 			handler = x -> {
 				var h = f.createHandler(Objects.requireNonNullElse(x.exception(), x.request()));
 				if (h == null)
@@ -137,20 +139,24 @@ public class PetClinicApplication {
 		return diFactory;
 	}
 
-	public Persistence persistence() {
-		return persistence;
-	}
-
-	public RenderableFactory renderableFactory() {
-		return renderableFactory;
+	public List<Path> files() {
+		return files;
 	}
 
 	public HttpHandler handler() {
 		return handler;
 	}
 
-	public TypeResolver typeResolver() {
-		return typeResolver;
+	public List<Invocable> invocables() {
+		return invocables;
+	}
+
+	public Persistence persistence() {
+		return persistence;
+	}
+
+	public RenderableFactory renderableFactory() {
+		return renderableFactory;
 	}
 
 	public Collection<Class<?>> types() {

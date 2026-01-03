@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2025 the original author or authors.
+ * Copyright 2012-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package com.janilla.petclinic;
 import java.util.List;
 
 import com.janilla.persistence.Entity;
-import com.janilla.persistence.Index;
 import com.janilla.persistence.Store;
 
 /**
@@ -29,6 +28,5 @@ import com.janilla.persistence.Store;
  * @author Arjen Poutsma
  */
 @Store
-@Index
 public record Vet(Long id, String firstName, String lastName, List<Long> specialties) implements Entity<Long> {
 }

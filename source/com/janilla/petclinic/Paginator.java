@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2025 the original author or authors.
+ * Copyright 2012-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,10 @@
 package com.janilla.petclinic;
 
 import java.net.URI;
-import java.util.Map;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import com.janilla.java.Java;
-import com.janilla.net.Net;
+import com.janilla.net.UriQueryBuilder;
 import com.janilla.web.HtmlRenderer;
 import com.janilla.web.Render;
 
@@ -61,14 +59,8 @@ public record Paginator(int index, int length, URI uri) {
 	}
 
 	private URI uri(int page) {
-//		var el = Net.parseQueryString(uri.getRawQuery());
-//		if (el == null)
-//			el = new Java.EntryList<>();
-//		el.set("page", String.valueOf(page));
-//		@SuppressWarnings("unchecked")
-//		var ee = (Map.Entry<String, String>[]) el.toArray(Map.Entry[]::new);
-//		return URI.create(Net.uriString(uri.getPath(), ee));
-		throw new RuntimeException();
+		return URI.create(uri.getPath() + "?"
+				+ new UriQueryBuilder(uri.getRawQuery()).delete("page").append("page", String.valueOf(page)));
 	}
 
 	@Render(renderer = ItemRenderer.class)
