@@ -47,7 +47,7 @@ The following items should be installed in your system:
 In order to install them all:
 
 1. Download the [Eclipse Installer](https://www.eclipse.org/downloads/packages/installer)
-2. Install the package for Enterprise Java and Web Developers with JRE 24
+2. Install the package for Enterprise Java and Web Developers with JRE 25
 
 ### Steps
 
