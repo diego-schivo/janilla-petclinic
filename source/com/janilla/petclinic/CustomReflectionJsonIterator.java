@@ -21,7 +21,7 @@ import java.util.Map;
 
 import com.janilla.json.JsonToken;
 import com.janilla.json.ReflectionJsonIterator;
-import com.janilla.persistence.Persistence;
+import com.janilla.backend.persistence.Persistence;
 
 /**
  * @author Diego Schivo

@@ -15,9 +15,9 @@
  */
 package com.janilla.petclinic;
 
-import com.janilla.persistence.Entity;
-import com.janilla.persistence.Index;
-import com.janilla.persistence.Store;
+import com.janilla.backend.persistence.Entity;
+import com.janilla.backend.persistence.Index;
+import com.janilla.backend.persistence.Store;
 
 /**
  * @author Diego Schivo

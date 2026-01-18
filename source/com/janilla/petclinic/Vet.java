@@ -17,8 +17,8 @@ package com.janilla.petclinic;
 
 import java.util.List;
 
-import com.janilla.persistence.Entity;
-import com.janilla.persistence.Store;
+import com.janilla.backend.persistence.Entity;
+import com.janilla.backend.persistence.Store;
 
 /**
  * @author Diego Schivo

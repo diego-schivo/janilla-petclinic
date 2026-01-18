@@ -21,8 +21,8 @@ import java.time.LocalDate;
 import java.util.Arrays;
 
 import com.janilla.ioc.DiFactory;
-import com.janilla.persistence.ApplicationPersistenceBuilder;
-import com.janilla.persistence.Persistence;
+import com.janilla.backend.persistence.ApplicationPersistenceBuilder;
+import com.janilla.backend.persistence.Persistence;
 
 /**
  * @author Diego Schivo

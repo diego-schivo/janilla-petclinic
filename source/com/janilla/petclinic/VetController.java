@@ -18,7 +18,7 @@ package com.janilla.petclinic;
 import java.net.URI;
 import java.util.List;
 
-import com.janilla.persistence.Persistence;
+import com.janilla.backend.persistence.Persistence;
 import com.janilla.web.Bind;
 import com.janilla.web.Handle;
 import com.janilla.web.HtmlRenderer;

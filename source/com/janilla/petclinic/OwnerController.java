@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
-import com.janilla.persistence.Persistence;
+import com.janilla.backend.persistence.Persistence;
 import com.janilla.reflect.Reflection;
 import com.janilla.web.Bind;
 import com.janilla.web.Handle;

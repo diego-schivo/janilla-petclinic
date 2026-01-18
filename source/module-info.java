@@ -19,5 +19,6 @@ module com.janilla.petclinic {
 
 	opens com.janilla.petclinic;
 
-	requires transitive com.janilla;
+	requires transitive com.janilla.backend;
+	requires transitive com.janilla.frontend;
 }
