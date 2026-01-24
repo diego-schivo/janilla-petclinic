@@ -24,7 +24,7 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import com.janilla.backend.persistence.Persistence;
-import com.janilla.reflect.Reflection;
+import com.janilla.java.Reflection;
 import com.janilla.web.Bind;
 import com.janilla.web.Handle;
 import com.janilla.web.Render;

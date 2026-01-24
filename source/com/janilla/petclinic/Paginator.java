@@ -19,7 +19,7 @@ import java.net.URI;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import com.janilla.net.UriQueryBuilder;
+import com.janilla.java.UriQueryBuilder;
 import com.janilla.web.HtmlRenderer;
 import com.janilla.web.Render;
 

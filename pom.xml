@@ -68,8 +68,7 @@
 	</developers>
 	<scm>
 		<connection>scm:git:git://github.com/diego-schivo/janilla-petclinic.git</connection>
-		<developerConnection>
-			scm:git:ssh://git@github.com/diego-schivo/janilla-petclinic.git</developerConnection>
+		<developerConnection>scm:git:ssh://git@github.com/diego-schivo/janilla-petclinic.git</developerConnection>
 		<url>https://github.com/diego-schivo/janilla-petclinic</url>
 		<tag>HEAD</tag>
 	</scm>
