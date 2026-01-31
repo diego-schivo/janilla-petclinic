@@ -39,7 +39,11 @@ import com.janilla.web.Render;
 @Handle(path = "/owners/(\\d+)/pets")
 public class PetController {
 
-	public Persistence persistence;
+	protected final Persistence persistence;
+
+	public PetController(Persistence persistence) {
+		this.persistence = persistence;
+	}
 
 	@Handle(method = "GET", path = "new")
 	public Object initCreate(long owner) {

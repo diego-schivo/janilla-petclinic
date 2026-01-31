@@ -33,12 +33,13 @@ import com.janilla.web.RenderableFactory;
  */
 public class CustomInvocationHandlerFactory extends InvocationHandlerFactory {
 
-	public Properties configuration;
+	protected final Properties configuration;
 
 	public CustomInvocationHandlerFactory(List<Invocable> invocables, Function<Class<?>, Object> instanceResolver,
 			Comparator<Invocation> invocationComparator, RenderableFactory renderableFactory,
-			HttpHandlerFactory rootFactory) {
+			HttpHandlerFactory rootFactory, Properties configuration) {
 		super(invocables, instanceResolver, invocationComparator, renderableFactory, rootFactory);
+		this.configuration = configuration;
 	}
 
 	@Override

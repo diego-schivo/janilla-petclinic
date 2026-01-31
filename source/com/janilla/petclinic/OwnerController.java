@@ -41,7 +41,11 @@ public class OwnerController {
 
 	protected static final Pattern TEN_DIGITS = Pattern.compile("\\d{10}");
 
-	public Persistence persistence;
+	protected final Persistence persistence;
+
+	public OwnerController(Persistence persistence) {
+		this.persistence = persistence;
+	}
 
 	@Handle(method = "GET", path = "find")
 	public Object initFind() {

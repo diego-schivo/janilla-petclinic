@@ -15,32 +15,38 @@
  */
 package com.janilla.petclinic;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.lang.reflect.Modifier;
 import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.net.ssl.SSLContext;
 
 import com.janilla.backend.persistence.ApplicationPersistenceBuilder;
 import com.janilla.backend.persistence.Persistence;
+import com.janilla.backend.persistence.Store;
 import com.janilla.http.HttpHandler;
 import com.janilla.http.HttpServer;
 import com.janilla.ioc.DiFactory;
+import com.janilla.java.DollarTypeResolver;
 import com.janilla.java.Java;
-import com.janilla.net.SecureServer;
+import com.janilla.java.TypeResolver;
 import com.janilla.web.ApplicationHandlerFactory;
 import com.janilla.web.Invocable;
 import com.janilla.web.NotFoundException;
 import com.janilla.web.RenderableFactory;
+import com.janilla.web.ResourceMap;
 
 /**
  * @author Diego Schivo
@@ -49,40 +55,50 @@ import com.janilla.web.RenderableFactory;
 public class PetClinicApplication {
 
 	public static void main(String[] args) {
-		try {
-			PetClinicApplication a;
-			{
-				var f = new DiFactory(Stream.of("com.janilla.web", PetClinicApplication.class.getPackageName())
-						.flatMap(x -> Java.getPackageClasses(x).stream()).toList());
-				a = f.create(PetClinicApplication.class,
-						Java.hashMap("diFactory", f, "configurationFile",
-								args.length > 0 ? Path.of(
-										args[0].startsWith("~") ? System.getProperty("user.home") + args[0].substring(1)
-												: args[0])
-										: null));
-			}
+		IO.println(ProcessHandle.current().pid());
+		var f = new DiFactory(Stream.of("com.janilla.web", PetClinicApplication.class.getPackageName())
+				.flatMap(x -> Java.getPackageClasses(x, false).stream()).toList());
+		serve(f, args.length > 0 ? args[0] : null);
+	}
 
-			HttpServer s;
-			{
-				SSLContext c;
-				try (var x = SecureServer.class.getResourceAsStream("localhost")) {
-					c = Java.sslContext(x, "passphrase".toCharArray());
-				}
-				var p = Integer.parseInt(a.configuration.getProperty("petclinic.server.port"));
-				s = a.diFactory.create(HttpServer.class,
-						Map.of("sslContext", c, "endpoint", new InetSocketAddress(p), "handler", a.handler));
-			}
-			s.serve();
-		} catch (Throwable e) {
-			e.printStackTrace();
+	protected static void serve(DiFactory diFactory, String configurationPath) {
+		PetClinicApplication a;
+		{
+			a = diFactory.create(PetClinicApplication.class,
+					Java.hashMap("diFactory", diFactory, "configurationFile",
+							configurationPath != null ? Path.of(configurationPath.startsWith("~")
+									? System.getProperty("user.home") + configurationPath.substring(1)
+									: configurationPath) : null));
 		}
+
+		SSLContext c;
+		{
+			var p = a.configuration.getProperty("petclinic.server.keystore.path");
+			var w = a.configuration.getProperty("petclinic.server.keystore.password");
+			if (p.startsWith("~"))
+				p = System.getProperty("user.home") + p.substring(1);
+			var f = Path.of(p);
+			if (!Files.exists(f))
+				Java.generateKeyPair(f, w);
+			try (var s = Files.newInputStream(f)) {
+				c = Java.sslContext(s, w.toCharArray());
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+		}
+
+		HttpServer s;
+		{
+			var p = Integer.parseInt(a.configuration.getProperty("petclinic.server.port"));
+			s = a.diFactory.create(HttpServer.class,
+					Map.of("sslContext", c, "endpoint", new InetSocketAddress(p), "handler", a.handler));
+		}
+		s.serve();
 	}
 
 	protected final Properties configuration;
 
 	protected final DiFactory diFactory;
-
-	protected final List<Path> files;
 
 	protected final HttpHandler handler;
 
@@ -92,25 +108,44 @@ public class PetClinicApplication {
 
 	protected final RenderableFactory renderableFactory;
 
+	protected final List<Class<?>> resolvables;
+
+	protected final ResourceMap resourceMap;
+
+	protected final List<Class<?>> storables;
+
+	protected final TypeResolver typeResolver;
+
 	public PetClinicApplication(DiFactory diFactory, Path configurationFile) {
 		this.diFactory = diFactory;
 		diFactory.context(this);
 		configuration = diFactory.create(Properties.class, Collections.singletonMap("file", configurationFile));
+
 		{
-			var p = configuration.getProperty("petclinic.database.file");
-			if (p.startsWith("~"))
-				p = System.getProperty("user.home") + p.substring(1);
-			var pb = diFactory.create(ApplicationPersistenceBuilder.class, Map.of("databaseFile", Path.of(p)));
-			persistence = pb.build();
+			Map<String, Class<?>> m = diFactory.types().stream()
+					.collect(Collectors.toMap(x -> x.getSimpleName(), x -> x, (_, x) -> x, LinkedHashMap::new));
+			resolvables = m.values().stream().toList();
+		}
+		typeResolver = diFactory.create(DollarTypeResolver.class);
+
+		storables = resolvables.stream().filter(x -> x.isAnnotationPresent(Store.class)).toList();
+		{
+			var f = configuration.getProperty("petclinic.database.file");
+			if (f.startsWith("~"))
+				f = System.getProperty("user.home") + f.substring(1);
+			var b = diFactory.create(ApplicationPersistenceBuilder.class, Map.of("databaseFile", Path.of(f)));
+			persistence = b.build();
 		}
 
-		invocables = types().stream()
+		invocables = diFactory.types().stream()
 				.flatMap(x -> Arrays.stream(x.getMethods())
 						.filter(y -> !Modifier.isStatic(y.getModifiers()) && !y.isBridge())
 						.map(y -> new Invocable(x, y)))
 				.toList();
-		files = Stream.of("com.janilla.frontend", PetClinicApplication.class.getPackageName())
-				.flatMap(x -> Java.getPackagePaths(x).stream().filter(Files::isRegularFile)).toList();
+		resourceMap = diFactory.create(ResourceMap.class,
+				Map.of("paths",
+						Map.of("", Stream.of("com.janilla.frontend", PetClinicApplication.class.getPackageName())
+								.flatMap(x -> Java.getPackagePaths(x, false).filter(Files::isRegularFile)).toList())));
 		renderableFactory = diFactory.create(RenderableFactory.class);
 		{
 			var f = diFactory.create(ApplicationHandlerFactory.class);
@@ -135,10 +170,6 @@ public class PetClinicApplication {
 		return diFactory;
 	}
 
-	public List<Path> files() {
-		return files;
-	}
-
 	public HttpHandler handler() {
 		return handler;
 	}
@@ -155,7 +186,19 @@ public class PetClinicApplication {
 		return renderableFactory;
 	}
 
-	public Collection<Class<?>> types() {
-		return diFactory.types();
+	public List<Class<?>> resolvables() {
+		return resolvables;
+	}
+
+	public ResourceMap resourceMap() {
+		return resourceMap;
+	}
+
+	public List<Class<?>> storables() {
+		return storables;
+	}
+
+	public TypeResolver typeResolver() {
+		return typeResolver;
 	}
 }

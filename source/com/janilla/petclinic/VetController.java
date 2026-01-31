@@ -34,7 +34,11 @@ import com.janilla.web.Render;
 @Handle(path = "/vets")
 public class VetController {
 
-	public Persistence persistence;
+	protected final Persistence persistence;
+
+	public VetController(Persistence persistence) {
+		this.persistence = persistence;
+	}
 
 	@Handle(method = "GET", path = "/vets.html")
 	public Object find(@Bind("page") Integer page) {

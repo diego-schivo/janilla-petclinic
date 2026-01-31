@@ -39,7 +39,11 @@ import com.janilla.web.Render;
 @Handle(path = "/owners/(\\d+)/pets/(\\d+)/visits")
 public class VisitController {
 
-	public Persistence persistence;
+	protected final Persistence persistence;
+
+	public VisitController(Persistence persistence) {
+		this.persistence = persistence;
+	}
 
 	@Handle(method = "GET", path = "new")
 	public Object initCreate(long owner, long pet) {

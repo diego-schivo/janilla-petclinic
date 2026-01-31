@@ -25,10 +25,11 @@ import com.janilla.web.TemplateHandlerFactory;
  */
 public class CustomTemplateHandlerFactory extends TemplateHandlerFactory {
 
-	public RenderableFactory renderableFactory;
+	protected final RenderableFactory renderableFactory;
 
-	public CustomTemplateHandlerFactory(Object application) {
+	public CustomTemplateHandlerFactory(Object application, RenderableFactory renderableFactory) {
 		super(application);
+		this.renderableFactory = renderableFactory;
 	}
 
 	@Override

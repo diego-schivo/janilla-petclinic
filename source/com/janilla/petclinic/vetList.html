@@ -9,14 +9,14 @@
 	<tbody>
 		<!--${results}-->
 	</tbody>
-	<template id="result">
+	<ssr-template id="result">
 		<tr>
 			<td>${vet.firstName} ${vet.lastName}</td>
 			<td><!--${specialties}--></td>
 		</tr>
-	</template>
-	<template id="specialty">
+	</ssr-template>
+	<ssr-template id="specialty">
 		<span>${name}</span>
-	</template>
+	</ssr-template>
 </table>
 <!--${paginator}-->

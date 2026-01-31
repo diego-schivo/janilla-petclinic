@@ -5,14 +5,14 @@
 			<!--${options}-->
 		</select>
 
-		<template id="option">
+		<ssr-template id="option">
 			<option value="${value}" selected="${selected}">${text}</option>
-		</template>
+		</ssr-template>
 		<span class="${feedbackClass}" aria-hidden="true"></span>
 		<!--${errors}-->
 
-		<template id="error">
+		<ssr-template id="error">
 			<span class="help-inline">${}</span>
-		</template>
+		</ssr-template>
 	</div>
 </div>
