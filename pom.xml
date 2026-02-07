@@ -18,6 +18,7 @@
 		</dependency>
 	</dependencies>
 	<properties>
+		<exec.mainClass>com.janilla.petclinic.PetClinicApplication</exec.mainClass>
 		<maven.compiler.parameters>true</maven.compiler.parameters>
 		<maven.compiler.release>25</maven.compiler.release>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -32,23 +33,30 @@
 				</excludes>
 			</resource>
 		</resources>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>3.6.3</version>
-				<configuration>
-					<executable>java</executable>
-					<arguments>
-						<argument>--module-path</argument>
-						<modulepath/>
-						<argument>--module</argument>
-						<argument>com.janilla.petclinic/com.janilla.petclinic.PetClinicApplication</argument>
-					</arguments>
-				</configuration>
-			</plugin>
-		</plugins>
 	</build>
+	<profiles>
+		<profile>
+			<id>execute</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>3.6.3</version>
+						<configuration>
+							<executable>java</executable>
+							<arguments>
+								<argument>--module-path</argument>
+								<modulepath/>
+								<argument>--module</argument>
+								<argument>com.janilla.petclinic/com.janilla.petclinic.PetClinicApplication</argument>
+							</arguments>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 	<name>Janilla PetClinic</name>
 	<description>Spring Petclinic porting to Janilla</description>
 	<url>https://github.com/diego-schivo/janilla-petclinic</url>

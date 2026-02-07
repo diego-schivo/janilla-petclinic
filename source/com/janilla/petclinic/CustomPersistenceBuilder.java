@@ -21,22 +21,22 @@ import java.time.LocalDate;
 import java.util.Arrays;
 
 import com.janilla.ioc.DiFactory;
-import com.janilla.backend.persistence.ApplicationPersistenceBuilder;
+import com.janilla.backend.persistence.PersistenceBuilder;
 import com.janilla.backend.persistence.Persistence;
 
 /**
  * @author Diego Schivo
  */
-public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
+public class CustomPersistenceBuilder extends PersistenceBuilder {
 
-	public CustomPersistenceBuilder(Path databaseFile, DiFactory diFactory) {
-		super(databaseFile, diFactory);
+	public CustomPersistenceBuilder(Path databaseFile) {
+		super(databaseFile);
 	}
 
 	@Override
-	public Persistence build() {
+	public Persistence build(DiFactory diFactory) {
 		var fe = Files.exists(databaseFile);
-		var p = super.build();
+		var p = super.build(diFactory);
 //		p.setTypeResolver(x -> {
 //			try {
 //				return Class.forName(getClass().getPackageName() + "." + x.replace('.', '$'));

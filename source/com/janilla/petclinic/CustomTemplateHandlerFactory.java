@@ -27,8 +27,10 @@ public class CustomTemplateHandlerFactory extends TemplateHandlerFactory {
 
 	protected final RenderableFactory renderableFactory;
 
-	public CustomTemplateHandlerFactory(Object application, RenderableFactory renderableFactory) {
-		super(application);
+	public CustomTemplateHandlerFactory(
+//			Object application, 
+			RenderableFactory renderableFactory) {
+//		super(application);
 		this.renderableFactory = renderableFactory;
 	}
 

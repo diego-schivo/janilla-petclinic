@@ -28,12 +28,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.net.ssl.SSLContext;
 
-import com.janilla.backend.persistence.ApplicationPersistenceBuilder;
+import com.janilla.backend.persistence.PersistenceBuilder;
 import com.janilla.backend.persistence.Persistence;
 import com.janilla.backend.persistence.Store;
 import com.janilla.http.HttpHandler;
@@ -44,6 +45,7 @@ import com.janilla.java.Java;
 import com.janilla.java.TypeResolver;
 import com.janilla.web.ApplicationHandlerFactory;
 import com.janilla.web.Invocable;
+import com.janilla.web.InvocationResolver;
 import com.janilla.web.NotFoundException;
 import com.janilla.web.RenderableFactory;
 import com.janilla.web.ResourceMap;
@@ -102,7 +104,7 @@ public class PetClinicApplication {
 
 	protected final HttpHandler handler;
 
-	protected final List<Invocable> invocables;
+	protected final InvocationResolver invocationResolver;
 
 	protected final Persistence persistence;
 
@@ -133,15 +135,22 @@ public class PetClinicApplication {
 			var f = configuration.getProperty("petclinic.database.file");
 			if (f.startsWith("~"))
 				f = System.getProperty("user.home") + f.substring(1);
-			var b = diFactory.create(ApplicationPersistenceBuilder.class, Map.of("databaseFile", Path.of(f)));
-			persistence = b.build();
+			var b = diFactory.create(PersistenceBuilder.class, Map.of("databaseFile", Path.of(f)));
+			persistence = b.build(diFactory);
 		}
 
-		invocables = diFactory.types().stream()
-				.flatMap(x -> Arrays.stream(x.getMethods())
-						.filter(y -> !Modifier.isStatic(y.getModifiers()) && !y.isBridge())
-						.map(y -> new Invocable(x, y)))
-				.toList();
+		invocationResolver = diFactory.create(InvocationResolver.class,
+				Map.of("invocables",
+						diFactory.types().stream()
+								.flatMap(x -> Arrays.stream(x.getMethods())
+										.filter(y -> !Modifier.isStatic(y.getModifiers()) && !y.isBridge())
+										.map(y -> new Invocable(x, y)))
+								.toList(),
+						"instanceResolver", (Function<Class<?>, Object>) x -> {
+							var y = diFactory.context();
+//							IO.println("x=" + x + ", y=" + y);
+							return x.isAssignableFrom(y.getClass()) ? diFactory.context() : diFactory.create(x);
+						}));
 		resourceMap = diFactory.create(ResourceMap.class,
 				Map.of("paths",
 						Map.of("", Stream.of("com.janilla.frontend", PetClinicApplication.class.getPackageName())
@@ -174,8 +183,8 @@ public class PetClinicApplication {
 		return handler;
 	}
 
-	public List<Invocable> invocables() {
-		return invocables;
+	public InvocationResolver invocationResolver() {
+		return invocationResolver;
 	}
 
 	public Persistence persistence() {
