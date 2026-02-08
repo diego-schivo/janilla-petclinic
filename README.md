@@ -2,7 +2,7 @@
 
 ## What's this?
 
-This is a Janilla version of the Spring PetClinic official sample application by [Spring](https://spring.io/).
+This is a [Janilla](https://janilla.com/) version of the Spring PetClinic official sample application by [Spring](https://spring.io/).
 
 The original application lives at <https://github.com/spring-projects/spring-petclinic>.
 
@@ -10,9 +10,15 @@ The original application lives at <https://github.com/spring-projects/spring-pet
 
 A database-oriented application designed to display and manage information related to pets and veterinarians in a pet clinic.
 
+## View a live demo
+
+```browser
+https://petclinic.janilla.com/
+```
+
 ## Run PetClinic locally
 
-Janilla PetClinic is a [Janilla](https://janilla.com/) application built using [Maven](https://maven.apache.org/users/index.html). You can run it from Maven directly (it should work just as well with Java 21 or newer):
+Janilla PetClinic is a [Janilla](https://janilla.com/) application built using [Maven](https://maven.apache.org/). You can run it from Maven directly (it should work just as well with Java 25 or newer):
 
 ```bash
 git clone https://github.com/diego-schivo/janilla-petclinic.git
@@ -40,7 +46,7 @@ You can change the file location by editing `configuration.properties` in the so
 
 The following items should be installed in your system:
 
-- Java 24
+- Java 25
 - [Git command line tool](https://help.github.com/articles/set-up-git)
 - Eclipse with the [m2e plugin](https://www.eclipse.org/m2e/)
 
@@ -53,7 +59,7 @@ In order to install them all:
 
 1. Launch Eclipse and choose Import projects from Git (with smart import)
 2. Select GitHub as the repository source, then search for `janilla-petclinic fork:true` and complete the wizard
-3. Select the project (`janilla-petclinic`) and launch Debug as Java Application
+3. open the Java class `com.janilla.petclinic.PetClinicApplication` and launch Debug as Java Application
 4. Open a browser and navigate to <https://localhost:8443/>
 
 ## Looking for something in particular?
