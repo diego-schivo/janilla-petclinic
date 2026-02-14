@@ -52,7 +52,7 @@ public class VisitController {
 		var t = persistence.crud(PetType.class).read(p.type());
 		var v = new Visit(null, null, LocalDate.now(), null);
 		var c = persistence.crud(Visit.class);
-		var w = c.read(c.filter("pet", pet));
+		var w = c.read(c.filter("pet", new Object[] { pet }));
 		return new Form(o, p, t, v, w, null);
 	}
 
@@ -86,7 +86,7 @@ public class VisitController {
 			var o = persistence.crud(Owner.class).read(p.owner());
 			var t = persistence.crud(PetType.class).read(p.type());
 			var c = persistence.crud(Visit.class);
-			var w = c.read(c.filter("pet", p.id()));
+			var w = c.read(c.filter("pet", new Object[] { p.id() }));
 			return new Form(o, p, t, visit, w, errors);
 		}
 

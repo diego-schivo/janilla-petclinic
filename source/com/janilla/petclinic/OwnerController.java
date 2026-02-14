@@ -25,7 +25,6 @@ import java.util.regex.Pattern;
 
 import com.janilla.backend.persistence.Persistence;
 import com.janilla.java.Reflection;
-import com.janilla.web.Bind;
 import com.janilla.web.Handle;
 import com.janilla.web.Render;
 
@@ -53,20 +52,21 @@ public class OwnerController {
 	}
 
 	@Handle(method = "GET")
-	public Object find(Owner owner, @Bind("page") Integer page) {
+	public Object find(String lastName, Integer page) {
+//		IO.println("OwnerController.find, lastName=" + lastName + ", page=" + page);
 		var oc = persistence.crud(Owner.class);
 		var i = page != null ? page - 1 : 0;
-		var op = owner.lastName() != null && !owner.lastName().isBlank()
-				? oc.filter("lastName", x -> startsWithIgnoreCase((String) x, owner.lastName()), i * 5, 5)
+		var op = lastName != null && !lastName.isBlank()
+				? oc.filter("lastName", x -> startsWithIgnoreCase((String) x, lastName), i * 5, 5)
 				: oc.list(i * 5, 5);
 		return switch ((int) op.total()) {
-		case 0 -> new FindForm(owner, Map.of("lastName", List.of("has not been found")));
+		case 0 -> new FindForm(lastName, Map.of("lastName", List.of("has not been found")));
 		case 1 -> URI.create("/owners/" + op.ids().getFirst());
 		default -> {
 			var pc = persistence.crud(Pet.class);
 			var l = (int) Math.ceilDiv(op.total(), 5);
 			var rr = oc.read(op.ids()).stream().map(o -> {
-				var pp = pc.read(pc.filter("owner", o.id()));
+				var pp = pc.read(pc.filter("owner", new Object[] { o.id() }));
 				return new FindOutcome.Result(o, pp);
 			}).toList();
 			var p = new Paginator(i, l, URI.create("/owners"));
@@ -82,9 +82,9 @@ public class OwnerController {
 		var tc = persistence.crud(PetType.class);
 		var vc = persistence.crud(Visit.class);
 		var o = oc.read(id);
-		var pp = pc.read(pc.filter("owner", o.id())).stream().map(x -> {
+		var pp = pc.read(pc.filter("owner", new Object[] { o.id() })).stream().map(x -> {
 			var t = tc.read(x.type());
-			var vv = vc.read(vc.filter("pet", x.id()));
+			var vv = vc.read(vc.filter("pet", new Object[] { x.id() }));
 			return new Details.Pet2(x, t, vv);
 		}).toList();
 		return new Details(o, pp);
@@ -143,7 +143,7 @@ public class OwnerController {
 	}
 
 	@Render(template = "findOwners.html")
-	public record FindForm(Owner owner, Map<String, List<String>> errors) {
+	public record FindForm(String lastName, Map<String, List<String>> errors) {
 	}
 
 	@Render(template = "ownersList.html")

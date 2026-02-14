@@ -38,13 +38,13 @@ public class CustomExceptionHandlerFactory extends ExceptionHandlerFactory {
 
 	@Override
 	protected boolean handle(Error error, HttpExchange exchange) {
-		IO.println(
-				"CustomExceptionHandlerFactory.handle, " + exchange.request().getPath() + ", " + exchange.exception());
+//		IO.println(
+//				"CustomExceptionHandlerFactory.handle, " + exchange.request().getPath() + ", " + exchange.exception());
 		var x = super.handle(error, exchange);
 		var r = renderableFactory.createRenderable(null, exchange.exception());
 		if (r.renderer() instanceof HtmlRenderer) {
 			var h = rootFactory.createHandler(r);
-			IO.println("r=" + r + ", h=" + h);
+//			IO.println("r=" + r + ", h=" + h);
 			x = h.handle(exchange);
 		}
 		return x;
