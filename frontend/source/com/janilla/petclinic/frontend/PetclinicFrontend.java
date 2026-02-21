@@ -92,7 +92,7 @@ public class PetclinicFrontend {
 			p = System.getProperty("user.home") + p.substring(1);
 		var f = Path.of(p);
 		if (!Files.exists(f))
-			Java.generateKeyPair(f, w);
+			Java.generateKeyPair("localhost", f, w, "dns:localhost,ip:127.0.0.1");
 		try (var s = Files.newInputStream(f)) {
 			return Java.sslContext(s, w.toCharArray());
 		} catch (IOException e) {
