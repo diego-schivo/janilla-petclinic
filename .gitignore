@@ -9,7 +9,8 @@ build/*
 .attach_pid*
 .idea
 *.iml
-/target
+target/
 .sts4-cache/
 .vscode
 _site/
+.settings/
