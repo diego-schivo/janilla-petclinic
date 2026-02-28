@@ -44,9 +44,10 @@ public class BackendOwnerApi implements OwnerApi {
 //		IO.println("BackendOwnerApi.read, lastName=" + lastName + ", depth=" + depth + ", skip=" + skip + ", limit="
 //				+ limit);
 		var c = persistence.crud(Owner.class);
-		var lp = lastName != null && !lastName.isBlank() ? c.filter("lastName",
-				x -> startsWithIgnoreCase((String) x, lastName), skip != null ? skip : 0, limit != null ? limit : -1)
-				: c.list(skip != null ? skip : 0, limit != null ? limit : -1);
+		var lp = lastName != null && !lastName.isBlank()
+				? c.filterAndCount("lastName", x -> startsWithIgnoreCase((String) x, lastName), false, skip != null ? skip : 0,
+						limit != null ? limit : -1)
+				: c.listAndCount(false, skip != null ? skip : 0, limit != null ? limit : -1);
 		return new ListPortion<>(c.read(lp.elements(), depth != null ? depth : 0), lp.totalSize());
 	}
 

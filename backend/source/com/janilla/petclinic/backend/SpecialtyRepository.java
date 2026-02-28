@@ -19,14 +19,14 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
-import com.janilla.backend.persistence.Crud;
+import com.janilla.backend.persistence.DefaultCrud;
 import com.janilla.backend.persistence.Persistence;
 import com.janilla.petclinic.Specialty;
 
 /**
  * @author Diego Schivo
  */
-public class SpecialtyRepository extends Crud<Long, Specialty> {
+public class SpecialtyRepository extends DefaultCrud<Long, Specialty> {
 
 	public SpecialtyRepository(Persistence persistence) {
 		super(Specialty.class, null, persistence);

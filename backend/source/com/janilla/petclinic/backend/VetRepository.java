@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
-import com.janilla.backend.persistence.Crud;
+import com.janilla.backend.persistence.DefaultCrud;
 import com.janilla.backend.persistence.Persistence;
 import com.janilla.persistence.ListPortion;
 import com.janilla.petclinic.Vet;
@@ -32,13 +32,13 @@ import com.janilla.petclinic.Vet;
  * @author Sam Brannen
  * @author Michael Isvy
  */
-public class VetRepository extends Crud<Long, Vet> {
+public class VetRepository extends DefaultCrud<Long, Vet> {
 
 	Map<Long, Supplier<Vet>> readCache = new ConcurrentHashMap<>();
 
 	Supplier<List<Long>> listCache1 = Lazy.of(() -> super.list());
 
-	Map<List<Long>, Supplier<ListPortion<Long>>> listCache2 = new ConcurrentHashMap<>();
+	Map<List<?>, Supplier<ListPortion<Long>>> listCache2 = new ConcurrentHashMap<>();
 
 	public VetRepository(Persistence persistence) {
 		super(Vet.class, null, persistence);
@@ -55,7 +55,9 @@ public class VetRepository extends Crud<Long, Vet> {
 	}
 
 	@Override
-	public ListPortion<Long> list(long skip, long limit) {
-		return listCache2.computeIfAbsent(List.of(skip, limit), _ -> Lazy.of(() -> super.list(skip, limit))).get();
+	public ListPortion<Long> listAndCount(boolean reverse, long skip, long limit) {
+		return listCache2
+				.computeIfAbsent(List.of(reverse, skip, limit), _ -> Lazy.of(() -> super.listAndCount(reverse, skip, limit)))
+				.get();
 	}
 }

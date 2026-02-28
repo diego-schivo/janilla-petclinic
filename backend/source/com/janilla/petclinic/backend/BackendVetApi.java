@@ -34,7 +34,7 @@ public class BackendVetApi implements VetApi {
 	@Handle(method = "GET")
 	public ListPortion<Vet> read(Integer depth, Integer skip, Integer limit) {
 		var c = persistence.crud(Vet.class);
-		var lp = c.list(skip != null ? skip : 0, limit != null ? limit : 0);
+		var lp = c.listAndCount(false, skip != null ? skip : 0, limit != null ? limit : 0);
 		return new ListPortion<>(c.read(lp.elements(), depth != null ? depth : 0), lp.totalSize());
 	}
 }
