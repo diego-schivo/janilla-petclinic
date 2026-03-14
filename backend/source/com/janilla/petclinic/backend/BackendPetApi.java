@@ -18,7 +18,7 @@ package com.janilla.petclinic.backend;
 import java.util.Set;
 
 import com.janilla.backend.persistence.Persistence;
-import com.janilla.java.Reflection;
+import com.janilla.java.JavaReflect;
 import com.janilla.petclinic.Pet;
 import com.janilla.petclinic.PetApi;
 import com.janilla.web.Handle;
@@ -50,6 +50,6 @@ public class BackendPetApi implements PetApi {
 	public Pet update(Long id, Pet pet) {
 //		IO.println("PetApi.update, id=" + id + ", owner=" + owner);
 		return persistence.crud(Pet.class).update(id,
-				x -> Reflection.copy(pet, x, y -> !Set.of("id", "owner").contains(y)));
+				x -> JavaReflect.copy(pet, x, y -> !Set.of("id", "owner").contains(y)));
 	}
 }

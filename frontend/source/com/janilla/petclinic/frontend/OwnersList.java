@@ -23,7 +23,7 @@ import com.janilla.petclinic.Owner;
 import com.janilla.petclinic.Pet;
 import com.janilla.web.Render;
 
-@Render(template = "ownersList.html")
+@Render(template = "ownersList", resource = "/ownersList.html")
 public record OwnersList(List<Result> results, Paginator paginator) {
 
 	public static OwnersList of(ListPortion<Owner> owners, int page) {

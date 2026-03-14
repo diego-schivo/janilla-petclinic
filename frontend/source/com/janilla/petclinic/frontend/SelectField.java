@@ -25,7 +25,7 @@ import com.janilla.web.Render;
 /**
  * @author Diego Schivo
  */
-@Render(template = "selectField.html")
+@Render(template = "selectField", resource = "/selectField.html")
 public record SelectField<T>(String label, String name, T value, List<String> errors, Map<T, String> items)
 		implements FormField<T> {
 

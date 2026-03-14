@@ -19,6 +19,7 @@ import java.util.Properties;
 
 import com.janilla.http.HttpExchange;
 import com.janilla.http.HttpHandlerFactory;
+import com.janilla.ioc.DiFactory;
 import com.janilla.web.HandleException;
 import com.janilla.web.Invocation;
 import com.janilla.web.InvocationHandlerFactory;
@@ -33,8 +34,8 @@ public class CustomInvocationHandlerFactory extends InvocationHandlerFactory {
 	protected final Properties configuration;
 
 	public CustomInvocationHandlerFactory(InvocationResolver invocationResolver, RenderableFactory renderableFactory,
-			HttpHandlerFactory rootFactory, Properties configuration) {
-		super(invocationResolver, renderableFactory, rootFactory);
+			HttpHandlerFactory rootFactory, DiFactory diFactory, Properties configuration) {
+		super(invocationResolver, renderableFactory, rootFactory, diFactory);
 		this.configuration = configuration;
 	}
 

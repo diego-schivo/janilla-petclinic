@@ -26,6 +26,6 @@ public class CustomHttpClient extends DirectHttpClient {
 
 	public CustomHttpClient() {
 		var b = PetclinicFullstack.INSTANCE.get().backend();
-		super(b.diFactory().create(HttpServer.class, Map.of("handler", b.handler())));
+		super(b.diFactory().newInstance(HttpServer.class, Map.of("handler", b.handler())));
 	}
 }

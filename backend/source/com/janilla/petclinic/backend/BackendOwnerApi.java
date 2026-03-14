@@ -16,7 +16,7 @@
 package com.janilla.petclinic.backend;
 
 import com.janilla.backend.persistence.Persistence;
-import com.janilla.java.Reflection;
+import com.janilla.java.JavaReflect;
 import com.janilla.persistence.ListPortion;
 import com.janilla.petclinic.Owner;
 import com.janilla.petclinic.OwnerApi;
@@ -61,7 +61,7 @@ public class BackendOwnerApi implements OwnerApi {
 	@Handle(method = "PUT", path = "(\\d+)")
 	public Owner update(Long id, Owner owner) {
 //		IO.println("OwnerApi.update, id=" + id + ", owner=" + owner);
-		return persistence.crud(Owner.class).update(id, x -> Reflection.copy(owner, x, y -> !y.equals("id")));
+		return persistence.crud(Owner.class).update(id, x -> JavaReflect.copy(owner, x, y -> !y.equals("id")));
 	}
 
 	protected static boolean startsWithIgnoreCase(String string, String prefix) {

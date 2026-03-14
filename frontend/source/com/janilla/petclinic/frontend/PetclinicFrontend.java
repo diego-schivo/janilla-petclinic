@@ -33,6 +33,7 @@ import javax.net.ssl.SSLContext;
 import com.janilla.http.HttpClient;
 import com.janilla.http.HttpHandler;
 import com.janilla.http.HttpServer;
+import com.janilla.ioc.DefaultDiFactory;
 import com.janilla.ioc.DiFactory;
 import com.janilla.java.Java;
 import com.janilla.petclinic.OwnerApi;
@@ -57,7 +58,7 @@ public class PetclinicFrontend {
 
 	public static void main(String[] args) {
 		IO.println(ProcessHandle.current().pid());
-		var f = new DiFactory(
+		var f = new DefaultDiFactory(
 				Arrays.stream(DI_PACKAGES).flatMap(x -> Java.getPackageClasses(x, false).stream()).toList());
 		serve(f, args.length > 0 ? args[0] : null);
 	}
@@ -65,7 +66,7 @@ public class PetclinicFrontend {
 	protected static void serve(DiFactory diFactory, String configurationPath) {
 		PetclinicFrontend a;
 		{
-			a = diFactory.create(diFactory.actualType(PetclinicFrontend.class),
+			a = diFactory.newInstance(diFactory.classFor(PetclinicFrontend.class),
 					Java.hashMap("diFactory", diFactory, "configurationFile",
 							configurationPath != null ? Path.of(configurationPath.startsWith("~")
 									? System.getProperty("user.home") + configurationPath.substring(1)
@@ -77,7 +78,7 @@ public class PetclinicFrontend {
 		HttpServer s;
 		{
 			var p = Integer.parseInt(a.configuration.getProperty("petclinic.server.port"));
-			s = a.diFactory.create(a.diFactory.actualType(HttpServer.class),
+			s = a.diFactory.newInstance(a.diFactory.classFor(HttpServer.class),
 					Map.of("sslContext", c, "endpoint", new InetSocketAddress(p), "handler", a.handler));
 		}
 		s.serve();
@@ -127,18 +128,18 @@ public class PetclinicFrontend {
 	public PetclinicFrontend(DiFactory diFactory, Path configurationFile) {
 		this.diFactory = diFactory;
 		diFactory.context(this);
-		configuration = diFactory.create(diFactory.actualType(Properties.class),
+		configuration = diFactory.newInstance(diFactory.classFor(Properties.class),
 				Collections.singletonMap("file", configurationFile));
 
-		httpClient = diFactory.create(diFactory.actualType(HttpClient.class),
+		httpClient = diFactory.newInstance(diFactory.classFor(HttpClient.class),
 				Map.of("sslContext", sslContext(configuration)));
-		ownerApi = diFactory.create(diFactory.actualType(OwnerApi.class));
-		petApi = diFactory.create(diFactory.actualType(PetApi.class));
-		petTypeApi = diFactory.create(diFactory.actualType(PetTypeApi.class));
-		vetApi = diFactory.create(diFactory.actualType(VetApi.class));
-		visitApi = diFactory.create(diFactory.actualType(VisitApi.class));
+		ownerApi = diFactory.newInstance(diFactory.classFor(OwnerApi.class));
+		petApi = diFactory.newInstance(diFactory.classFor(PetApi.class));
+		petTypeApi = diFactory.newInstance(diFactory.classFor(PetTypeApi.class));
+		vetApi = diFactory.newInstance(diFactory.classFor(VetApi.class));
+		visitApi = diFactory.newInstance(diFactory.classFor(VisitApi.class));
 
-		invocationResolver = diFactory.create(diFactory.actualType(InvocationResolver.class),
+		invocationResolver = diFactory.newInstance(diFactory.classFor(InvocationResolver.class),
 				Map.of("invocables",
 						diFactory.types().stream()
 								.flatMap(x -> Arrays.stream(x.getMethods())
@@ -149,16 +150,16 @@ public class PetclinicFrontend {
 							var y = diFactory.context();
 //							IO.println("x=" + x + ", y=" + y);
 							return x.isAssignableFrom(y.getClass()) ? diFactory.context()
-									: diFactory.create(diFactory.actualType(x));
+									: diFactory.newInstance(diFactory.classFor(x));
 						}));
-		resourceMap = diFactory.create(diFactory.actualType(ResourceMap.class), Map.of("paths",
+		resourceMap = diFactory.newInstance(diFactory.classFor(ResourceMap.class), Map.of("paths",
 				Map.of("/base",
 						Java.getPackagePaths("com.janilla.frontend", false).filter(Files::isRegularFile).toList(), "",
 						Java.getPackagePaths(PetclinicFrontend.class.getPackageName(), false)
 								.filter(Files::isRegularFile).toList())));
-		renderableFactory = diFactory.create(diFactory.actualType(RenderableFactory.class));
+		renderableFactory = diFactory.newInstance(diFactory.classFor(RenderableFactory.class));
 		{
-			var f = diFactory.create(diFactory.actualType(ApplicationHandlerFactory.class));
+			var f = diFactory.newInstance(diFactory.classFor(ApplicationHandlerFactory.class));
 			handler = x -> {
 				var h = f.createHandler(Objects.requireNonNullElse(x.exception(), x.request()));
 				if (h == null)

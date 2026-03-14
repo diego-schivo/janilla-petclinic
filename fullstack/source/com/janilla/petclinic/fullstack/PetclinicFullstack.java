@@ -32,6 +32,7 @@ import javax.net.ssl.SSLContext;
 import com.janilla.http.HttpClient;
 import com.janilla.http.HttpHandler;
 import com.janilla.http.HttpServer;
+import com.janilla.ioc.DefaultDiFactory;
 import com.janilla.ioc.DiFactory;
 import com.janilla.java.Java;
 import com.janilla.petclinic.backend.BackendExchange;
@@ -48,14 +49,14 @@ public class PetclinicFullstack {
 
 	public static void main(String[] args) {
 		IO.println(ProcessHandle.current().pid());
-		var f = new DiFactory(Java.getPackageClasses(PetclinicFullstack.class.getPackageName(), false), "fullstack");
+		var f = new DefaultDiFactory(Java.getPackageClasses(PetclinicFullstack.class.getPackageName(), false), "fullstack");
 		serve(f, args.length > 0 ? args[0] : null);
 	}
 
 	protected static void serve(DiFactory diFactory, String configurationPath) {
 		PetclinicFullstack a;
 		{
-			a = diFactory.create(diFactory.actualType(PetclinicFullstack.class),
+			a = diFactory.newInstance(diFactory.classFor(PetclinicFullstack.class),
 					Java.hashMap("diFactory", diFactory, "configurationFile",
 							configurationPath != null ? Path.of(configurationPath.startsWith("~")
 									? System.getProperty("user.home") + configurationPath.substring(1)
@@ -84,7 +85,7 @@ public class PetclinicFullstack {
 		HttpServer s;
 		{
 			var p = Integer.parseInt(a.configuration.getProperty("petclinic.server.port"));
-			s = a.diFactory.create(a.diFactory.actualType(HttpServer.class),
+			s = a.diFactory.newInstance(a.diFactory.classFor(HttpServer.class),
 					Map.of("sslContext", c, "endpoint", new InetSocketAddress(p), "handler", a.handler));
 		}
 		s.serve();
@@ -103,7 +104,7 @@ public class PetclinicFullstack {
 	public PetclinicFullstack(DiFactory diFactory, Path configurationFile) {
 		this.diFactory = diFactory;
 		diFactory.context(this);
-		configuration = diFactory.create(diFactory.actualType(Properties.class),
+		configuration = diFactory.newInstance(diFactory.classFor(Properties.class),
 				Collections.singletonMap("file", configurationFile));
 
 		var cf = Optional.ofNullable(configurationFile).orElseGet(() -> {
@@ -114,15 +115,15 @@ public class PetclinicFullstack {
 			}
 		});
 		backend = ScopedValue.where(INSTANCE, this)
-				.call(() -> diFactory.create(diFactory.actualType(PetclinicBackend.class), Java.hashMap("diFactory",
-						new DiFactory(Stream
+				.call(() -> diFactory.newInstance(diFactory.classFor(PetclinicBackend.class), Java.hashMap("diFactory",
+						new DefaultDiFactory(Stream
 								.of("com.janilla.web", "com.janilla.petclinic", "com.janilla.petclinic.backend",
 										"com.janilla.petclinic.fullstack")
 								.flatMap(x -> Java.getPackageClasses(x, false).stream()).toList(), "backend"),
 						"configurationFile", cf)));
 		frontend = ScopedValue.where(INSTANCE, this)
-				.call(() -> diFactory.create(diFactory.actualType(PetclinicFrontend.class), Java.hashMap("diFactory",
-						new DiFactory(Stream
+				.call(() -> diFactory.newInstance(diFactory.classFor(PetclinicFrontend.class), Java.hashMap("diFactory",
+						new DefaultDiFactory(Stream
 								.of("com.janilla.http", "com.janilla.web", "com.janilla.petclinic.frontend",
 										"com.janilla.petclinic.fullstack")
 								.flatMap(x -> Java.getPackageClasses(x, false).stream()).toList(), "frontend"),

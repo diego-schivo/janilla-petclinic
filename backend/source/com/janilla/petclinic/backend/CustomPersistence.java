@@ -20,7 +20,7 @@ import java.util.List;
 import com.janilla.backend.persistence.Crud;
 import com.janilla.backend.persistence.Persistence;
 import com.janilla.backend.sqlite.SqliteDatabase;
-import com.janilla.java.TypeResolver;
+import com.janilla.java.Converter;
 import com.janilla.persistence.Entity;
 import com.janilla.petclinic.Specialty;
 import com.janilla.petclinic.Vet;
@@ -31,8 +31,9 @@ import com.janilla.petclinic.Vet;
 public class CustomPersistence extends Persistence {
 
 	public CustomPersistence(SqliteDatabase database, List<Class<? extends Entity<?>>> storables,
-			TypeResolver typeResolver) {
-		super(database, storables, typeResolver);
+//			TypeResolver typeResolver,
+			Converter converter) {
+		super(database, storables, converter);
 	}
 
 	@Override

@@ -22,7 +22,7 @@ import com.janilla.petclinic.Pet;
 import com.janilla.petclinic.Visit;
 import com.janilla.web.Render;
 
-@Render(template = "ownerDetails.html")
+@Render(template = "ownerDetails", resource = "/ownerDetails.html")
 public record OwnerDetails(Owner owner, List<Pet2> pets) {
 
 	public static OwnerDetails of(Owner owner) {
